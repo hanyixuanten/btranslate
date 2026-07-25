@@ -1,0 +1,18 @@
+<?php
+
+use PHPUnit\Framework\TestCase;
+
+class WPT_Test_Language_Router extends WPT_Language_Router {
+	public function current_language() {
+		return 'en';
+	}
+}
+
+class DocumentTitleTest extends TestCase {
+	public function test_document_title_callback_leaves_non_singular_title_parts_unchanged() {
+		$controller = new WPT_Content_Controller( new WPT_Test_Translation_Store(), new WPT_Test_Language_Router() );
+		$parts      = array( 'title' => '中文主页', 'site' => '示例站点' );
+
+		$this->assertSame( $parts, $controller->translate_document_title_parts( $parts ) );
+	}
+}

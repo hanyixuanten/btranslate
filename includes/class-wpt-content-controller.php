@@ -24,10 +24,15 @@ class WPT_Content_Controller {
 		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'translate_image_alt' ), 20, 2 );
 		add_filter( 'single_term_title', array( $this, 'translate_term_title' ), 20, 2 );
 		add_filter( 'term_description', array( $this, 'translate_term_description' ), 20, 3 );
+		add_filter( 'document_title_parts', array( $this, 'translate_document_title_parts' ), 20 );
 		add_filter( 'wpseo_title', array( $this, 'translate_seo_title' ), 20 );
 		add_filter( 'wpseo_metadesc', array( $this, 'translate_seo_description' ), 20 );
 		add_filter( 'rank_math/frontend/title', array( $this, 'translate_seo_title' ), 20 );
 		add_filter( 'rank_math/frontend/description', array( $this, 'translate_seo_description' ), 20 );
+		add_filter( 'aioseo_title', array( $this, 'translate_seo_title' ), 20 );
+		add_filter( 'aioseo_description', array( $this, 'translate_seo_description' ), 20 );
+		add_filter( 'seopress_titles_the_title', array( $this, 'translate_seo_title' ), 20 );
+		add_filter( 'seopress_titles_the_description', array( $this, 'translate_seo_description' ), 20 );
 		add_filter( 'post_link', array( $this, 'localize_permalink' ), 20 );
 		add_filter( 'page_link', array( $this, 'localize_permalink' ), 20 );
 		add_filter( 'post_type_link', array( $this, 'localize_permalink' ), 20 );
@@ -200,6 +205,21 @@ class WPT_Content_Controller {
 
 	public function translate_term_description( $description, $term_id, $taxonomy ) {
 		return $this->translated_value( $description, 'term:' . $term_id . ':description' );
+	}
+
+	public function translate_document_title_parts( $parts ) {
+		if ( ! is_singular() || empty( $parts['title'] ) ) {
+			return $parts;
+		}
+
+		$post_id = get_queried_object_id();
+		if ( ! $post_id ) {
+			return $parts;
+		}
+
+		$parts['title'] = $this->translated_value( $parts['title'], 'post:' . $post_id . ':post_title' );
+
+		return $parts;
 	}
 
 	public function translate_term_object( $term, $taxonomy, $context = '' ) {

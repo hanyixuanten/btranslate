@@ -30,8 +30,9 @@ Changing source text produces a new fingerprint and therefore schedules a new tr
 - Assigned categories and tags, including their descriptions.
 - Yoast SEO title and description fields.
 - Rank Math title and description fields.
+- All in One SEO and SEOPress title and description output filters.
 
-Only the listed SEO meta fields are sent for translation. Arbitrary metadata, serialized data, credentials, and code are excluded.
+Only the listed SEO meta fields and the generated title/description output from supported SEO plugins are sent for translation. Browser titles generated through the WordPress document-title API use the persisted translated post title. Arbitrary metadata, serialized data, credentials, and code are excluded.
 
 When post content contains HTML links, the plugin preserves each link's `href` and attributes, translates its visible text as a separate value, and inserts that translated text back into the original link. Re-run a post translation after upgrading to regenerate previously translated content that contains links.
 
