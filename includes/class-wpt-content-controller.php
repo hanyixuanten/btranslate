@@ -24,6 +24,10 @@ class WPT_Content_Controller {
 		add_filter( 'wpseo_metadesc', array( $this, 'translate_seo_value' ), 20 );
 		add_filter( 'rank_math/frontend/title', array( $this, 'translate_seo_value' ), 20 );
 		add_filter( 'rank_math/frontend/description', array( $this, 'translate_seo_value' ), 20 );
+		add_filter( 'post_link', array( $this, 'localize_permalink' ), 20 );
+		add_filter( 'page_link', array( $this, 'localize_permalink' ), 20 );
+		add_filter( 'post_type_link', array( $this, 'localize_permalink' ), 20 );
+		add_filter( 'term_link', array( $this, 'localize_permalink' ), 20 );
 	}
 
 	public function schedule_post_translation( $post_id, $post, $update ) {
@@ -131,6 +135,10 @@ class WPT_Content_Controller {
 		}
 
 		return $value;
+	}
+
+	public function localize_permalink( $url ) {
+		return $this->router->localized_url( $url );
 	}
 
 	private function translated_value( $source_value, $context ) {

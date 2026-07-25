@@ -51,4 +51,40 @@ class WPT_Language_Router {
 
 		return sanitize_key( $settings['source_language'] );
 	}
+
+	public function localized_url( $url ) {
+		$settings = WPT_Settings::get();
+		$language = $this->current_language();
+
+		if ( $language === $settings['source_language'] || ! WPT_Settings::is_supported_language( $language ) ) {
+			return $url;
+		}
+
+		if ( 'domain' === $settings['routing_mode'] ) {
+			$domain = array_search( $language, (array) $settings['domain_bindings'], true );
+			$parts  = wp_parse_url( $url );
+
+			if ( false === $domain || ! is_array( $parts ) || empty( $parts['host'] ) ) {
+				return $url;
+			}
+
+			$scheme   = isset( $parts['scheme'] ) ? $parts['scheme'] : 'https';
+			$path     = isset( $parts['path'] ) ? $parts['path'] : '/';
+			$query    = isset( $parts['query'] ) ? '?' . $parts['query'] : '';
+			$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
+
+			return $scheme . '://' . $domain . $path . $query . $fragment;
+		}
+
+		$parts = wp_parse_url( $url );
+		if ( ! is_array( $parts ) || empty( $parts['path'] ) ) {
+			return $url;
+		}
+
+		$path     = '/' . $language . '/' . ltrim( $parts['path'], '/' );
+		$query    = isset( $parts['query'] ) ? '?' . $parts['query'] : '';
+		$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
+
+		return home_url( $path ) . $query . $fragment;
+	}
 }

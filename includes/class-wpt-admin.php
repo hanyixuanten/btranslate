@@ -6,6 +6,7 @@ class WPT_Admin {
 	public function register() {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_post_wpt_queue_existing_translations', array( $this, 'queue_existing_translations' ) );
 	}
 
 	public function add_settings_page() {
@@ -61,7 +62,45 @@ class WPT_Admin {
 				</table>
 				<?php submit_button(); ?>
 			</form>
+			<hr />
+			<h2>翻译已有内容</h2>
+			<p>保存语言或百度凭据后，使用此操作将所有已发布的文章和页面加入翻译队列。</p>
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
+				<input type="hidden" name="action" value="wpt_queue_existing_translations" />
+				<?php wp_nonce_field( 'wpt_queue_existing_translations' ); ?>
+				<?php submit_button( '翻译已有文章和页面', 'secondary', 'submit', false ); ?>
+			</form>
 		</div>
 		<?php
+	}
+
+	public function queue_existing_translations() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( '您没有执行此操作的权限。' );
+		}
+
+		check_admin_referer( 'wpt_queue_existing_translations' );
+
+		$post_ids = get_posts(
+			array(
+				'post_type'      => array( 'post', 'page' ),
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+			)
+		);
+		$scheduled = 0;
+
+		foreach ( $post_ids as $post_id ) {
+			foreach ( WPT_Settings::target_languages() as $target_language ) {
+				if ( ! wp_next_scheduled( 'wpt_process_translation', array( $post_id, $target_language ) ) ) {
+					wp_schedule_single_event( time() + 30, 'wpt_process_translation', array( $post_id, $target_language ) );
+					++$scheduled;
+				}
+			}
+		}
+
+		wp_safe_redirect( add_query_arg( 'wpt_queued', $scheduled, admin_url( 'options-general.php?page=wp-translate' ) ) );
+		exit;
 	}
 }

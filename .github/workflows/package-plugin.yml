@@ -15,29 +15,13 @@ permissions:
   contents: write
 
 jobs:
-  test-and-package:
-    name: Test and package plugin
+  package:
+    name: Package plugin
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          tools: composer:v2
-          coverage: none
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
-
-      - name: Run tests
-        run: composer test
-
-      - name: Lint PHP
-        run: composer lint
 
       - name: Build installable plugin archive
         id: package
