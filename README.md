@@ -33,6 +33,8 @@ Changing source text produces a new fingerprint and therefore schedules a new tr
 
 Only the listed SEO meta fields are sent for translation. Arbitrary metadata, serialized data, credentials, and code are excluded.
 
+When post content contains HTML links, the plugin preserves each link's `href` and attributes, translates its visible text as a separate value, and inserts that translated text back into the original link. Re-run a post translation after upgrading to regenerate previously translated content that contains links.
+
 Category and tag names are translated when they are created, edited, or included in a full retranslation. On a translated site, term objects used by archives, navigation, and post metadata use the persisted translated name and description.
 
 ## Routing

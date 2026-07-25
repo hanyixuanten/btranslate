@@ -81,7 +81,12 @@ class WPT_Content_Controller {
 
 		foreach ( $fields as $field => $value ) {
 			if ( '' !== $value ) {
-				$service->get_or_translate( $value, $settings['source_language'], $target_language, 'post:' . $post_id . ':' . $field, $force_refresh );
+				$context = 'post:' . $post_id . ':' . $field;
+				if ( 'post_content' === $field ) {
+					( new WPT_Content_Translator( $service ) )->translate( $value, $settings['source_language'], $target_language, $context, $force_refresh );
+				} else {
+					$service->get_or_translate( $value, $settings['source_language'], $target_language, $context, $force_refresh );
+				}
 			}
 		}
 
@@ -142,7 +147,37 @@ class WPT_Content_Controller {
 	}
 
 	public function translate_content( $content ) {
-		return $this->translated_value( $content, 'post:' . get_the_ID() . ':post_content' );
+		$post_id = get_the_ID();
+		if ( ! $post_id || false === stripos( $content, '<a' ) ) {
+			return $this->translated_value( $content, 'post:' . $post_id . ':post_content' );
+		}
+
+		$links = array();
+		$template = preg_replace_callback(
+			'#<a\b([^>]*)>(.*?)</a>#is',
+			function ( $matches ) use ( &$links ) {
+				$index = count( $links );
+				$links[] = $matches;
+
+				return '[[WPT_LINK_' . $index . ']]';
+			},
+			$content
+		);
+		if ( null === $template ) {
+			return $content;
+		}
+
+		$translated_template = $this->translated_value( $template, 'post:' . $post_id . ':post_content:template' );
+		if ( $translated_template === $template ) {
+			return $content;
+		}
+
+		foreach ( $links as $index => $link ) {
+			$translated_text = $this->translated_value( $link[2], 'post:' . $post_id . ':post_content:link:' . $index );
+			$translated_template = str_replace( '[[WPT_LINK_' . $index . ']]', '<a' . $link[1] . '>' . $translated_text . '</a>', $translated_template );
+		}
+
+		return $translated_template;
 	}
 
 	public function translate_excerpt( $excerpt, $post ) {

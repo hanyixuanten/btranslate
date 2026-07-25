@@ -21,6 +21,7 @@ require_once WPT_PATH . 'includes/class-wpt-translation-identity.php';
 require_once WPT_PATH . 'includes/class-wpt-translation-store.php';
 require_once WPT_PATH . 'includes/class-wpt-baidu-provider.php';
 require_once WPT_PATH . 'includes/class-wpt-translation-service.php';
+require_once WPT_PATH . 'includes/class-wpt-content-translator.php';
 require_once WPT_PATH . 'includes/class-wpt-settings.php';
 require_once WPT_PATH . 'includes/class-wpt-language-router.php';
 require_once WPT_PATH . 'includes/class-wpt-content-controller.php';
