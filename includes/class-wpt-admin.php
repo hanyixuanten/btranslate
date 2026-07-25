@@ -98,7 +98,7 @@ class WPT_Admin {
 								var progress = response.data;
 								container.innerHTML = '<p><strong>' + progress.percent + '%</strong>（' + progress.completed + ' / ' + progress.total + ' 个内容项）</p>' +
 									'<div style="max-width:480px;height:12px;background:#dcdcde"><div style="height:12px;width:' + progress.percent + '%;background:#2271b1"></div></div>' +
-									'<p class="description">文章和页面：' + progress.posts_completed + ' / ' + progress.posts_total + '；分类和标签：' + progress.terms_completed + ' / ' + progress.terms_total + '。每 5 秒自动更新。</p>';
+									'<p class="description">文章和页面：' + progress.posts_completed + ' / ' + progress.posts_total + '；分类和标签：' + progress.terms_completed + ' / ' + progress.terms_total + '。显示最近一次全量重翻批次的进度，每 5 秒自动更新。</p>';
 							})
 							.catch(function () {
 								container.innerHTML = '<p>暂时无法读取翻译进度。</p>';
@@ -119,6 +119,14 @@ class WPT_Admin {
 		}
 
 		check_admin_referer( 'wpt_queue_existing_translations' );
+		$batch_started_at = current_time( 'mysql', true );
+		update_option(
+			'wpt_retranslation_batch',
+			array(
+				'started_at' => $batch_started_at,
+			),
+			false
+		);
 
 		$post_ids = get_posts(
 			array(
@@ -184,7 +192,9 @@ class WPT_Admin {
 		);
 		$term_count = is_wp_error( $terms ) ? 0 : count( $terms );
 		$languages  = WPT_Settings::target_languages();
-		$counts     = ( new WPT_Translation_Store() )->get_completed_item_counts( $languages );
+		$batch      = (array) get_option( 'wpt_retranslation_batch', array() );
+		$started_at = isset( $batch['started_at'] ) ? sanitize_text_field( $batch['started_at'] ) : '';
+		$counts     = ( new WPT_Translation_Store() )->get_completed_item_counts( $languages, $started_at );
 
 		$posts_total      = $post_count * count( $languages );
 		$terms_total      = $term_count * count( $languages );
@@ -203,6 +213,7 @@ class WPT_Admin {
 				'completed'       => $completed,
 				'total'           => $total,
 				'percent'         => $percent,
+				'batch_started_at' => $started_at,
 			)
 		);
 	}

@@ -87,7 +87,7 @@ class WPT_Translation_Store {
 		return $wpdb->get_row( $sql, ARRAY_A );
 	}
 
-	public function get_completed_item_counts( $target_languages ) {
+	public function get_completed_item_counts( $target_languages, $since = '' ) {
 		global $wpdb;
 
 		$target_languages = array_values( array_filter( array_map( 'sanitize_key', (array) $target_languages ) ) );
@@ -100,17 +100,22 @@ class WPT_Translation_Store {
 
 		$table_name   = self::table_name();
 		$placeholders = implode( ',', array_fill( 0, count( $target_languages ), '%s' ) );
+		$since_clause = '' === $since ? '' : ' AND updated_at >= %s';
+		$query_args   = $target_languages;
+		if ( '' !== $since ) {
+			$query_args[] = $since;
+		}
 		$post_sql     = $wpdb->prepare(
 			"SELECT COUNT(DISTINCT CONCAT(target_language, '|', SUBSTRING_INDEX(field_context, ':', 2)))
 			FROM {$table_name}
-			WHERE status = 'complete' AND target_language IN ({$placeholders}) AND field_context LIKE 'post:%'",
-			$target_languages
+			WHERE status = 'complete' AND target_language IN ({$placeholders}) AND field_context LIKE 'post:%'{$since_clause}",
+			$query_args
 		);
 		$term_sql     = $wpdb->prepare(
 			"SELECT COUNT(DISTINCT CONCAT(target_language, '|', SUBSTRING_INDEX(field_context, ':', 2)))
 			FROM {$table_name}
-			WHERE status = 'complete' AND target_language IN ({$placeholders}) AND field_context LIKE 'term:%'",
-			$target_languages
+			WHERE status = 'complete' AND target_language IN ({$placeholders}) AND field_context LIKE 'term:%'{$since_clause}",
+			$query_args
 		);
 
 		return array(
