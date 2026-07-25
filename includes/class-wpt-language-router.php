@@ -4,10 +4,25 @@ defined( 'ABSPATH' ) || exit;
 
 class WPT_Language_Router {
 	public function register() {
-		add_rewrite_tag( '%wpt_language%', '([a-zA-Z-]+)' );
-		add_rewrite_rule( '^([a-zA-Z-]+)/(.*)?$', 'index.php?wpt_language=$matches[1]&pagename=$matches[2]', 'top' );
 		add_filter( 'query_vars', array( $this, 'query_vars' ) );
 		add_action( 'parse_request', array( $this, 'resolve_domain_language' ) );
+		$this->register_rewrite_rules();
+	}
+
+	public function register_rewrite_rules() {
+		if ( 'subdirectory' !== WPT_Settings::get()['routing_mode'] ) {
+			return;
+		}
+
+		$language_pattern = implode( '|', array_map( 'preg_quote', array_map( 'strtolower', WPT_Settings::target_languages() ) ) );
+
+		if ( '' === $language_pattern ) {
+			return;
+		}
+
+		add_rewrite_tag( '%wpt_language%', '(' . $language_pattern . ')' );
+		add_rewrite_rule( '^(' . $language_pattern . ')/(.*)$', 'index.php?wpt_language=$matches[1]&pagename=$matches[2]', 'top' );
+		add_rewrite_rule( '^(' . $language_pattern . ')/?$', 'index.php?wpt_language=$matches[1]', 'top' );
 	}
 
 	public function query_vars( $query_vars ) {
@@ -18,10 +33,10 @@ class WPT_Language_Router {
 
 	public function resolve_domain_language( $wp ) {
 		$settings = WPT_Settings::get();
-		$host     = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+		$host     = isset( $_SERVER['HTTP_HOST'] ) ? WPT_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
 		$bindings = (array) $settings['domain_bindings'];
 
-		if ( 'domain' === $settings['routing_mode'] && isset( $bindings[ $host ] ) && WPT_Settings::is_supported_language( $bindings[ $host ] ) ) {
+		if ( 'domain' === $settings['routing_mode'] && '' !== $host && isset( $bindings[ $host ] ) && WPT_Settings::is_supported_language( $bindings[ $host ] ) ) {
 			$wp->query_vars['wpt_language'] = sanitize_key( $bindings[ $host ] );
 		}
 	}

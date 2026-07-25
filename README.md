@@ -35,7 +35,9 @@ Only the listed SEO meta fields are sent for translation. Arbitrary metadata, se
 
 ## Routing
 
-The **Subdirectory** mode resolves configured language paths such as `/en/example-post/`. The **Domain binding** mode maps a request host to a language using one `domain=language` entry per line in Settings. Use one canonical strategy for each language to avoid duplicate URLs.
+The **Subdirectory** mode resolves configured language paths such as `/en/example-post/`. The **Domain binding** mode maps a request host to a language using one `domain=language` entry per line in Settings. Use one canonical strategy for each language to avoid duplicate URLs. In domain mode, the plugin does not register front-end rewrite rules, so the primary site URL is not affected.
+
+For a bound subdomain, enter a value such as `en.example.com=en`. The server and DNS must route that hostname to the same WordPress installation before WordPress can resolve the language.
 
 After changing routing settings, rewrite rules are refreshed. The initial implementation does not yet generate translated permalinks, canonical URLs, `hreflang` alternates, redirects, or sitemap entries.
 

@@ -40,6 +40,8 @@ class WPT_Plugin {
 			'',
 			false
 		);
+		$router = new WPT_Language_Router();
+		$router->register_rewrite_rules();
 		flush_rewrite_rules();
 	}
 
@@ -55,6 +57,7 @@ class WPT_Plugin {
 
 	public function refresh_rewrite_rules( $old_value, $new_value ) {
 		if ( (array) $old_value !== (array) $new_value ) {
+			$this->router->register_rewrite_rules();
 			flush_rewrite_rules();
 		}
 	}

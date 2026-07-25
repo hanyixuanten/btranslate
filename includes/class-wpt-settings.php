@@ -27,4 +27,13 @@ class WPT_Settings {
 
 		return in_array( sanitize_key( $language ), $languages, true );
 	}
+
+	public static function normalize_domain( $domain ) {
+		$domain = strtolower( trim( (string) $domain ) );
+		$domain = preg_replace( '#^https?://#', '', $domain );
+		$domain = explode( '/', $domain, 2 )[0];
+		$domain = preg_replace( '/:\d+$/', '', $domain );
+
+		return preg_match( '/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/', $domain ) ? $domain : '';
+	}
 }

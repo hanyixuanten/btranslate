@@ -22,8 +22,10 @@ class WPT_Admin {
 
 		foreach ( preg_split( '/\r\n|\r|\n/', (string) ( $settings['domain_bindings'] ?? '' ) ) as $line ) {
 			$parts = array_map( 'trim', explode( '=', $line, 2 ) );
-			if ( 2 === count( $parts ) && '' !== $parts[0] && '' !== $parts[1] ) {
-				$bindings[ sanitize_text_field( $parts[0] ) ] = sanitize_key( $parts[1] );
+			$domain = 2 === count( $parts ) ? WPT_Settings::normalize_domain( $parts[0] ) : '';
+			$language = 2 === count( $parts ) ? sanitize_key( $parts[1] ) : '';
+			if ( '' !== $domain && '' !== $language ) {
+				$bindings[ $domain ] = $language;
 			}
 		}
 
@@ -46,16 +48,16 @@ class WPT_Admin {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'WP Translate', 'wp-translate' ); ?></h1>
+			<h1>WP Translate</h1>
 			<form action="options.php" method="post">
 				<?php settings_fields( 'wpt_settings' ); ?>
 				<table class="form-table" role="presentation">
-					<tr><th scope="row"><label for="wpt-source-language"><?php esc_html_e( 'Source language', 'wp-translate' ); ?></label></th><td><input id="wpt-source-language" name="wpt_settings[source_language]" type="text" value="<?php echo esc_attr( $settings['source_language'] ); ?>" /></td></tr>
-					<tr><th scope="row"><label for="wpt-target-languages"><?php esc_html_e( 'Target languages', 'wp-translate' ); ?></label></th><td><input id="wpt-target-languages" name="wpt_settings[target_languages]" type="text" value="<?php echo esc_attr( implode( ',', $settings['target_languages'] ) ); ?>" class="regular-text" /></td></tr>
-					<tr><th scope="row"><label for="wpt-routing-mode"><?php esc_html_e( 'URL mode', 'wp-translate' ); ?></label></th><td><select id="wpt-routing-mode" name="wpt_settings[routing_mode]"><option value="subdirectory" <?php selected( $settings['routing_mode'], 'subdirectory' ); ?>><?php esc_html_e( 'Subdirectory', 'wp-translate' ); ?></option><option value="domain" <?php selected( $settings['routing_mode'], 'domain' ); ?>><?php esc_html_e( 'Domain binding', 'wp-translate' ); ?></option></select></td></tr>
-					<tr><th scope="row"><label for="wpt-domain-bindings"><?php esc_html_e( 'Domain bindings', 'wp-translate' ); ?></label></th><td><textarea id="wpt-domain-bindings" name="wpt_settings[domain_bindings]" rows="4" class="large-text"><?php echo esc_textarea( implode( "\n", $bindings ) ); ?></textarea></td></tr>
-					<tr><th scope="row"><label for="wpt-baidu-app-id"><?php esc_html_e( 'Baidu app ID', 'wp-translate' ); ?></label></th><td><input id="wpt-baidu-app-id" name="wpt_settings[baidu_app_id]" type="text" value="<?php echo esc_attr( $settings['baidu_app_id'] ); ?>" class="regular-text" /></td></tr>
-					<tr><th scope="row"><label for="wpt-baidu-secret-key"><?php esc_html_e( 'Baidu secret key', 'wp-translate' ); ?></label></th><td><input id="wpt-baidu-secret-key" name="wpt_settings[baidu_secret_key]" type="password" value="<?php echo esc_attr( $settings['baidu_secret_key'] ); ?>" class="regular-text" autocomplete="new-password" /></td></tr>
+					<tr><th scope="row"><label for="wpt-source-language">源语言</label></th><td><input id="wpt-source-language" name="wpt_settings[source_language]" type="text" value="<?php echo esc_attr( $settings['source_language'] ); ?>" /><p class="description">使用百度翻译语言代码，例如 <code>zh</code>。</p></td></tr>
+					<tr><th scope="row"><label for="wpt-target-languages">目标语言</label></th><td><input id="wpt-target-languages" name="wpt_settings[target_languages]" type="text" value="<?php echo esc_attr( implode( ',', $settings['target_languages'] ) ); ?>" class="regular-text" /><p class="description">多个语言代码用英文逗号分隔，例如 <code>en,ja</code>。</p></td></tr>
+					<tr><th scope="row"><label for="wpt-routing-mode">网址模式</label></th><td><select id="wpt-routing-mode" name="wpt_settings[routing_mode]"><option value="subdirectory" <?php selected( $settings['routing_mode'], 'subdirectory' ); ?>>子目录</option><option value="domain" <?php selected( $settings['routing_mode'], 'domain' ); ?>>绑定域名</option></select></td></tr>
+					<tr><th scope="row"><label for="wpt-domain-bindings">域名绑定</label></th><td><textarea id="wpt-domain-bindings" name="wpt_settings[domain_bindings]" rows="4" class="large-text" placeholder="en.example.com=en"><?php echo esc_textarea( implode( "\n", $bindings ) ); ?></textarea><p class="description">每行一个 <code>域名=语言代码</code>，例如 <code>en.example.com=en</code>。请勿填写 <code>https://</code>、路径或端口。</p></td></tr>
+					<tr><th scope="row"><label for="wpt-baidu-app-id">百度应用 ID</label></th><td><input id="wpt-baidu-app-id" name="wpt_settings[baidu_app_id]" type="text" value="<?php echo esc_attr( $settings['baidu_app_id'] ); ?>" class="regular-text" /></td></tr>
+					<tr><th scope="row"><label for="wpt-baidu-secret-key">百度密钥</label></th><td><input id="wpt-baidu-secret-key" name="wpt_settings[baidu_secret_key]" type="password" value="<?php echo esc_attr( $settings['baidu_secret_key'] ); ?>" class="regular-text" autocomplete="new-password" /></td></tr>
 				</table>
 				<?php submit_button(); ?>
 			</form>
