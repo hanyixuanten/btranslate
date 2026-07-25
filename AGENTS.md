@@ -45,5 +45,5 @@ Unless a user explicitly requests a refresh, each translatable value must be tra
 - Mock Baidu API calls in every test. Tests must not require live credentials or outbound network access.
 - Keep changes narrow and avoid unrelated refactors or formatting churn.
 - Plugin slug and PHP prefix: `wp-translate` and `wpt_`/`WPT_`. The current minimum supported PHP version is 8.1 and the current minimum WordPress version is 6.4.
-- Composer is not installed in the initial development environment. Until a WordPress test suite is added, validate syntax with `find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l`.
+- Composer manages the development dependencies. Run `composer test` for isolated unit tests and `composer lint` for PHP syntax checks. WordPress API calls must be mocked in tests; tests must not require live credentials, external network access, or a WordPress database.
 - Document supported languages, routing modes, data retention, translation lifecycle, and known limitations in the README whenever the implementation changes.

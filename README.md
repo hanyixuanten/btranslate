@@ -47,7 +47,15 @@ Use HTTPS and restrict database access appropriately because WordPress options a
 
 ## Development
 
-The project currently has no Composer dependencies. Validate PHP syntax with:
+Install development dependencies with `composer install`. The project includes WordPress API stubs for Intelephense and PHPUnit tests that use fake providers and storage, so they do not need WordPress, a database, credentials, or network access.
+
+Run tests with:
+
+```sh
+composer test
+```
+
+Validate PHP syntax with:
 
 ```sh
 find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l

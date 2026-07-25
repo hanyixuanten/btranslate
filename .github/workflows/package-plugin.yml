@@ -1,0 +1,67 @@
+name: Package Plugin
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-package:
+    name: Test and package plugin
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run tests
+        run: composer test
+
+      - name: Lint PHP
+        run: composer lint
+
+      - name: Build installable plugin archive
+        id: package
+        run: |
+          set -eu
+          plugin_slug="wp-translate"
+          version="$(grep -E '^ \* Version:' wp-translate.php | sed -E 's/^ \* Version: *//')"
+          archive_name="${plugin_slug}-${version}.zip"
+
+          rm -rf build
+          mkdir -p "build/${plugin_slug}"
+          cp wp-translate.php README.md "build/${plugin_slug}/"
+          cp -R includes "build/${plugin_slug}/"
+          (
+            cd build
+            zip -qr "../${archive_name}" "${plugin_slug}"
+          )
+
+          printf 'archive=%s\n' "${archive_name}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload plugin archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: wp-translate-plugin
+          path: ${{ steps.package.outputs.archive }}
+          if-no-files-found: error
+          retention-days: 30
