@@ -69,4 +69,21 @@ class WPT_Translation_Store {
 			array( '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
 	}
+
+	public function get_post_language_status( $post_id, $target_language ) {
+		global $wpdb;
+
+		$table_name = self::table_name();
+		$sql        = $wpdb->prepare(
+			"SELECT COUNT(*) AS translated_fields, MAX(updated_at) AS last_translated_at
+			FROM {$table_name}
+			WHERE target_language = %s
+			AND status = 'complete'
+			AND field_context LIKE %s",
+			$target_language,
+			'post:' . absint( $post_id ) . ':%'
+		);
+
+		return $wpdb->get_row( $sql, ARRAY_A );
+	}
 }

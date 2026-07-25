@@ -7,6 +7,11 @@ class WPT_Admin {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_post_wpt_queue_existing_translations', array( $this, 'queue_existing_translations' ) );
+		add_action( 'admin_post_wpt_translate_post', array( $this, 'queue_post_translation' ) );
+		add_filter( 'manage_post_posts_columns', array( $this, 'add_translation_column' ) );
+		add_filter( 'manage_page_posts_columns', array( $this, 'add_translation_column' ) );
+		add_action( 'manage_post_posts_custom_column', array( $this, 'render_translation_column' ), 10, 2 );
+		add_action( 'manage_page_posts_custom_column', array( $this, 'render_translation_column' ), 10, 2 );
 	}
 
 	public function add_settings_page() {
@@ -101,6 +106,61 @@ class WPT_Admin {
 		}
 
 		wp_safe_redirect( add_query_arg( 'wpt_queued', $scheduled, admin_url( 'options-general.php?page=wp-translate' ) ) );
+		exit;
+	}
+
+	public function add_translation_column( $columns ) {
+		$columns['wpt_translation'] = '翻译状态';
+
+		return $columns;
+	}
+
+	public function render_translation_column( $column, $post_id ) {
+		if ( 'wpt_translation' !== $column ) {
+			return;
+		}
+
+		$store = new WPT_Translation_Store();
+
+		foreach ( WPT_Settings::target_languages() as $target_language ) {
+			$status      = $store->get_post_language_status( $post_id, $target_language );
+			$translated  = ! empty( $status['translated_fields'] );
+			$button_text = $translated ? '重新翻译' : '翻译';
+			$action_url  = wp_nonce_url(
+				add_query_arg(
+					array(
+						'action'   => 'wpt_translate_post',
+						'post_id'  => $post_id,
+						'language' => $target_language,
+						'force'    => $translated ? '1' : '0',
+					),
+					admin_url( 'admin-post.php' )
+				),
+				'wpt_translate_post_' . $post_id . '_' . $target_language
+			);
+
+			echo '<p><strong>' . esc_html( strtoupper( $target_language ) ) . '</strong>: ';
+			echo $translated ? '<span style="color:#008a20">已翻译</span>' : '<span>未翻译</span>';
+			if ( $translated && ! empty( $status['last_translated_at'] ) ) {
+				echo '<br><small>上次翻译：' . esc_html( get_date_from_gmt( $status['last_translated_at'], 'Y-m-d H:i' ) ) . '</small>';
+			}
+			echo '<br><a class="button button-small" href="' . esc_url( $action_url ) . '">' . esc_html( $button_text ) . '</a></p>';
+		}
+	}
+
+	public function queue_post_translation() {
+		$post_id         = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+		$target_language = isset( $_GET['language'] ) ? sanitize_key( wp_unslash( $_GET['language'] ) ) : '';
+		$force_refresh   = ! empty( $_GET['force'] );
+
+		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) || ! WPT_Settings::is_supported_language( $target_language ) || $target_language === WPT_Settings::get()['source_language'] ) {
+			wp_die( '无效的翻译请求。' );
+		}
+
+		check_admin_referer( 'wpt_translate_post_' . $post_id . '_' . $target_language );
+		wp_schedule_single_event( time() + 5, 'wpt_process_translation', array( $post_id, $target_language, $force_refresh ) );
+
+		wp_safe_redirect( wp_get_referer() ? wp_get_referer() : admin_url( 'edit.php?post_type=' . get_post_type( $post_id ) ) );
 		exit;
 	}
 }

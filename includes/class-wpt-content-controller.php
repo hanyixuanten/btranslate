@@ -13,7 +13,7 @@ class WPT_Content_Controller {
 
 	public function register() {
 		add_action( 'save_post', array( $this, 'schedule_post_translation' ), 20, 3 );
-		add_action( 'wpt_process_translation', array( $this, 'translate_post' ), 10, 2 );
+		add_action( 'wpt_process_translation', array( $this, 'translate_post' ), 10, 3 );
 		add_filter( 'the_title', array( $this, 'translate_title' ), 20, 2 );
 		add_filter( 'the_content', array( $this, 'translate_content' ), 20 );
 		add_filter( 'get_the_excerpt', array( $this, 'translate_excerpt' ), 20, 2 );
@@ -42,7 +42,7 @@ class WPT_Content_Controller {
 		}
 	}
 
-	public function translate_post( $post_id, $target_language ) {
+	public function translate_post( $post_id, $target_language, $force_refresh = false ) {
 		$post     = get_post( $post_id );
 		$settings = WPT_Settings::get();
 
@@ -76,12 +76,12 @@ class WPT_Content_Controller {
 
 		foreach ( $fields as $field => $value ) {
 			if ( '' !== $value ) {
-				$service->get_or_translate( $value, $settings['source_language'], $target_language, 'post:' . $post_id . ':' . $field );
+				$service->get_or_translate( $value, $settings['source_language'], $target_language, 'post:' . $post_id . ':' . $field, $force_refresh );
 			}
 		}
 
-		$this->translate_attachment_alt_text( $post_id, $service, $settings, $target_language );
-		$this->translate_terms( $post_id, $service, $settings, $target_language );
+		$this->translate_attachment_alt_text( $post_id, $service, $settings, $target_language, $force_refresh );
+		$this->translate_terms( $post_id, $service, $settings, $target_language, $force_refresh );
 	}
 
 	public function translate_title( $title, $post_id ) {
@@ -156,18 +156,18 @@ class WPT_Content_Controller {
 		return ! empty( $translation['translated_value'] ) ? $translation['translated_value'] : $source_value;
 	}
 
-	private function translate_attachment_alt_text( $post_id, $service, $settings, $target_language ) {
+	private function translate_attachment_alt_text( $post_id, $service, $settings, $target_language, $force_refresh ) {
 		$attachments = get_attached_media( 'image', $post_id );
 
 		foreach ( $attachments as $attachment ) {
 			$alt_text = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
 			if ( is_string( $alt_text ) && '' !== $alt_text ) {
-				$service->get_or_translate( $alt_text, $settings['source_language'], $target_language, 'attachment:' . $attachment->ID . ':alt' );
+				$service->get_or_translate( $alt_text, $settings['source_language'], $target_language, 'attachment:' . $attachment->ID . ':alt', $force_refresh );
 			}
 		}
 	}
 
-	private function translate_terms( $post_id, $service, $settings, $target_language ) {
+	private function translate_terms( $post_id, $service, $settings, $target_language, $force_refresh ) {
 		$terms = get_the_terms( $post_id, array( 'category', 'post_tag' ) );
 
 		if ( ! is_array( $terms ) ) {
@@ -176,10 +176,10 @@ class WPT_Content_Controller {
 
 		foreach ( $terms as $term ) {
 			if ( '' !== $term->name ) {
-				$service->get_or_translate( $term->name, $settings['source_language'], $target_language, 'term:' . $term->term_id . ':name' );
+				$service->get_or_translate( $term->name, $settings['source_language'], $target_language, 'term:' . $term->term_id . ':name', $force_refresh );
 			}
 			if ( '' !== $term->description ) {
-				$service->get_or_translate( $term->description, $settings['source_language'], $target_language, 'term:' . $term->term_id . ':description' );
+				$service->get_or_translate( $term->description, $settings['source_language'], $target_language, 'term:' . $term->term_id . ':description', $force_refresh );
 			}
 		}
 	}

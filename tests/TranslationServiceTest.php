@@ -65,4 +65,16 @@ class TranslationServiceTest extends TestCase {
 		$this->assertFalse( $result->success );
 		$this->assertSame( 'failed', $store->save_calls[0]['status'] );
 	}
+
+	public function test_forced_refresh_calls_the_provider_when_a_translation_is_already_persisted() {
+		$store    = new WPT_Test_Translation_Store();
+		$provider = new WPT_Test_Translation_Provider();
+		$service  = new WPT_Translation_Service( $store, $provider );
+
+		$service->get_or_translate( 'Welcome', 'en', 'zh', 'post:8:post_title' );
+		$service->get_or_translate( 'Welcome', 'en', 'zh', 'post:8:post_title', true );
+
+		$this->assertSame( 2, $provider->calls );
+		$this->assertCount( 2, $store->save_calls );
+	}
 }

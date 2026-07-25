@@ -11,11 +11,11 @@ class WPT_Translation_Service {
 		$this->provider = $provider;
 	}
 
-	public function get_or_translate( $source_value, $source_language, $target_language, $context ) {
+	public function get_or_translate( $source_value, $source_language, $target_language, $context, $force_refresh = false ) {
 		$source_value       = (string) $source_value;
 		$source_fingerprint = WPT_Translation_Identity::source_fingerprint( $source_value );
 		$identity_key       = WPT_Translation_Identity::key( $source_value, $source_language, $target_language, $context, $this->provider->get_version() );
-		$existing           = $this->store->find_valid( $identity_key );
+		$existing           = $force_refresh ? null : $this->store->find_valid( $identity_key );
 
 		if ( ! empty( $existing['translated_value'] ) ) {
 			return WPT_Translation_Result::success( $existing['translated_value'] );
