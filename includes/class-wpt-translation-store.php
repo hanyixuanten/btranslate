@@ -86,4 +86,36 @@ class WPT_Translation_Store {
 
 		return $wpdb->get_row( $sql, ARRAY_A );
 	}
+
+	public function get_completed_item_counts( $target_languages ) {
+		global $wpdb;
+
+		$target_languages = array_values( array_filter( array_map( 'sanitize_key', (array) $target_languages ) ) );
+		if ( empty( $target_languages ) ) {
+			return array(
+				'posts' => 0,
+				'terms' => 0,
+			);
+		}
+
+		$table_name   = self::table_name();
+		$placeholders = implode( ',', array_fill( 0, count( $target_languages ), '%s' ) );
+		$post_sql     = $wpdb->prepare(
+			"SELECT COUNT(DISTINCT CONCAT(target_language, '|', SUBSTRING_INDEX(field_context, ':', 2)))
+			FROM {$table_name}
+			WHERE status = 'complete' AND target_language IN ({$placeholders}) AND field_context LIKE 'post:%'",
+			$target_languages
+		);
+		$term_sql     = $wpdb->prepare(
+			"SELECT COUNT(DISTINCT CONCAT(target_language, '|', SUBSTRING_INDEX(field_context, ':', 2)))
+			FROM {$table_name}
+			WHERE status = 'complete' AND target_language IN ({$placeholders}) AND field_context LIKE 'term:%'",
+			$target_languages
+		);
+
+		return array(
+			'posts' => (int) $wpdb->get_var( $post_sql ),
+			'terms' => (int) $wpdb->get_var( $term_sql ),
+		);
+	}
 }

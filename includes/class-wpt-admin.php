@@ -8,6 +8,7 @@ class WPT_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_post_wpt_queue_existing_translations', array( $this, 'queue_existing_translations' ) );
 		add_action( 'admin_post_wpt_translate_post', array( $this, 'queue_post_translation' ) );
+		add_action( 'wp_ajax_wpt_translation_progress', array( $this, 'translation_progress' ) );
 		add_filter( 'manage_post_posts_columns', array( $this, 'add_translation_column' ) );
 		add_filter( 'manage_page_posts_columns', array( $this, 'add_translation_column' ) );
 		add_action( 'manage_post_posts_custom_column', array( $this, 'render_translation_column' ), 10, 2 );
@@ -76,6 +77,38 @@ class WPT_Admin {
 				<?php wp_nonce_field( 'wpt_queue_existing_translations' ); ?>
 				<?php submit_button( '重新翻译所有内容', 'secondary', 'submit', false ); ?>
 			</form>
+			<hr />
+			<h2>翻译进度</h2>
+			<div id="wpt-translation-progress" aria-live="polite">
+				<p>正在读取翻译进度...</p>
+			</div>
+			<script>
+				(function () {
+					var container = document.getElementById('wpt-translation-progress');
+					var endpoint = <?php echo wp_json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
+					var nonce = <?php echo wp_json_encode( wp_create_nonce( 'wpt_translation_progress' ) ); ?>;
+
+					function updateProgress() {
+						fetch(endpoint + '?action=wpt_translation_progress&_ajax_nonce=' + encodeURIComponent(nonce), { credentials: 'same-origin' })
+							.then(function (response) { return response.json(); })
+							.then(function (response) {
+								if (!response.success) {
+									throw new Error('progress_request_failed');
+								}
+								var progress = response.data;
+								container.innerHTML = '<p><strong>' + progress.percent + '%</strong>（' + progress.completed + ' / ' + progress.total + ' 个内容项）</p>' +
+									'<div style="max-width:480px;height:12px;background:#dcdcde"><div style="height:12px;width:' + progress.percent + '%;background:#2271b1"></div></div>' +
+									'<p class="description">文章和页面：' + progress.posts_completed + ' / ' + progress.posts_total + '；分类和标签：' + progress.terms_completed + ' / ' + progress.terms_total + '。每 5 秒自动更新。</p>';
+							})
+							.catch(function () {
+								container.innerHTML = '<p>暂时无法读取翻译进度。</p>';
+							});
+					}
+
+					updateProgress();
+					window.setInterval(updateProgress, 5000);
+				}());
+			</script>
 		</div>
 		<?php
 	}
@@ -132,6 +165,46 @@ class WPT_Admin {
 		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=wp-translate' ) ) . '">设置</a>' );
 
 		return $links;
+	}
+
+	public function translation_progress() {
+		check_ajax_referer( 'wpt_translation_progress' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => 'forbidden' ), 403 );
+		}
+
+		$post_count = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
+		$terms      = get_terms(
+			array(
+				'taxonomy'   => array( 'category', 'post_tag' ),
+				'hide_empty' => false,
+				'fields'     => 'ids',
+			)
+		);
+		$term_count = is_wp_error( $terms ) ? 0 : count( $terms );
+		$languages  = WPT_Settings::target_languages();
+		$counts     = ( new WPT_Translation_Store() )->get_completed_item_counts( $languages );
+
+		$posts_total      = $post_count * count( $languages );
+		$terms_total      = $term_count * count( $languages );
+		$total            = $posts_total + $terms_total;
+		$posts_completed  = min( $counts['posts'], $posts_total );
+		$terms_completed  = min( $counts['terms'], $terms_total );
+		$completed        = $posts_completed + $terms_completed;
+		$percent          = $total ? (int) floor( ( $completed / $total ) * 100 ) : 100;
+
+		wp_send_json_success(
+			array(
+				'posts_completed' => $posts_completed,
+				'posts_total'     => $posts_total,
+				'terms_completed' => $terms_completed,
+				'terms_total'     => $terms_total,
+				'completed'       => $completed,
+				'total'           => $total,
+				'percent'         => $percent,
+			)
+		);
 	}
 
 	public function add_translation_column( $columns ) {
