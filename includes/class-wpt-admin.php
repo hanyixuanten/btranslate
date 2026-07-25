@@ -12,6 +12,7 @@ class WPT_Admin {
 		add_filter( 'manage_page_posts_columns', array( $this, 'add_translation_column' ) );
 		add_action( 'manage_post_posts_custom_column', array( $this, 'render_translation_column' ), 10, 2 );
 		add_action( 'manage_page_posts_custom_column', array( $this, 'render_translation_column' ), 10, 2 );
+		add_filter( 'plugin_action_links_' . plugin_basename( WPT_FILE ), array( $this, 'add_plugin_settings_link' ) );
 	}
 
 	public function add_settings_page() {
@@ -68,12 +69,12 @@ class WPT_Admin {
 				<?php submit_button(); ?>
 			</form>
 			<hr />
-			<h2>翻译已有内容</h2>
-			<p>保存语言或百度凭据后，使用此操作将所有已发布的文章和页面加入翻译队列。</p>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
+			<h2>重新翻译所有内容</h2>
+			<p>此操作会将所有已发布文章、页面、分类和标签重新加入翻译队列。</p>
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" onsubmit="return window.confirm('这将重新翻译所有内容，请注意 API 消耗。确认继续吗？');">
 				<input type="hidden" name="action" value="wpt_queue_existing_translations" />
 				<?php wp_nonce_field( 'wpt_queue_existing_translations' ); ?>
-				<?php submit_button( '翻译已有文章和页面', 'secondary', 'submit', false ); ?>
+				<?php submit_button( '重新翻译所有内容', 'secondary', 'submit', false ); ?>
 			</form>
 		</div>
 		<?php
@@ -98,15 +99,39 @@ class WPT_Admin {
 
 		foreach ( $post_ids as $post_id ) {
 			foreach ( WPT_Settings::target_languages() as $target_language ) {
-				if ( ! wp_next_scheduled( 'wpt_process_translation', array( $post_id, $target_language ) ) ) {
-					wp_schedule_single_event( time() + 30, 'wpt_process_translation', array( $post_id, $target_language ) );
+				if ( ! wp_next_scheduled( 'wpt_process_translation', array( $post_id, $target_language, true ) ) ) {
+					wp_schedule_single_event( time() + 30, 'wpt_process_translation', array( $post_id, $target_language, true ) );
 					++$scheduled;
+				}
+			}
+		}
+
+		$terms = get_terms(
+			array(
+				'taxonomy'   => array( 'category', 'post_tag' ),
+				'hide_empty' => false,
+				'fields'     => 'ids',
+			)
+		);
+		if ( ! is_wp_error( $terms ) ) {
+			foreach ( $terms as $term_id ) {
+				foreach ( WPT_Settings::target_languages() as $target_language ) {
+					if ( ! wp_next_scheduled( 'wpt_process_term_translation', array( $term_id, $target_language, true ) ) ) {
+						wp_schedule_single_event( time() + 30, 'wpt_process_term_translation', array( $term_id, $target_language, true ) );
+						++$scheduled;
+					}
 				}
 			}
 		}
 
 		wp_safe_redirect( add_query_arg( 'wpt_queued', $scheduled, admin_url( 'options-general.php?page=wp-translate' ) ) );
 		exit;
+	}
+
+	public function add_plugin_settings_link( $links ) {
+		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=wp-translate' ) ) . '">设置</a>' );
+
+		return $links;
 	}
 
 	public function add_translation_column( $columns ) {

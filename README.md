@@ -33,9 +33,13 @@ Changing source text produces a new fingerprint and therefore schedules a new tr
 
 Only the listed SEO meta fields are sent for translation. Arbitrary metadata, serialized data, credentials, and code are excluded.
 
+Category and tag names are translated when they are created, edited, or included in a full retranslation. On a translated site, term objects used by archives, navigation, and post metadata use the persisted translated name and description.
+
 ## Routing
 
 The **Subdirectory** mode resolves configured language paths such as `/en/example-post/`. The **Domain binding** mode maps a request host to a language using one `domain=language` entry per line in Settings. Use one canonical strategy for each language to avoid duplicate URLs. In domain mode, the plugin does not register front-end rewrite rules, so the primary site URL is not affected.
+
+Post, page, term, and home links are generated for the active language. For example, a theme's "back to home" link that uses `home_url()` resolves to the bound language domain or language subdirectory.
 
 For a bound subdomain, enter a value such as `en.example.com=en`. The server and DNS must route that hostname to the same WordPress installation before WordPress can resolve the language.
 
@@ -64,6 +68,10 @@ find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php
 ```
 
 Before production use, add WordPress PHPUnit integration tests with mocked `wp_remote_post` responses. Required coverage includes language resolution, rewrite behavior, persistence reuse and invalidation, Baidu request signing and errors, content filtering, and fallback rendering.
+
+## Retranslation
+
+The Posts and Pages lists show a status column for every target language, including the latest successful translation time and a translation action. The Settings page also provides **重新翻译所有内容**. It shows a confirmation warning before scheduling a forced refresh of published posts, pages, categories, and tags; this bypasses persisted translations and consumes Baidu API quota.
 
 ## Known Limitations
 

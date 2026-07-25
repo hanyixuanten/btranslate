@@ -14,6 +14,9 @@ class WPT_Content_Controller {
 	public function register() {
 		add_action( 'save_post', array( $this, 'schedule_post_translation' ), 20, 3 );
 		add_action( 'wpt_process_translation', array( $this, 'translate_post' ), 10, 3 );
+		add_action( 'wpt_process_term_translation', array( $this, 'translate_term' ), 10, 3 );
+		add_action( 'created_term', array( $this, 'schedule_term_translation' ), 20, 3 );
+		add_action( 'edited_term', array( $this, 'schedule_term_translation' ), 20, 3 );
 		add_filter( 'the_title', array( $this, 'translate_title' ), 20, 2 );
 		add_filter( 'the_content', array( $this, 'translate_content' ), 20 );
 		add_filter( 'get_the_excerpt', array( $this, 'translate_excerpt' ), 20, 2 );
@@ -28,6 +31,7 @@ class WPT_Content_Controller {
 		add_filter( 'page_link', array( $this, 'localize_permalink' ), 20 );
 		add_filter( 'post_type_link', array( $this, 'localize_permalink' ), 20 );
 		add_filter( 'term_link', array( $this, 'localize_permalink' ), 20 );
+		add_filter( 'get_term', array( $this, 'translate_term_object' ), 20, 3 );
 	}
 
 	public function schedule_post_translation( $post_id, $post, $update ) {
@@ -84,6 +88,39 @@ class WPT_Content_Controller {
 		$this->translate_terms( $post_id, $service, $settings, $target_language, $force_refresh );
 	}
 
+	public function schedule_term_translation( $term_id, $term_taxonomy_id, $taxonomy ) {
+		if ( ! in_array( $taxonomy, array( 'category', 'post_tag' ), true ) ) {
+			return;
+		}
+
+		foreach ( WPT_Settings::target_languages() as $target_language ) {
+			if ( ! wp_next_scheduled( 'wpt_process_term_translation', array( $term_id, $target_language, false ) ) ) {
+				wp_schedule_single_event( time() + 30, 'wpt_process_term_translation', array( $term_id, $target_language, false ) );
+			}
+		}
+	}
+
+	public function translate_term( $term_id, $target_language, $force_refresh = false ) {
+		$term     = get_term( $term_id );
+		$settings = WPT_Settings::get();
+
+		if ( ! $term || is_wp_error( $term ) || ! in_array( $term->taxonomy, array( 'category', 'post_tag' ), true ) || ! WPT_Settings::is_supported_language( $target_language ) ) {
+			return;
+		}
+
+		$service = new WPT_Translation_Service(
+			$this->store,
+			new WPT_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] )
+		);
+
+		if ( '' !== $term->name ) {
+			$service->get_or_translate( $term->name, $settings['source_language'], $target_language, 'term:' . $term->term_id . ':name', $force_refresh );
+		}
+		if ( '' !== $term->description ) {
+			$service->get_or_translate( $term->description, $settings['source_language'], $target_language, 'term:' . $term->term_id . ':description', $force_refresh );
+		}
+	}
+
 	public function translate_title( $title, $post_id ) {
 		return $this->translated_value( $title, 'post:' . $post_id . ':post_title' );
 	}
@@ -112,6 +149,18 @@ class WPT_Content_Controller {
 
 	public function translate_term_description( $description, $term_id, $taxonomy ) {
 		return $this->translated_value( $description, 'term:' . $term_id . ':description' );
+	}
+
+	public function translate_term_object( $term, $taxonomy, $context = '' ) {
+		if ( ! $term instanceof WP_Term || ! in_array( $term->taxonomy, array( 'category', 'post_tag' ), true ) ) {
+			return $term;
+		}
+
+		$translated_term = clone $term;
+		$translated_term->name = $this->translated_value( $term->name, 'term:' . $term->term_id . ':name' );
+		$translated_term->description = $this->translated_value( $term->description, 'term:' . $term->term_id . ':description' );
+
+		return $translated_term;
 	}
 
 	public function translate_seo_value( $value ) {

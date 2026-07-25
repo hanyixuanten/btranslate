@@ -6,6 +6,7 @@ class WPT_Language_Router {
 	public function register() {
 		add_filter( 'query_vars', array( $this, 'query_vars' ) );
 		add_action( 'parse_request', array( $this, 'resolve_domain_language' ) );
+		add_filter( 'home_url', array( $this, 'localize_home_url' ), 20, 4 );
 		$this->register_rewrite_rules();
 	}
 
@@ -81,10 +82,17 @@ class WPT_Language_Router {
 			return $url;
 		}
 
+		$scheme   = isset( $parts['scheme'] ) ? $parts['scheme'] . '://' : '//';
+		$host     = isset( $parts['host'] ) ? $parts['host'] : '';
+		$port     = isset( $parts['port'] ) ? ':' . $parts['port'] : '';
 		$path     = '/' . $language . '/' . ltrim( $parts['path'], '/' );
 		$query    = isset( $parts['query'] ) ? '?' . $parts['query'] : '';
 		$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
 
-		return home_url( $path ) . $query . $fragment;
+		return $scheme . $host . $port . $path . $query . $fragment;
+	}
+
+	public function localize_home_url( $url, $path, $scheme, $blog_id ) {
+		return $this->localized_url( $url );
 	}
 }
