@@ -10,40 +10,25 @@ class WPT_Content_Translator {
 	}
 
 	public function translate( $content, $source_language, $target_language, $context, $force_refresh = false ) {
-		$links = array();
-		$template = preg_replace_callback(
-			'#<a\b([^>]*)>(.*?)</a>#is',
-			function ( $matches ) use ( &$links ) {
-				$index          = count( $links );
-				$links[ $index ] = array(
-					'attributes' => $matches[1],
-					'text'       => $matches[2],
-				);
-
-				return '[[WPT_LINK_' . $index . ']]';
-			},
-			$content
-		);
-
-		if ( null === $template ) {
+		$protected = self::protect( $content );
+		if ( false === $protected ) {
 			return WPT_Translation_Result::failure( 'content_parse_failed', 'Unable to protect links before translation.' );
 		}
 
-		$template_context = empty( $links ) ? $context : $context . ':template';
-		$template_result  = $this->service->get_or_translate( $template, $source_language, $target_language, $template_context, $force_refresh );
+		$template_result = $this->service->get_or_translate( $protected['template'], $source_language, $target_language, $context . ':template', $force_refresh );
 
-		if ( ! $template_result->success || empty( $links ) ) {
+		if ( ! $template_result->success ) {
 			return $template_result;
 		}
 
-		$translated_content = $template_result->value;
+		$anchors = array();
 
-		foreach ( $links as $index => $link ) {
+		foreach ( $protected['anchors'] as $index => $anchor ) {
 			$link_result = $this->service->get_or_translate(
-				$link['text'],
+				$anchor['text'],
 				$source_language,
 				$target_language,
-				$context . ':link:' . $index,
+				$context . ':anchor:' . $index,
 				$force_refresh
 			);
 
@@ -51,10 +36,71 @@ class WPT_Content_Translator {
 				return $link_result;
 			}
 
-			$anchor = '<a' . $link['attributes'] . '>' . $link_result->value . '</a>';
-			$translated_content = str_replace( '[[WPT_LINK_' . $index . ']]', $anchor, $translated_content );
+			$anchors[ $index ] = '<a' . $anchor['attributes'] . '>' . $link_result->value . '</a>';
 		}
 
-		return WPT_Translation_Result::success( $translated_content );
+		return WPT_Translation_Result::success( self::restore( $template_result->value, $anchors, $protected['tags'] ) );
+	}
+
+	public static function protect( $content ) {
+		$anchors = array();
+		$template = preg_replace_callback(
+			'#<a\b([^>]*)>(.*?)</a>#is',
+			function ( $matches ) use ( &$anchors ) {
+				$index             = count( $anchors );
+				$anchors[ $index ] = array(
+					'attributes' => $matches[1],
+					'text'       => $matches[2],
+				);
+
+				return self::token( 'ANCHOR', $index );
+			},
+			$content
+		);
+		if ( null === $template ) {
+			return false;
+		}
+
+		$tags = array();
+		$template = preg_replace_callback(
+			'#<[^>]+>#s',
+			function ( $matches ) use ( &$tags ) {
+				$index         = count( $tags );
+				$tags[ $index ] = $matches[0];
+
+				return self::token( 'TAG', $index );
+			},
+			$template
+		);
+
+		if ( null === $template ) {
+			return false;
+		}
+
+		return array(
+			'template' => $template,
+			'anchors'  => $anchors,
+			'tags'     => $tags,
+		);
+	}
+
+	public static function restore( $content, $anchors, $tags ) {
+		foreach ( $anchors as $index => $anchor ) {
+			$content = preg_replace( self::token_pattern( 'ANCHOR', $index ), $anchor, $content );
+		}
+
+		foreach ( $tags as $index => $tag ) {
+			$content = preg_replace( self::token_pattern( 'TAG', $index ), $tag, $content );
+		}
+
+		return $content;
+	}
+
+	private static function token( $type, $index ) {
+		return 'WPTTOKEN' . $type . $index . 'END';
+	}
+
+	private static function token_pattern( $type, $index ) {
+		return '#(?:\[\s*)?WPT\s*TOKEN\s*' . $type . '\s*' . $index . '\s*END(?:\s*\]|)#i';
 	}
 }

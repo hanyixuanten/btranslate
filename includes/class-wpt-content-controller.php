@@ -153,36 +153,27 @@ class WPT_Content_Controller {
 
 	public function translate_content( $content ) {
 		$post_id = get_the_ID();
-		if ( ! $post_id || false === stripos( $content, '<a' ) ) {
+		if ( ! $post_id || false === strpos( $content, '<' ) ) {
 			return $this->translated_value( $content, 'post:' . $post_id . ':post_content' );
 		}
 
-		$links = array();
-		$template = preg_replace_callback(
-			'#<a\b([^>]*)>(.*?)</a>#is',
-			function ( $matches ) use ( &$links ) {
-				$index = count( $links );
-				$links[] = $matches;
-
-				return '[[WPT_LINK_' . $index . ']]';
-			},
-			$content
-		);
-		if ( null === $template ) {
+		$protected = WPT_Content_Translator::protect( $content );
+		if ( false === $protected ) {
 			return $content;
 		}
 
-		$translated_template = $this->translated_value( $template, 'post:' . $post_id . ':post_content:template' );
-		if ( $translated_template === $template ) {
+		$translated_template = $this->translated_value( $protected['template'], 'post:' . $post_id . ':post_content:template' );
+		if ( $translated_template === $protected['template'] ) {
 			return $content;
 		}
 
-		foreach ( $links as $index => $link ) {
-			$translated_text = $this->translated_value( $link[2], 'post:' . $post_id . ':post_content:link:' . $index );
-			$translated_template = str_replace( '[[WPT_LINK_' . $index . ']]', '<a' . $link[1] . '>' . $translated_text . '</a>', $translated_template );
+		$anchors = array();
+		foreach ( $protected['anchors'] as $index => $anchor ) {
+			$translated_text = $this->translated_value( $anchor['text'], 'post:' . $post_id . ':post_content:anchor:' . $index );
+			$anchors[ $index ] = '<a' . $anchor['attributes'] . '>' . $translated_text . '</a>';
 		}
 
-		return $translated_template;
+		return WPT_Content_Translator::restore( $translated_template, $anchors, $protected['tags'] );
 	}
 
 	public function translate_excerpt( $excerpt, $post ) {
