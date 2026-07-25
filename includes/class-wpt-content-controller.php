@@ -15,18 +15,19 @@ class WPT_Content_Controller {
 		add_action( 'save_post', array( $this, 'schedule_post_translation' ), 20, 3 );
 		add_action( 'wpt_process_translation', array( $this, 'translate_post' ), 10, 3 );
 		add_action( 'wpt_process_term_translation', array( $this, 'translate_term' ), 10, 3 );
+		add_action( 'wpt_process_seo_output_translation', array( $this, 'translate_seo_output' ), 10, 4 );
 		add_action( 'created_term', array( $this, 'schedule_term_translation' ), 20, 3 );
 		add_action( 'edited_term', array( $this, 'schedule_term_translation' ), 20, 3 );
 		add_filter( 'the_title', array( $this, 'translate_title' ), 20, 2 );
-		add_filter( 'the_content', array( $this, 'translate_content' ), 20 );
+		add_filter( 'the_content', array( $this, 'translate_content' ), 1 );
 		add_filter( 'get_the_excerpt', array( $this, 'translate_excerpt' ), 20, 2 );
 		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'translate_image_alt' ), 20, 2 );
 		add_filter( 'single_term_title', array( $this, 'translate_term_title' ), 20, 2 );
 		add_filter( 'term_description', array( $this, 'translate_term_description' ), 20, 3 );
-		add_filter( 'wpseo_title', array( $this, 'translate_seo_value' ), 20 );
-		add_filter( 'wpseo_metadesc', array( $this, 'translate_seo_value' ), 20 );
-		add_filter( 'rank_math/frontend/title', array( $this, 'translate_seo_value' ), 20 );
-		add_filter( 'rank_math/frontend/description', array( $this, 'translate_seo_value' ), 20 );
+		add_filter( 'wpseo_title', array( $this, 'translate_seo_title' ), 20 );
+		add_filter( 'wpseo_metadesc', array( $this, 'translate_seo_description' ), 20 );
+		add_filter( 'rank_math/frontend/title', array( $this, 'translate_seo_title' ), 20 );
+		add_filter( 'rank_math/frontend/description', array( $this, 'translate_seo_description' ), 20 );
 		add_filter( 'post_link', array( $this, 'localize_permalink' ), 20 );
 		add_filter( 'page_link', array( $this, 'localize_permalink' ), 20 );
 		add_filter( 'post_type_link', array( $this, 'localize_permalink' ), 20 );
@@ -121,6 +122,21 @@ class WPT_Content_Controller {
 		}
 	}
 
+	public function translate_seo_output( $post_id, $source_value, $target_language, $context ) {
+		$settings = WPT_Settings::get();
+
+		if ( ! get_post( $post_id ) || ! WPT_Settings::is_supported_language( $target_language ) || '' === $source_value ) {
+			return;
+		}
+
+		$service = new WPT_Translation_Service(
+			$this->store,
+			new WPT_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] )
+		);
+
+		$service->get_or_translate( $source_value, $settings['source_language'], $target_language, $context );
+	}
+
 	public function translate_title( $title, $post_id ) {
 		return $this->translated_value( $title, 'post:' . $post_id . ':post_title' );
 	}
@@ -163,27 +179,41 @@ class WPT_Content_Controller {
 		return $translated_term;
 	}
 
-	public function translate_seo_value( $value ) {
+	public function translate_seo_title( $value ) {
+		return $this->translate_seo_value( $value, array( '_yoast_wpseo_title', 'rank_math_title', 'post_title' ) );
+	}
+
+	public function translate_seo_description( $value ) {
+		return $this->translate_seo_value( $value, array( '_yoast_wpseo_metadesc', 'rank_math_description', 'post_excerpt', 'post_content' ) );
+	}
+
+	private function translate_seo_value( $value, $source_fields ) {
 		$post_id = get_queried_object_id();
 
 		if ( ! $post_id || '' === $value ) {
 			return $value;
 		}
 
-		$seo_meta_keys = array(
-			'_yoast_wpseo_title',
-			'_yoast_wpseo_metadesc',
-			'rank_math_title',
-			'rank_math_description',
-		);
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return $value;
+		}
 
-		foreach ( $seo_meta_keys as $meta_key ) {
-			if ( $value === get_post_meta( $post_id, $meta_key, true ) ) {
-				return $this->translated_value( $value, 'post:' . $post_id . ':meta:' . $meta_key );
+		foreach ( $source_fields as $source_field ) {
+			if ( 0 === strpos( $source_field, '_' ) || 0 === strpos( $source_field, 'rank_math_' ) ) {
+				$source_value = get_post_meta( $post_id, $source_field, true );
+				$context      = 'post:' . $post_id . ':meta:' . $source_field;
+			} else {
+				$source_value = $post->{$source_field};
+				$context      = 'post:' . $post_id . ':' . $source_field;
+			}
+
+			if ( is_string( $source_value ) && '' !== $source_value && $value === $source_value ) {
+				return $this->translated_value( $source_value, $context );
 			}
 		}
 
-		return $value;
+		return $this->translated_or_schedule_seo_output( $value, $post_id, in_array( 'post_content', $source_fields, true ) ? 'seo_description' : 'seo_title' );
 	}
 
 	public function localize_permalink( $url ) {
@@ -203,6 +233,28 @@ class WPT_Content_Controller {
 		$translation  = $this->store->find_valid( $identity_key );
 
 		return ! empty( $translation['translated_value'] ) ? $translation['translated_value'] : $source_value;
+	}
+
+	private function translated_or_schedule_seo_output( $source_value, $post_id, $field_context ) {
+		$settings        = WPT_Settings::get();
+		$target_language = $this->router->current_language();
+		$context         = 'post:' . $post_id . ':' . $field_context;
+
+		if ( $target_language === $settings['source_language'] || '' === $source_value ) {
+			return $source_value;
+		}
+
+		$translated_value = $this->translated_value( $source_value, $context );
+		if ( $translated_value !== $source_value ) {
+			return $translated_value;
+		}
+
+		$event_args = array( $post_id, $source_value, $target_language, $context );
+		if ( ! wp_next_scheduled( 'wpt_process_seo_output_translation', $event_args ) ) {
+			wp_schedule_single_event( time() + 5, 'wpt_process_seo_output_translation', $event_args );
+		}
+
+		return $source_value;
 	}
 
 	private function translate_attachment_alt_text( $post_id, $service, $settings, $target_language, $force_refresh ) {
