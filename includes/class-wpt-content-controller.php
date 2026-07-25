@@ -157,23 +157,24 @@ class WPT_Content_Controller {
 			return $this->translated_value( $content, 'post:' . $post_id . ':post_content' );
 		}
 
-		$protected = WPT_Content_Translator::protect( $content );
-		if ( false === $protected ) {
+		$segments = WPT_Content_Translator::segments( $content );
+		if ( false === $segments ) {
 			return $content;
 		}
 
-		$translated_template = $this->translated_value( $protected['template'], 'post:' . $post_id . ':post_content:template' );
-		if ( $translated_template === $protected['template'] ) {
-			return $content;
+		$text_index = 0;
+		foreach ( $segments as $index => $segment ) {
+			if ( WPT_Content_Translator::is_tag( $segment ) || '' === trim( $segment ) ) {
+				continue;
+			}
+
+			$whitespace = WPT_Content_Translator::surrounding_whitespace( $segment );
+			$translated = $this->translated_value( $whitespace['text'], 'post:' . $post_id . ':post_content:text:' . $text_index );
+			$segments[ $index ] = $whitespace['leading'] . $translated . $whitespace['trailing'];
+			++$text_index;
 		}
 
-		$anchors = array();
-		foreach ( $protected['anchors'] as $index => $anchor ) {
-			$translated_text = $this->translated_value( $anchor['text'], 'post:' . $post_id . ':post_content:anchor:' . $index );
-			$anchors[ $index ] = '<a' . $anchor['attributes'] . '>' . $translated_text . '</a>';
-		}
-
-		return WPT_Content_Translator::restore( $translated_template, $anchors, $protected['tags'] );
+		return implode( '', $segments );
 	}
 
 	public function translate_excerpt( $excerpt, $post ) {

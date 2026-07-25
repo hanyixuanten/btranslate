@@ -10,97 +10,51 @@ class WPT_Content_Translator {
 	}
 
 	public function translate( $content, $source_language, $target_language, $context, $force_refresh = false ) {
-		$protected = self::protect( $content );
-		if ( false === $protected ) {
+		$segments = self::segments( $content );
+		if ( false === $segments ) {
 			return WPT_Translation_Result::failure( 'content_parse_failed', 'Unable to protect links before translation.' );
 		}
 
-		$template_result = $this->service->get_or_translate( $protected['template'], $source_language, $target_language, $context . ':template', $force_refresh );
-
-		if ( ! $template_result->success ) {
-			return $template_result;
-		}
-
-		$anchors = array();
-
-		foreach ( $protected['anchors'] as $index => $anchor ) {
-			$link_result = $this->service->get_or_translate(
-				$anchor['text'],
-				$source_language,
-				$target_language,
-				$context . ':anchor:' . $index,
-				$force_refresh
-			);
-
-			if ( ! $link_result->success ) {
-				return $link_result;
+		$text_index = 0;
+		foreach ( $segments as $segment ) {
+			if ( self::is_tag( $segment ) || '' === trim( $segment ) ) {
+				continue;
 			}
 
-			$anchors[ $index ] = '<a' . $anchor['attributes'] . '>' . $link_result->value . '</a>';
+			$result = $this->service->get_or_translate( trim( $segment ), $source_language, $target_language, $context . ':text:' . $text_index, $force_refresh );
+			if ( ! $result->success ) {
+				return $result;
+			}
+
+			++$text_index;
 		}
 
-		return WPT_Translation_Result::success( self::restore( $template_result->value, $anchors, $protected['tags'] ) );
+		return WPT_Translation_Result::success( $content );
 	}
 
-	public static function protect( $content ) {
-		$anchors = array();
-		$template = preg_replace_callback(
-			'#<a\b([^>]*)>(.*?)</a>#is',
-			function ( $matches ) use ( &$anchors ) {
-				$index             = count( $anchors );
-				$anchors[ $index ] = array(
-					'attributes' => $matches[1],
-					'text'       => $matches[2],
-				);
+	public static function segments( $content ) {
+		$segments = preg_split( '/(<[^>]+>)/s', $content, -1, PREG_SPLIT_DELIM_CAPTURE );
 
-				return self::token( 'ANCHOR', $index );
-			},
-			$content
-		);
-		if ( null === $template ) {
+		if ( false === $segments ) {
 			return false;
 		}
 
-		$tags = array();
-		$template = preg_replace_callback(
-			'#<[^>]+>#s',
-			function ( $matches ) use ( &$tags ) {
-				$index         = count( $tags );
-				$tags[ $index ] = $matches[0];
+		return array_values( array_filter( $segments, static function ( $segment ) {
+			return '' !== $segment;
+		} ) );
+	}
 
-				return self::token( 'TAG', $index );
-			},
-			$template
-		);
+	public static function is_tag( $segment ) {
+		return 1 === preg_match( '/^<[^>]+>$/s', $segment );
+	}
 
-		if ( null === $template ) {
-			return false;
-		}
+	public static function surrounding_whitespace( $segment ) {
+		preg_match( '/^(\s*)(.*?)(\s*)$/s', $segment, $matches );
 
 		return array(
-			'template' => $template,
-			'anchors'  => $anchors,
-			'tags'     => $tags,
+			'leading' => $matches[1],
+			'text'    => $matches[2],
+			'trailing' => $matches[3],
 		);
-	}
-
-	public static function restore( $content, $anchors, $tags ) {
-		foreach ( $anchors as $index => $anchor ) {
-			$content = preg_replace( self::token_pattern( 'ANCHOR', $index ), $anchor, $content );
-		}
-
-		foreach ( $tags as $index => $tag ) {
-			$content = preg_replace( self::token_pattern( 'TAG', $index ), $tag, $content );
-		}
-
-		return $content;
-	}
-
-	private static function token( $type, $index ) {
-		return 'WPTTOKEN' . $type . $index . 'END';
-	}
-
-	private static function token_pattern( $type, $index ) {
-		return '#(?:\[\s*)?WPT\s*TOKEN\s*' . $type . '\s*' . $index . '\s*END(?:\s*\]|)#i';
 	}
 }
