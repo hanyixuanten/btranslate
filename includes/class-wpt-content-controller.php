@@ -26,6 +26,7 @@ class WPT_Content_Controller {
 		add_filter( 'term_description', array( $this, 'translate_term_description' ), 20, 3 );
 		add_filter( 'document_title_parts', array( $this, 'translate_document_title_parts' ), 20 );
 		add_filter( 'wpai_meta_description', array( $this, 'translate_wordpress_ai_meta_description' ), 20 );
+		add_filter( 'get_post_metadata', array( $this, 'translate_wordpress_ai_meta_description_metadata' ), 20, 4 );
 		add_filter( 'wpseo_title', array( $this, 'translate_seo_title' ), 20 );
 		add_filter( 'wpseo_metadesc', array( $this, 'translate_seo_description' ), 20 );
 		add_filter( 'rank_math/frontend/title', array( $this, 'translate_seo_title' ), 20 );
@@ -224,6 +225,14 @@ class WPT_Content_Controller {
 		}
 
 		return $this->translated_value( $description, 'post:' . $post_id . ':meta:wpai_meta_description' );
+	}
+
+	public function translate_wordpress_ai_meta_description_metadata( $value, $post_id, $meta_key, $single ) {
+		if ( 'wpai_meta_description' !== $meta_key || ! $single || ! is_string( $value ) ) {
+			return $value;
+		}
+
+		return $this->translated_value( $value, 'post:' . $post_id . ':meta:wpai_meta_description' );
 	}
 
 	public function translate_term_object( $term, $taxonomy, $context = '' ) {
