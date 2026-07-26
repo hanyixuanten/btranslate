@@ -22,12 +22,14 @@ class DocumentTitleTest extends TestCase {
 		$identity_key = WPT_Translation_Identity::key( $description, 'zh', 'en', 'post:42:meta:wpai_meta_description', 'baidu-vip-v1' );
 		$store->values[ $identity_key ] = array( 'translated_value' => 'Translated description' );
 		$controller  = new WPT_Content_Controller( $store, new WPT_Test_Language_Router() );
+		global $wpt_test_post_meta;
+		$wpt_test_post_meta[42]['wpai_meta_description'] = $description;
 
 		$this->assertSame(
 			'Translated description',
-			$controller->translate_wordpress_ai_meta_description_metadata( $description, 42, 'wpai_meta_description', true )
+			$controller->translate_wordpress_ai_meta_description_metadata( null, 42, 'wpai_meta_description', true )
 		);
-		$this->assertNull( $controller->translate_wordpress_ai_meta_description_metadata( null, 42, 'wpai_meta_description', true ) );
+		$this->assertNull( $controller->translate_wordpress_ai_meta_description_metadata( null, 42, 'wpai_meta_description', false ) );
 		$this->assertSame( $description, $controller->translate_wordpress_ai_meta_description_metadata( $description, 42, '_unrelated_meta', true ) );
 	}
 }
