@@ -73,9 +73,9 @@ Before production use, test the plugin in a WordPress staging environment. Cover
 
 ## Retranslation
 
-The Posts and Pages lists show a status column for every target language, including the latest successful translation time and a translation action. The Settings page also provides **重新翻译所有内容**. It shows a confirmation warning before scheduling a forced refresh of published posts, pages, categories, and tags; this bypasses persisted translations and consumes Baidu API quota.
+The Posts and Pages lists show a status column for every target language, including the latest successful translation time and a translation action. The Settings page provides **重新翻译所有内容**, **翻译所有文章**, and **翻译所有分类标签**. Each action shows a confirmation before scheduling a forced refresh of all supported content, only published posts and pages, or only categories and tags; this bypasses persisted translations and consumes Baidu API quota.
 
-The Settings page also shows a live progress panel. It refreshes every five seconds and counts completed post/page and category/tag items for every configured target language. When **重新翻译所有内容** starts a batch, progress resets and counts only translations completed after that batch began, so historical translations do not make a new batch appear complete. Progress reads only local WordPress and translation-table data; it does not send additional requests to Baidu.
+The Settings page also shows a live progress panel. It refreshes every five seconds and counts completed post/page and category/tag items for every configured target language. When **重新翻译所有内容** starts a batch, progress resets and counts only translations completed after that batch began, so historical translations do not make a new batch appear complete. Forced retranslation jobs are scheduled one minute apart, so a single WP-Cron request processes at most one batch item instead of timing out while processing every post. Progress reads only local WordPress and translation-table data; it does not send additional requests to Baidu.
 
 ## Known Limitations
 

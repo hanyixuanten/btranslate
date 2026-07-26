@@ -77,6 +77,19 @@ class WPT_Admin {
 				<?php wp_nonce_field( 'wpt_queue_existing_translations' ); ?>
 				<?php submit_button( '重新翻译所有内容', 'secondary', 'submit', false ); ?>
 			</form>
+			<p>也可以只重新翻译一种内容类型。</p>
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block;margin-right:8px" onsubmit="return window.confirm('这将重新翻译所有文章和页面，请注意 API 消耗。确认继续吗？');">
+				<input type="hidden" name="action" value="wpt_queue_existing_translations" />
+				<input type="hidden" name="scope" value="posts" />
+				<?php wp_nonce_field( 'wpt_queue_existing_translations' ); ?>
+				<?php submit_button( '翻译所有文章', 'secondary', 'submit', false ); ?>
+			</form>
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block" onsubmit="return window.confirm('这将重新翻译所有分类和标签，请注意 API 消耗。确认继续吗？');">
+				<input type="hidden" name="action" value="wpt_queue_existing_translations" />
+				<input type="hidden" name="scope" value="terms" />
+				<?php wp_nonce_field( 'wpt_queue_existing_translations' ); ?>
+				<?php submit_button( '翻译所有分类标签', 'secondary', 'submit', false ); ?>
+			</form>
 			<hr />
 			<h2>翻译进度</h2>
 			<div id="wpt-translation-progress" aria-live="polite">
@@ -119,6 +132,11 @@ class WPT_Admin {
 		}
 
 		check_admin_referer( 'wpt_queue_existing_translations' );
+		$scope = isset( $_POST['scope'] ) ? sanitize_key( wp_unslash( $_POST['scope'] ) ) : 'all';
+		if ( ! in_array( $scope, array( 'all', 'posts', 'terms' ), true ) ) {
+			wp_die( '无效的翻译范围。' );
+		}
+
 		$batch_started_at = current_time( 'mysql', true );
 		update_option(
 			'wpt_retranslation_batch',
@@ -128,37 +146,43 @@ class WPT_Admin {
 			false
 		);
 
-		$post_ids = get_posts(
-			array(
-				'post_type'      => array( 'post', 'page' ),
-				'post_status'    => 'publish',
-				'posts_per_page' => -1,
-				'fields'         => 'ids',
-			)
-		);
 		$scheduled = 0;
+		$next_run  = time() + MINUTE_IN_SECONDS;
 
-		foreach ( $post_ids as $post_id ) {
-			foreach ( WPT_Settings::target_languages() as $target_language ) {
-				if ( ! wp_next_scheduled( 'wpt_process_translation', array( $post_id, $target_language, true ) ) ) {
-					wp_schedule_single_event( time() + 30, 'wpt_process_translation', array( $post_id, $target_language, true ) );
+		if ( 'all' === $scope || 'posts' === $scope ) {
+			$post_ids = get_posts(
+				array(
+					'post_type'      => array( 'post', 'page' ),
+					'post_status'    => 'publish',
+					'posts_per_page' => -1,
+					'fields'         => 'ids',
+				)
+			);
+
+			foreach ( $post_ids as $post_id ) {
+				foreach ( WPT_Settings::target_languages() as $target_language ) {
+					$this->clear_scheduled_event( 'wpt_process_translation', array( $post_id, $target_language, true ) );
+					wp_schedule_single_event( $next_run, 'wpt_process_translation', array( $post_id, $target_language, true ) );
+					$next_run += MINUTE_IN_SECONDS;
 					++$scheduled;
 				}
 			}
 		}
 
-		$terms = get_terms(
-			array(
-				'taxonomy'   => array( 'category', 'post_tag' ),
-				'hide_empty' => false,
-				'fields'     => 'ids',
-			)
-		);
-		if ( ! is_wp_error( $terms ) ) {
-			foreach ( $terms as $term_id ) {
-				foreach ( WPT_Settings::target_languages() as $target_language ) {
-					if ( ! wp_next_scheduled( 'wpt_process_term_translation', array( $term_id, $target_language, true ) ) ) {
-						wp_schedule_single_event( time() + 30, 'wpt_process_term_translation', array( $term_id, $target_language, true ) );
+		if ( 'all' === $scope || 'terms' === $scope ) {
+			$terms = get_terms(
+				array(
+					'taxonomy'   => array( 'category', 'post_tag' ),
+					'hide_empty' => false,
+					'fields'     => 'ids',
+				)
+			);
+			if ( ! is_wp_error( $terms ) ) {
+				foreach ( $terms as $term_id ) {
+					foreach ( WPT_Settings::target_languages() as $target_language ) {
+						$this->clear_scheduled_event( 'wpt_process_term_translation', array( $term_id, $target_language, true ) );
+						wp_schedule_single_event( $next_run, 'wpt_process_term_translation', array( $term_id, $target_language, true ) );
+						$next_run += MINUTE_IN_SECONDS;
 						++$scheduled;
 					}
 				}
@@ -167,6 +191,12 @@ class WPT_Admin {
 
 		wp_safe_redirect( add_query_arg( 'wpt_queued', $scheduled, admin_url( 'options-general.php?page=wp-btranslate' ) ) );
 		exit;
+	}
+
+	private function clear_scheduled_event( $hook, $args ) {
+		while ( false !== ( $timestamp = wp_next_scheduled( $hook, $args ) ) ) {
+			wp_unschedule_event( $timestamp, $hook, $args );
+		}
 	}
 
 	public function add_plugin_settings_link( $links ) {
