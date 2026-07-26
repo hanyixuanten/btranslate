@@ -17,7 +17,7 @@ class WPT_Baidu_Provider implements WPT_Translation_Provider {
 
 	public function translate( $source_value, $source_language, $target_language, $context ) {
 		if ( '' === $this->app_id || '' === $this->secret_key ) {
-			return WPT_Translation_Result::failure( 'missing_credentials', __( 'Baidu Translate credentials are not configured.', 'wp-translate' ) );
+			return WPT_Translation_Result::failure( 'missing_credentials', __( 'Baidu Translate credentials are not configured.', 'wp-btranslate' ) );
 		}
 
 		$salt      = (string) wp_rand( 100000, 999999 );
@@ -45,7 +45,7 @@ class WPT_Baidu_Provider implements WPT_Translation_Provider {
 
 		if ( ! is_array( $body ) || empty( $body['trans_result'] ) || ! is_array( $body['trans_result'] ) ) {
 			$error_code    = isset( $body['error_code'] ) ? sanitize_key( $body['error_code'] ) : 'invalid_response';
-			$error_message = isset( $body['error_msg'] ) ? sanitize_text_field( $body['error_msg'] ) : __( 'Baidu Translate returned an invalid response.', 'wp-translate' );
+			$error_message = isset( $body['error_msg'] ) ? sanitize_text_field( $body['error_msg'] ) : __( 'Baidu Translate returned an invalid response.', 'wp-btranslate' );
 
 			return WPT_Translation_Result::failure( $error_code, $error_message );
 		}

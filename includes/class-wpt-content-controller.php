@@ -25,6 +25,7 @@ class WPT_Content_Controller {
 		add_filter( 'single_term_title', array( $this, 'translate_term_title' ), 20, 2 );
 		add_filter( 'term_description', array( $this, 'translate_term_description' ), 20, 3 );
 		add_filter( 'document_title_parts', array( $this, 'translate_document_title_parts' ), 20 );
+		add_filter( 'wpai_meta_description', array( $this, 'translate_wordpress_ai_meta_description' ), 20 );
 		add_filter( 'wpseo_title', array( $this, 'translate_seo_title' ), 20 );
 		add_filter( 'wpseo_metadesc', array( $this, 'translate_seo_description' ), 20 );
 		add_filter( 'rank_math/frontend/title', array( $this, 'translate_seo_title' ), 20 );
@@ -71,6 +72,7 @@ class WPT_Content_Controller {
 			'post_excerpt' => $post->post_excerpt,
 		);
 		$seo_meta_keys = array(
+			'wpai_meta_description',
 			'_yoast_wpseo_title',
 			'_yoast_wpseo_metadesc',
 			'rank_math_title',
@@ -212,6 +214,16 @@ class WPT_Content_Controller {
 		$parts['title'] = $this->translated_value( $parts['title'], 'post:' . $post_id . ':post_title' );
 
 		return $parts;
+	}
+
+	public function translate_wordpress_ai_meta_description( $description ) {
+		$post_id = get_queried_object_id();
+
+		if ( ! $post_id || '' === $description ) {
+			return $description;
+		}
+
+		return $this->translated_value( $description, 'post:' . $post_id . ':meta:wpai_meta_description' );
 	}
 
 	public function translate_term_object( $term, $taxonomy, $context = '' ) {

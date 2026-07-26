@@ -27,7 +27,7 @@ jobs:
         id: package
         run: |
           set -eu
-          plugin_slug="wp-translate"
+          plugin_slug="btranslate"
           version="$(grep -E '^ \* Version:' wp-translate.php | sed -E 's/^ \* Version: *//')"
           archive_name="${plugin_slug}-${version}.zip"
 
@@ -40,14 +40,14 @@ jobs:
             zip -qr "../${archive_name}" "${plugin_slug}"
           )
 
-          unzip -p "${archive_name}" "${plugin_slug}/wp-translate.php" | grep -q '^ \* Plugin Name: WP Translate$'
+          unzip -p "${archive_name}" "${plugin_slug}/wp-translate.php" | grep -q '^ \* Plugin Name: Btranslate$'
 
           printf 'archive=%s\n' "${archive_name}" >> "$GITHUB_OUTPUT"
 
       - name: Upload plugin archive
         uses: actions/upload-artifact@v4
         with:
-          name: wp-translate-plugin
+          name: btranslate-plugin
           path: ${{ steps.package.outputs.archive }}
           if-no-files-found: error
           retention-days: 30

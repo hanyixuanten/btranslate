@@ -1,17 +1,17 @@
 <?php
 /**
- * Plugin Name: WP Translate
+ * Plugin Name: Btranslate
  * Description: Persistent multilingual WordPress translations powered by Baidu Translate.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Requires at least: 6.4
  * Requires PHP: 8.1
- * Author: WP Translate
- * Text Domain: wp-translate
+ * Author: hanyixuanten
+ * Text Domain: wp-btranslate
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WPT_VERSION', '0.1.0' );
+define( 'WPT_VERSION', '0.1.1' );
 define( 'WPT_FILE', __FILE__ );
 define( 'WPT_PATH', plugin_dir_path( __FILE__ ) );
 

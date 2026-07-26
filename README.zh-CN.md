@@ -1,8 +1,8 @@
-# WP Translate
+# Btranslate
 
 中文|[English](README.md)
 
-WP Translate 是一个 WordPress 插件骨架，使用百度翻译 API 持久化管理多语言内容。
+Btranslate 是一个 WordPress 插件骨架，使用百度翻译 API 持久化管理多语言内容。
 
 ## 要求
 
@@ -13,15 +13,15 @@ WP Translate 是一个 WordPress 插件骨架，使用百度翻译 API 持久化
 
 ## 安装
 
-1. 将此目录复制到 `wp-content/plugins/wp-translate`。
-2. 在 WordPress 后台启用 **WP Translate**。
-3. 打开 **设置 > WP Translate**。
+1. 将此目录复制到 `wp-content/plugins/wp-btranslate`。
+2. 在 WordPress 后台启用 **Btranslate**。
+3. 打开 **设置 > Btranslate**。
 4. 填写百度翻译凭据、源语言、目标语言代码和 URL 路由模式。
 5. 保存文章或页面，为每种已配置的目标语言安排翻译任务。
 
 ## 翻译生命周期
 
-保存文章或页面后，`wpt_process_translation` Cron 任务会生成翻译。对于插件启用前已发布的内容，请打开 **设置 > WP Translate**，使用 **翻译现有文章和页面** 为全部已发布文章和页面安排任务。翻译具有确定性标识，标识由源内容指纹、源语言、目标语言、字段上下文和提供程序版本构成。插件会先在 `{$wpdb->prefix}wpt_translations` 表中查找已完成的结果；只有缓存未命中时才会向百度发起请求。
+保存文章或页面后，`wpt_process_translation` Cron 任务会生成翻译。对于插件启用前已发布的内容，请打开 **设置 > Btranslate**，使用 **翻译现有文章和页面** 为全部已发布文章和页面安排任务。翻译具有确定性标识，标识由源内容指纹、源语言、目标语言、字段上下文和提供程序版本构成。插件会先在 `{$wpdb->prefix}wpt_translations` 表中查找已完成的结果；只有缓存未命中时才会向百度发起请求。
 
 源文本变更会生成新的指纹，因此会安排新的翻译任务，而不会删除此前有效的翻译。前端渲染不会请求百度 API；它只读取表中已完成的值，若不存在则回退显示源文本。内容入队后必须运行 WordPress Cron；生产环境应配置真实的服务器 Cron，定期调用 WordPress Cron。
 

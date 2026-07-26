@@ -17,7 +17,7 @@ class WPT_Admin {
 	}
 
 	public function add_settings_page() {
-		add_options_page( __( 'WP Translate', 'wp-translate' ), __( 'WP Translate', 'wp-translate' ), 'manage_options', 'wp-translate', array( $this, 'render_settings_page' ) );
+		add_options_page( __( 'Btranslate', 'wp-btranslate' ), __( 'Btranslate', 'wp-btranslate' ), 'manage_options', 'wp-btranslate', array( $this, 'render_settings_page' ) );
 	}
 
 	public function register_settings() {
@@ -56,7 +56,7 @@ class WPT_Admin {
 		}
 		?>
 		<div class="wrap">
-			<h1>WP Translate</h1>
+			<h1>Btranslate</h1>
 			<form action="options.php" method="post">
 				<?php settings_fields( 'wpt_settings' ); ?>
 				<table class="form-table" role="presentation">
@@ -165,12 +165,12 @@ class WPT_Admin {
 			}
 		}
 
-		wp_safe_redirect( add_query_arg( 'wpt_queued', $scheduled, admin_url( 'options-general.php?page=wp-translate' ) ) );
+		wp_safe_redirect( add_query_arg( 'wpt_queued', $scheduled, admin_url( 'options-general.php?page=wp-btranslate' ) ) );
 		exit;
 	}
 
 	public function add_plugin_settings_link( $links ) {
-		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=wp-translate' ) ) . '">设置</a>' );
+		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=wp-btranslate' ) ) . '">设置</a>' );
 
 		return $links;
 	}

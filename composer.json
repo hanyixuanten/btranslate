@@ -1,5 +1,5 @@
 {
-    "name": "wp-translate/wp-translate",
+    "name": "wp-btranslate/wp-btranslate",
     "description": "Persistent multilingual WordPress translations powered by Baidu Translate.",
     "type": "wordpress-plugin",
     "license": "proprietary",
