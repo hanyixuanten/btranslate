@@ -120,7 +120,7 @@ class WPT_Admin {
 								var progress = response.data;
 								container.innerHTML = '<p><strong>' + progress.percent + '%</strong>（' + progress.completed + ' / ' + progress.total + ' 个内容项）</p>' +
 									'<div style="max-width:480px;height:12px;background:#dcdcde"><div style="height:12px;width:' + progress.percent + '%;background:#2271b1"></div></div>' +
-									'<p class="description">文章和页面：' + progress.posts_completed + ' / ' + progress.posts_total + '；分类和标签：' + progress.terms_completed + ' / ' + progress.terms_total + '。显示最近一次全量重翻批次的进度，每 5 秒自动更新。</p>';
+									'<p class="description">最近任务：' + progress.task_label + '。文章和页面：' + progress.posts_completed + ' / ' + progress.posts_total + '；分类和标签：' + progress.terms_completed + ' / ' + progress.terms_total + '。每 5 秒自动更新。</p>';
 							})
 							.catch(function () {
 								container.innerHTML = '<p>暂时无法读取翻译进度。</p>';
@@ -146,17 +146,11 @@ class WPT_Admin {
 			wp_die( '无效的翻译范围。' );
 		}
 
-		$batch_started_at = current_time( 'mysql', true );
-		update_option(
-			'wpt_retranslation_batch',
-			array(
-				'started_at' => $batch_started_at,
-			),
-			false
-		);
-
 		$scheduled = 0;
-		$next_run  = time() + MINUTE_IN_SECONDS;
+		$next_run  = time();
+		$post_ids  = array();
+		$term_ids  = array();
+		$languages = WPT_Settings::target_languages();
 
 		if ( 'all' === $scope || 'posts' === $scope ) {
 			$post_ids = get_posts(
@@ -168,33 +162,38 @@ class WPT_Admin {
 				)
 			);
 
-			foreach ( $post_ids as $post_id ) {
-				foreach ( WPT_Settings::target_languages() as $target_language ) {
-					$this->clear_scheduled_event( 'wpt_process_translation', array( $post_id, $target_language, true ) );
-					wp_schedule_single_event( $next_run, 'wpt_process_translation', array( $post_id, $target_language, true ) );
-					$next_run += MINUTE_IN_SECONDS;
-					++$scheduled;
-				}
-			}
 		}
 
 		if ( 'all' === $scope || 'terms' === $scope ) {
-			$terms = get_terms(
+			$term_ids = get_terms(
 				array(
 					'taxonomy'   => array( 'category', 'post_tag' ),
 					'hide_empty' => false,
 					'fields'     => 'ids',
 				)
 			);
-			if ( ! is_wp_error( $terms ) ) {
-				foreach ( $terms as $term_id ) {
-					foreach ( WPT_Settings::target_languages() as $target_language ) {
-						$this->clear_scheduled_event( 'wpt_process_term_translation', array( $term_id, $target_language, true ) );
-						wp_schedule_single_event( $next_run, 'wpt_process_term_translation', array( $term_id, $target_language, true ) );
-						$next_run += MINUTE_IN_SECONDS;
-						++$scheduled;
-					}
-				}
+			if ( is_wp_error( $term_ids ) ) {
+				$term_ids = array();
+			}
+		}
+
+		$this->update_translation_task( $post_ids, $term_ids, $languages );
+
+		foreach ( $post_ids as $post_id ) {
+			foreach ( $languages as $target_language ) {
+				$this->clear_scheduled_event( 'wpt_process_translation', array( $post_id, $target_language, true ) );
+				wp_schedule_single_event( $next_run, 'wpt_process_translation', array( $post_id, $target_language, true ) );
+				$next_run += 2;
+				++$scheduled;
+			}
+		}
+
+		foreach ( $term_ids as $term_id ) {
+			foreach ( $languages as $target_language ) {
+				$this->clear_scheduled_event( 'wpt_process_term_translation', array( $term_id, $target_language, true ) );
+				wp_schedule_single_event( $next_run, 'wpt_process_term_translation', array( $term_id, $target_language, true ) );
+				$next_run += 2;
+				++$scheduled;
 			}
 		}
 
@@ -217,6 +216,7 @@ class WPT_Admin {
 		wp_clear_scheduled_hook( 'wpt_process_translation' );
 		wp_clear_scheduled_hook( 'wpt_process_term_translation' );
 		wp_clear_scheduled_hook( 'wpt_process_seo_output_translation' );
+		delete_option( 'wpt_translation_task' );
 		delete_option( 'wpt_retranslation_batch' );
 
 		wp_safe_redirect( add_query_arg( 'wpt_cache_cleared', 1, admin_url( 'options-general.php?page=wp-btranslate' ) ) );
@@ -242,22 +242,15 @@ class WPT_Admin {
 			wp_send_json_error( array( 'message' => 'forbidden' ), 403 );
 		}
 
-		$post_count = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
-		$terms      = get_terms(
-			array(
-				'taxonomy'   => array( 'category', 'post_tag' ),
-				'hide_empty' => false,
-				'fields'     => 'ids',
-			)
-		);
-		$term_count = is_wp_error( $terms ) ? 0 : count( $terms );
-		$languages  = WPT_Settings::target_languages();
-		$batch      = (array) get_option( 'wpt_retranslation_batch', array() );
-		$started_at = isset( $batch['started_at'] ) ? sanitize_text_field( $batch['started_at'] ) : '';
-		$counts     = ( new WPT_Translation_Store() )->get_completed_item_counts( $languages, $started_at );
+		$task      = (array) get_option( 'wpt_translation_task', array() );
+		$post_ids  = array_values( array_filter( array_map( 'absint', (array) ( $task['post_ids'] ?? array() ) ) ) );
+		$term_ids  = array_values( array_filter( array_map( 'absint', (array) ( $task['term_ids'] ?? array() ) ) ) );
+		$languages = array_values( array_filter( array_map( 'sanitize_key', (array) ( $task['target_languages'] ?? array() ) ) ) );
+		$started_at = isset( $task['started_at'] ) ? sanitize_text_field( $task['started_at'] ) : '';
+		$counts     = ( new WPT_Translation_Store() )->get_completed_item_counts( $languages, $post_ids, $term_ids, $started_at );
 
-		$posts_total      = $post_count * count( $languages );
-		$terms_total      = $term_count * count( $languages );
+		$posts_total      = count( $post_ids ) * count( $languages );
+		$terms_total      = count( $term_ids ) * count( $languages );
 		$total            = $posts_total + $terms_total;
 		$posts_completed  = min( $counts['posts'], $posts_total );
 		$terms_completed  = min( $counts['terms'], $terms_total );
@@ -274,6 +267,7 @@ class WPT_Admin {
 				'total'           => $total,
 				'percent'         => $percent,
 				'batch_started_at' => $started_at,
+				'task_label'      => $this->translation_task_label( $post_ids, $term_ids ),
 			)
 		);
 	}
@@ -327,9 +321,43 @@ class WPT_Admin {
 		}
 
 		check_admin_referer( 'wpt_translate_post_' . $post_id . '_' . $target_language );
+		$this->update_translation_task( array( $post_id ), array(), array( $target_language ) );
 		wp_schedule_single_event( time() + 5, 'wpt_process_translation', array( $post_id, $target_language, $force_refresh ) );
 
 		wp_safe_redirect( wp_get_referer() ? wp_get_referer() : admin_url( 'edit.php?post_type=' . get_post_type( $post_id ) ) );
 		exit;
+	}
+
+	private function update_translation_task( $post_ids, $term_ids, $target_languages ) {
+		update_option(
+			'wpt_translation_task',
+			array(
+				'started_at'       => current_time( 'mysql', true ),
+				'post_ids'         => array_values( array_filter( array_map( 'absint', (array) $post_ids ) ) ),
+				'term_ids'         => array_values( array_filter( array_map( 'absint', (array) $term_ids ) ) ),
+				'target_languages' => array_values( array_filter( array_map( 'sanitize_key', (array) $target_languages ) ) ),
+			),
+			false
+		);
+	}
+
+	private function translation_task_label( $post_ids, $term_ids ) {
+		if ( ! empty( $post_ids ) && ! empty( $term_ids ) ) {
+			return '全量翻译';
+		}
+
+		if ( 1 === count( $post_ids ) ) {
+			return '单篇文章翻译';
+		}
+
+		if ( ! empty( $post_ids ) ) {
+			return '文章和页面翻译';
+		}
+
+		if ( ! empty( $term_ids ) ) {
+			return '分类和标签翻译';
+		}
+
+		return '暂无翻译任务';
 	}
 }

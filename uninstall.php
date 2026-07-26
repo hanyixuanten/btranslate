@@ -16,6 +16,7 @@ function wpt_uninstall_site_data() {
 	wp_clear_scheduled_hook( 'wpt_process_term_translation' );
 	wp_clear_scheduled_hook( 'wpt_process_seo_output_translation' );
 	delete_option( 'wpt_settings' );
+	delete_option( 'wpt_translation_task' );
 	delete_option( 'wpt_retranslation_batch' );
 
 	$table_name = $wpdb->prefix . 'wpt_translations';
