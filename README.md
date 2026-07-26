@@ -1,5 +1,7 @@
 # WP Translate
 
+[中文](README.zh-CN.md)|English
+
 WP Translate is a WordPress plugin skeleton for persistent multilingual content using the Baidu Translate API.
 
 ## Requirements
