@@ -56,6 +56,10 @@ Btranslate 是一个 WordPress 插件骨架，使用百度翻译 API 持久化�
 
 由于 WordPress 选项由数据库保存，请使用 HTTPS 并适当限制数据库访问权限。生产站点应配置真实的 Cron 执行器，确保翻译任务可靠运行。
 
+## 卸载
+
+卸载 Btranslate 会永久删除其设置和凭据、重新翻译批处理状态、所有待执行的 Btranslate Cron 事件，以及每个站点的 `{$wpdb->prefix}wpt_translations` 表。这会删除所有已持久化的翻译。停用插件不会删除这些记录。
+
 ## 开发
 
 使用 `composer install` 安装开发依赖。项目包含用于 Intelephense 的 WordPress API 存根，以及使用伪造提供程序和存储的 PHPUnit 测试；因此测试不需要 WordPress、数据库、凭据或网络访问。

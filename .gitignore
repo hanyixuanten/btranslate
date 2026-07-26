@@ -6,5 +6,11 @@
 /dist/
 /phpunit.xml
 /.intelephense/
+.env
+.env.*
+!/env.example
+/wp-config.php
+/wordpress/
+/wp-content/
 .DS_Store
 *.zip

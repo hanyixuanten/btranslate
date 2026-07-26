@@ -57,6 +57,10 @@ Credentials are stored in the WordPress `wpt_settings` option and are not render
 
 Use HTTPS and restrict database access appropriately because WordPress options are database-backed. Production sites should configure a real cron runner for reliable translation processing.
 
+## Uninstalling
+
+Uninstalling Btranslate permanently deletes its settings and credentials, retranslation batch state, all pending Btranslate cron events, and every site's `{$wpdb->prefix}wpt_translations` table. This removes all persisted translations. Deactivating the plugin does not delete these records.
+
 ## Development
 
 Install development dependencies with `composer install`. The project includes WordPress API stubs for Intelephense and PHPUnit tests that use fake providers and storage, so they do not need WordPress, a database, credentials, or network access.
