@@ -7,6 +7,7 @@ class WPT_Admin {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_post_wpt_queue_existing_translations', array( $this, 'queue_existing_translations' ) );
+		add_action( 'admin_post_wpt_clear_translation_cache', array( $this, 'clear_translation_cache' ) );
 		add_action( 'admin_post_wpt_translate_post', array( $this, 'queue_post_translation' ) );
 		add_action( 'wp_ajax_wpt_translation_progress', array( $this, 'translation_progress' ) );
 		add_filter( 'manage_post_posts_columns', array( $this, 'add_translation_column' ) );
@@ -89,6 +90,14 @@ class WPT_Admin {
 				<input type="hidden" name="scope" value="terms" />
 				<?php wp_nonce_field( 'wpt_queue_existing_translations' ); ?>
 				<?php submit_button( '翻译所有分类标签', 'secondary', 'submit', false ); ?>
+			</form>
+			<hr />
+			<h2>翻译缓存</h2>
+			<p>清除后，前台会暂时显示源文；重新翻译时将再次调用百度翻译 API。</p>
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" onsubmit="return window.confirm('这将删除所有已保存的翻译、取消待执行翻译任务并重置进度。确认继续吗？');">
+				<input type="hidden" name="action" value="wpt_clear_translation_cache" />
+				<?php wp_nonce_field( 'wpt_clear_translation_cache' ); ?>
+				<?php submit_button( '清除已翻译的缓存', 'delete', 'submit', false ); ?>
 			</form>
 			<hr />
 			<h2>翻译进度</h2>
@@ -190,6 +199,27 @@ class WPT_Admin {
 		}
 
 		wp_safe_redirect( add_query_arg( 'wpt_queued', $scheduled, admin_url( 'options-general.php?page=wp-btranslate' ) ) );
+		exit;
+	}
+
+	public function clear_translation_cache() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( '您没有执行此操作的权限。' );
+		}
+
+		check_admin_referer( 'wpt_clear_translation_cache' );
+		$deleted = ( new WPT_Translation_Store() )->clear();
+
+		if ( false === $deleted ) {
+			wp_die( '翻译缓存清除失败。' );
+		}
+
+		wp_clear_scheduled_hook( 'wpt_process_translation' );
+		wp_clear_scheduled_hook( 'wpt_process_term_translation' );
+		wp_clear_scheduled_hook( 'wpt_process_seo_output_translation' );
+		delete_option( 'wpt_retranslation_batch' );
+
+		wp_safe_redirect( add_query_arg( 'wpt_cache_cleared', 1, admin_url( 'options-general.php?page=wp-btranslate' ) ) );
 		exit;
 	}
 

@@ -70,6 +70,12 @@ class WPT_Translation_Store {
 		);
 	}
 
+	public function clear() {
+		global $wpdb;
+
+		return $wpdb->query( 'DELETE FROM ' . self::table_name() );
+	}
+
 	public function get_post_language_status( $post_id, $target_language ) {
 		global $wpdb;
 

@@ -77,6 +77,8 @@ The Posts and Pages lists show a status column for every target language, includ
 
 The Settings page also shows a live progress panel. It refreshes every five seconds and counts completed post/page and category/tag items for every configured target language. When **重新翻译所有内容** starts a batch, progress resets and counts only translations completed after that batch began, so historical translations do not make a new batch appear complete. Forced retranslation jobs are scheduled one minute apart, so a single WP-Cron request processes at most one batch item instead of timing out while processing every post. Progress reads only local WordPress and translation-table data; it does not send additional requests to Baidu.
 
+The **清除已翻译的缓存** action deletes every persisted translation, cancels pending translation jobs, and resets batch progress. The front end then falls back to source content until translations are explicitly queued again; regenerating them consumes Baidu API quota.
+
 ## Known Limitations
 
 - The settings UI accepts language codes but does not yet validate them against a maintained Baidu language-code list.
