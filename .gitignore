@@ -1,10 +1,7 @@
 /vendor/
 /node_modules/
-/.phpunit.result.cache
-/coverage/
 /build/
 /dist/
-/phpunit.xml
 /.intelephense/
 .env
 .env.*

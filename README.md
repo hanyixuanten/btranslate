@@ -63,21 +63,13 @@ Uninstalling Btranslate permanently deletes its settings and credentials, retran
 
 ## Development
 
-Install development dependencies with `composer install`. The project includes WordPress API stubs for Intelephense and PHPUnit tests that use fake providers and storage, so they do not need WordPress, a database, credentials, or network access.
-
-Run tests with:
-
-```sh
-composer test
-```
-
-Validate PHP syntax with:
+The repository has no Composer or PHPUnit dependency. Validate PHP syntax with the PHP executable available on your system:
 
 ```sh
 find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 ```
 
-Before production use, add WordPress PHPUnit integration tests with mocked `wp_remote_post` responses. Required coverage includes language resolution, rewrite behavior, persistence reuse and invalidation, Baidu request signing and errors, content filtering, and fallback rendering.
+Before production use, test the plugin in a WordPress staging environment. Cover language resolution, rewrite behavior, persistence reuse and invalidation, Baidu request signing and errors, content filtering, and fallback rendering. Mock `wp_remote_post` responses for any automated tests so they do not need live credentials, a database, or outbound network access.
 
 ## Retranslation
 

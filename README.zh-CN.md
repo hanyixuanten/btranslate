@@ -62,21 +62,13 @@ Btranslate 是一个 WordPress 插件骨架，使用百度翻译 API 持久化�
 
 ## 开发
 
-使用 `composer install` 安装开发依赖。项目包含用于 Intelephense 的 WordPress API 存根，以及使用伪造提供程序和存储的 PHPUnit 测试；因此测试不需要 WordPress、数据库、凭据或网络访问。
-
-运行测试：
-
-```sh
-composer test
-```
-
-验证 PHP 语法：
+仓库不依赖 Composer 或 PHPUnit。使用系统中可用的 PHP 可执行文件验证 PHP 语法：
 
 ```sh
 find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 ```
 
-投入生产前，应添加 WordPress PHPUnit 集成测试，并模拟 `wp_remote_post` 响应。所需覆盖范围包括语言解析、重写行为、持久化复用与失效、百度请求签名和错误处理、内容过滤和回退渲染。
+投入生产前，应在 WordPress 预发布环境中测试插件，覆盖语言解析、重写行为、持久化复用与失效、百度请求签名和错误处理、内容过滤和回退渲染。任何自动化测试都应模拟 `wp_remote_post` 响应，避免依赖真实凭据、数据库或外部网络访问。
 
 ## 重新翻译
 
