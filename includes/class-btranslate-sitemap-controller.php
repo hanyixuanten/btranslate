@@ -30,22 +30,25 @@ class BTRANSLATE_Sitemap_Controller {
 			return;
 		}
 
-		$response = wp_remote_get(
-			$source_url,
+		$context = stream_context_create(
 			array(
-				'timeout'     => 10,
-				'redirection' => 0,
-				'headers'     => array(
-					'Accept' => 'application/xml, text/xml;q=0.9',
+				'http' => array(
+					'method'        => 'GET',
+					'timeout'       => 10,
+					'ignore_errors' => false,
+					'follow_location' => 0,
+					'max_redirects' => 0,
+					'header'        => "Accept: application/xml, text/xml;q=0.9\r\n",
 				),
 			)
 		);
+		$source_xml = @file_get_contents( $source_url, false, $context ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.PHP.NoSilencedErrors.Discouraged
 
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+		if ( false === $source_xml ) {
 			return;
 		}
 
-		$xml = $this->rewrite_sitemap( wp_remote_retrieve_body( $response ), $source_url );
+		$xml = $this->rewrite_sitemap( $source_xml, $source_url );
 		if ( '' === $xml ) {
 			return;
 		}
