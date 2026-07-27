@@ -49,7 +49,7 @@ Post, page, term, and home links are generated for the active language. For exam
 
 For a bound subdomain, enter a value such as `en.example.com=en`. The server and DNS must route that hostname to the same WordPress installation before WordPress can resolve the language.
 
-Sitemap requests made through a configured target-language subdirectory or bound domain are proxied to the same sitemap path on the source site. The plugin rewrites standard `<loc>` entries in both sitemap indexes and URL sets to the active language URL, so sitemap index links continue through the same language route. Source sitemap failures remain non-fatal and fall back to normal WordPress request handling. The source sitemap must be available from the WordPress `home` origin; upstream redirects are not followed.
+The plugin handles only the target language's `sitemap.xml` request: `/{language}/sitemap.xml` in subdirectory mode and `/sitemap.xml` on a bound domain. It always fetches `/sitemap.xml` from the source site's origin and rewrites complete source-site URLs in XML text nodes and attributes to the current language URL. Other sitemap filenames and external URLs remain unchanged. Source sitemap failures remain non-fatal and fall back to normal WordPress request handling. The source sitemap must be available from the WordPress `home` origin; upstream redirects are not followed.
 
 After changing routing settings, rewrite rules are refreshed. The initial implementation does not yet generate translated permalinks, canonical URLs, `hreflang` alternates, or redirects.
 
