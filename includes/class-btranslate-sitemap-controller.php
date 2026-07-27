@@ -105,6 +105,12 @@ class BTRANSLATE_Sitemap_Controller {
 			return '';
 		}
 
+		foreach ( $document->childNodes as $child_node ) {
+			if ( XML_PI_NODE === $child_node->nodeType && 'xml-stylesheet' === $child_node->nodeName ) {
+				$document->removeChild( $child_node );
+			}
+		}
+
 		$xpath = new DOMXPath( $document );
 		$nodes = $xpath->query( '/*[local-name()="urlset" or local-name()="sitemapindex"]/*[local-name()="url" or local-name()="sitemap"]/*[local-name()="loc"]' );
 
