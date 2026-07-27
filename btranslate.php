@@ -34,6 +34,5 @@ require_once BTRANSLATE_PATH . 'includes/class-btranslate-uninstaller.php';
 
 register_activation_hook( BTRANSLATE_FILE, array( 'BTRANSLATE_Plugin', 'activate' ) );
 register_deactivation_hook( BTRANSLATE_FILE, array( 'BTRANSLATE_Plugin', 'deactivate' ) );
-register_uninstall_hook( BTRANSLATE_FILE, array( 'BTRANSLATE_Uninstaller', 'uninstall' ) );
 
 add_action( 'plugins_loaded', array( 'BTRANSLATE_Plugin', 'instance' ) );

@@ -34,21 +34,8 @@ class BTRANSLATE_Sitemap_Controller {
 			return;
 		}
 
-		$context = stream_context_create(
-			array(
-				'http'  => array(
-					'method'          => 'GET',
-					'timeout'         => 10,
-					'ignore_errors'   => false,
-					'follow_location' => 0,
-					'max_redirects'   => 0,
-					'header'          => "Accept: application/xml, text/xml;q=0.9\r\n",
-				),
-			)
-		);
-		$source_xml = @file_get_contents( $source_url, false, $context ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.PHP.NoSilencedErrors.Discouraged
-
-		if ( false === $source_xml ) {
+		$source_xml = $this->source_sitemap_xml( $source_url );
+		if ( '' === $source_xml ) {
 			return;
 		}
 
@@ -62,6 +49,38 @@ class BTRANSLATE_Sitemap_Controller {
 		header( 'X-Robots-Tag: noindex, follow', true );
 		echo $xml; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Serialized XML from DOMDocument.
 		exit;
+	}
+
+	private function source_sitemap_xml( $source_url ) {
+		$cache_key = 'btranslate_sitemap_' . md5( $source_url );
+		$cached    = get_transient( $cache_key );
+
+		if ( is_string( $cached ) && '' !== $cached ) {
+			return $cached;
+		}
+
+		$response = wp_safe_remote_get(
+			$source_url,
+			array(
+				'timeout'             => 10,
+				'redirection'         => 0,
+				'limit_response_size' => 5 * MB_IN_BYTES,
+				'headers'             => array(
+					'Accept' => 'application/xml, text/xml;q=0.9',
+				),
+			)
+		);
+
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return '';
+		}
+
+		$source_xml = wp_remote_retrieve_body( $response );
+		if ( '' !== $source_xml ) {
+			set_transient( $cache_key, $source_xml, 5 * MINUTE_IN_SECONDS );
+		}
+
+		return $source_xml;
 	}
 
 	private function request_path() {

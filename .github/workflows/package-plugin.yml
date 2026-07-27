@@ -35,6 +35,7 @@ jobs:
           mkdir -p "build/${plugin_slug}"
           cp btranslate.php uninstall.php readme.txt readme-zh_CN.txt LICENSE "build/${plugin_slug}/"
           cp -R includes "build/${plugin_slug}/"
+          cp -R assets "build/${plugin_slug}/"
           (
             cd build
             zip -qr "../${archive_name}" "${plugin_slug}"

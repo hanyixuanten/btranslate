@@ -43,7 +43,7 @@ class BTRANSLATE_Content_Controller {
 	}
 
 	public function schedule_post_translation( $post_id, $post, $update ) {
-		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) || ! in_array( $post->post_type, array( 'post', 'page' ), true ) ) {
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) || 'publish' !== $post->post_status || ! in_array( $post->post_type, array( 'post', 'page' ), true ) ) {
 			return;
 		}
 
@@ -58,7 +58,7 @@ class BTRANSLATE_Content_Controller {
 		$post     = get_post( $post_id );
 		$settings = BTRANSLATE_Settings::get();
 
-		if ( ! $post || ! BTRANSLATE_Settings::is_supported_language( $target_language ) ) {
+		if ( ! $post || 'publish' !== $post->post_status || ! BTRANSLATE_Settings::is_supported_language( $target_language ) ) {
 			return;
 		}
 

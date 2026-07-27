@@ -6,6 +6,7 @@ class BTRANSLATE_Admin {
 	public function register() {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_settings_assets' ) );
 		add_action( 'admin_post_btranslate_queue_existing_translations', array( $this, 'queue_existing_translations' ) );
 		add_action( 'admin_post_btranslate_clear_translation_cache', array( $this, 'clear_translation_cache' ) );
 		add_action( 'admin_post_btranslate_translate_post', array( $this, 'queue_post_translation' ) );
@@ -23,6 +24,28 @@ class BTRANSLATE_Admin {
 
 	public function register_settings() {
 		register_setting( 'btranslate_settings', 'btranslate_settings', array( $this, 'sanitize_settings' ) );
+	}
+
+	public function enqueue_settings_assets( $hook_suffix ) {
+		if ( 'settings_page_btranslate' !== $hook_suffix ) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'btranslate-admin',
+			plugins_url( 'assets/js/btranslate-admin.js', BTRANSLATE_FILE ),
+			array(),
+			BTRANSLATE_VERSION,
+			true
+		);
+		wp_localize_script(
+			'btranslate-admin',
+			'btranslateAdmin',
+			array(
+				'progressUrl'   => admin_url( 'admin-ajax.php' ),
+				'progressNonce' => wp_create_nonce( 'btranslate_translation_progress' ),
+			)
+		);
 	}
 
 	public function sanitize_settings( $settings ) {
@@ -74,34 +97,22 @@ class BTRANSLATE_Admin {
 				</table>
 				<?php submit_button(); ?>
 			</form>
-			<script>
-				(function () {
-					var domainMode = document.querySelector('#btranslate-routing-mode input[value="domain"]');
-					var bindingsRow = document.getElementById('btranslate-domain-bindings-row');
-
-					function toggleDomainBindings() {
-						bindingsRow.style.display = domainMode.checked ? '' : 'none';
-					}
-
-					domainMode.addEventListener('change', toggleDomainBindings);
-				}());
-			</script>
 			<hr />
 			<h2>重新翻译所有内容</h2>
 			<p>此操作会将所有已发布文章、页面、分类和标签重新加入翻译队列。</p>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" onsubmit="return window.confirm('这将重新翻译所有内容，请注意 API 消耗。确认继续吗？');">
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" data-btranslate-confirm="这将重新翻译所有内容，请注意 API 消耗。确认继续吗？">
 				<input type="hidden" name="action" value="btranslate_queue_existing_translations" />
 				<?php wp_nonce_field( 'btranslate_queue_existing_translations' ); ?>
 				<?php submit_button( '重新翻译所有内容', 'secondary', 'submit', false ); ?>
 			</form>
 			<p>也可以只重新翻译一种内容类型。</p>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block;margin-right:8px" onsubmit="return window.confirm('这将重新翻译所有文章和页面，请注意 API 消耗。确认继续吗？');">
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block;margin-right:8px" data-btranslate-confirm="这将重新翻译所有文章和页面，请注意 API 消耗。确认继续吗？">
 				<input type="hidden" name="action" value="btranslate_queue_existing_translations" />
 				<input type="hidden" name="scope" value="posts" />
 				<?php wp_nonce_field( 'btranslate_queue_existing_translations' ); ?>
 				<?php submit_button( '翻译所有文章', 'secondary', 'submit', false ); ?>
 			</form>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block" onsubmit="return window.confirm('这将重新翻译所有分类和标签，请注意 API 消耗。确认继续吗？');">
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block" data-btranslate-confirm="这将重新翻译所有分类和标签，请注意 API 消耗。确认继续吗？">
 				<input type="hidden" name="action" value="btranslate_queue_existing_translations" />
 				<input type="hidden" name="scope" value="terms" />
 				<?php wp_nonce_field( 'btranslate_queue_existing_translations' ); ?>
@@ -110,7 +121,7 @@ class BTRANSLATE_Admin {
 			<hr />
 			<h2>翻译缓存</h2>
 			<p>清除后，前台会暂时显示源文；重新翻译时将再次调用百度翻译 API。</p>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" onsubmit="return window.confirm('这将删除所有已保存的翻译、取消待执行翻译任务并重置进度。确认继续吗？');">
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" data-btranslate-confirm="这将删除所有已保存的翻译、取消待执行翻译任务并重置进度。确认继续吗？">
 				<input type="hidden" name="action" value="btranslate_clear_translation_cache" />
 				<?php wp_nonce_field( 'btranslate_clear_translation_cache' ); ?>
 				<?php submit_button( '清除已翻译的缓存', 'delete', 'submit', false ); ?>
@@ -120,33 +131,6 @@ class BTRANSLATE_Admin {
 			<div id="btranslate-translation-progress" aria-live="polite">
 				<p>正在读取翻译进度...</p>
 			</div>
-			<script>
-				(function () {
-					var container = document.getElementById('btranslate-translation-progress');
-					var endpoint = <?php echo wp_json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
-					var nonce = <?php echo wp_json_encode( wp_create_nonce( 'btranslate_translation_progress' ) ); ?>;
-
-					function updateProgress() {
-						fetch(endpoint + '?action=btranslate_translation_progress&_ajax_nonce=' + encodeURIComponent(nonce), { credentials: 'same-origin' })
-							.then(function (response) { return response.json(); })
-							.then(function (response) {
-								if (!response.success) {
-									throw new Error('progress_request_failed');
-								}
-								var progress = response.data;
-								container.innerHTML = '<p><strong>' + progress.percent + '%</strong>（' + progress.completed + ' / ' + progress.total + ' 个内容项）</p>' +
-									'<div style="max-width:480px;height:12px;background:#dcdcde"><div style="height:12px;width:' + progress.percent + '%;background:#2271b1"></div></div>' +
-									'<p class="description">最近任务：' + progress.task_label + '。文章和页面：' + progress.posts_completed + ' / ' + progress.posts_total + '；分类和标签：' + progress.terms_completed + ' / ' + progress.terms_total + '。每 5 秒自动更新。</p>';
-							})
-							.catch(function () {
-								container.innerHTML = '<p>暂时无法读取翻译进度。</p>';
-							});
-					}
-
-					updateProgress();
-					window.setInterval(updateProgress, 5000);
-				}());
-			</script>
 		</div>
 		<?php
 	}
