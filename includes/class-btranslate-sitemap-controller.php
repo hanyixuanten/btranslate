@@ -107,12 +107,7 @@ class BTRANSLATE_Sitemap_Controller {
 		}
 
 		foreach ( $nodes as $node ) {
-			$value     = trim( $node->nodeValue );
-			$rewritten = $this->rewrite_source_url( $value, $source_url );
-
-			if ( $rewritten !== $value ) {
-				$node->nodeValue = str_replace( $value, $rewritten, $node->nodeValue );
-			}
+			$node->nodeValue = $this->rewrite_source_urls( $node->nodeValue, $source_url );
 		}
 
 		$result = $document->saveXML();
@@ -120,29 +115,27 @@ class BTRANSLATE_Sitemap_Controller {
 		return false === $result ? '' : $result;
 	}
 
-	private function rewrite_source_url( $url, $source_url ) {
-		$url_parts    = wp_parse_url( $url );
+	private function rewrite_source_urls( $value, $source_url ) {
 		$source_parts = wp_parse_url( $source_url );
 
-		if (
-			! is_array( $url_parts ) ||
-			! is_array( $source_parts ) ||
-			empty( $url_parts['scheme'] ) ||
-			empty( $url_parts['host'] ) ||
-			0 !== strcasecmp( $url_parts['host'], $source_parts['host'] ) ||
-			$this->url_port( $url_parts ) !== $this->url_port( $source_parts )
-		) {
-			return $url;
+		if ( ! is_array( $source_parts ) || empty( $source_parts['host'] ) ) {
+			return $value;
 		}
 
-		return $this->router->localized_url( $url );
-	}
+		$rewritten = preg_replace_callback(
+			'#https?://[^\s<>"\']+#i',
+			function ( $matches ) use ( $source_parts ) {
+				$url_parts = wp_parse_url( $matches[0] );
 
-	private function url_port( $parts ) {
-		if ( isset( $parts['port'] ) ) {
-			return (int) $parts['port'];
-		}
+				if ( ! is_array( $url_parts ) || empty( $url_parts['host'] ) || 0 !== strcasecmp( $url_parts['host'], $source_parts['host'] ) ) {
+					return $matches[0];
+				}
 
-		return isset( $parts['scheme'] ) && 'http' === strtolower( $parts['scheme'] ) ? 80 : 443;
+				return $this->router->localized_url( $matches[0] );
+			},
+			$value
+		);
+
+		return null === $rewritten ? $value : $rewritten;
 	}
 }
