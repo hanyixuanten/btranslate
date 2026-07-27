@@ -22,6 +22,7 @@ class BTRANSLATE_Language_Router {
 		}
 
 		add_rewrite_tag( '%btranslate_language%', '(' . $language_pattern . ')' );
+		add_rewrite_rule( '^(' . $language_pattern . ')/sitemap\.xml$', 'index.php?btranslate_language=$matches[1]&btranslate_sitemap=1', 'top' );
 		add_rewrite_rule( '^(' . $language_pattern . ')/(.*)$', 'index.php?btranslate_language=$matches[1]&pagename=$matches[2]', 'top' );
 		add_rewrite_rule( '^(' . $language_pattern . ')/?$', 'index.php?btranslate_language=$matches[1]', 'top' );
 	}

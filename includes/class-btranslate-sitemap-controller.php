@@ -10,18 +10,34 @@ class BTRANSLATE_Sitemap_Controller {
 	}
 
 	public function register() {
+		add_filter( 'query_vars', array( $this, 'query_vars' ) );
+		add_action( 'parse_request', array( $this, 'capture_request' ), 20 );
 		add_action( 'template_redirect', array( $this, 'maybe_serve_localized_sitemap' ), 0 );
+	}
+
+	public function query_vars( $query_vars ) {
+		$query_vars[] = 'btranslate_sitemap';
+
+		return $query_vars;
+	}
+
+	public function capture_request( $wp ) {
+		$settings = BTRANSLATE_Settings::get();
+		$language = $this->requested_language( $this->request_path(), $settings );
+
+		if ( '' === $language ) {
+			return;
+		}
+
+		$wp->query_vars['btranslate_language'] = $language;
+		$wp->query_vars['btranslate_sitemap']  = '1';
 	}
 
 	public function maybe_serve_localized_sitemap() {
 		$settings = BTRANSLATE_Settings::get();
 		$language = $this->router->current_language();
 
-		if ( $language === sanitize_key( $settings['source_language'] ) || ! in_array( $language, BTRANSLATE_Settings::target_languages(), true ) ) {
-			return;
-		}
-
-		if ( ! $this->is_sitemap_request( $this->request_path(), $language, $settings['routing_mode'] ) ) {
+		if ( '1' !== (string) get_query_var( 'btranslate_sitemap' ) || $language === sanitize_key( $settings['source_language'] ) || ! in_array( $language, BTRANSLATE_Settings::target_languages(), true ) ) {
 			return;
 		}
 
@@ -67,10 +83,28 @@ class BTRANSLATE_Sitemap_Controller {
 		return is_string( $path ) ? '/' . ltrim( $path, '/' ) : '';
 	}
 
-	private function is_sitemap_request( $path, $language, $routing_mode ) {
-		$expected_path = 'subdirectory' === $routing_mode ? '/' . $language . '/sitemap.xml' : '/sitemap.xml';
+	private function requested_language( $path, $settings ) {
+		if ( 'subdirectory' === $settings['routing_mode'] ) {
+			foreach ( BTRANSLATE_Settings::target_languages() as $language ) {
+				$language = sanitize_key( $language );
 
-		return $expected_path === untrailingslashit( $path );
+				if ( '/' . $language . '/sitemap.xml' === untrailingslashit( $path ) ) {
+					return $language;
+				}
+			}
+
+			return '';
+		}
+
+		if ( '/sitemap.xml' !== untrailingslashit( $path ) ) {
+			return '';
+		}
+
+		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+		$bindings = (array) $settings['domain_bindings'];
+		$language = isset( $bindings[ $host ] ) ? sanitize_key( $bindings[ $host ] ) : '';
+
+		return in_array( $language, BTRANSLATE_Settings::target_languages(), true ) ? $language : '';
 	}
 
 	private function source_sitemap_url() {
