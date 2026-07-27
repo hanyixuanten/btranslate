@@ -13,7 +13,7 @@ Btranslate 是一个 WordPress 插件骨架，使用百度翻译 API 持久化�
 
 ## 安装
 
-1. 将此目录复制到 `wp-content/plugins/wp-btranslate`。
+1. 将此目录复制到 `wp-content/plugins/btranslate`。
 2. 在 WordPress 后台启用 **Btranslate**。
 3. 打开 **设置 > Btranslate**。
 4. 填写百度翻译凭据、源语言、目标语言代码和 URL 路由模式。
@@ -89,3 +89,7 @@ find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php
 - 分类法和 SEO 值会入队，但当前渲染过滤器只覆盖部分 SEO 插件和术语视图。
 - 域名绑定假定 WordPress 站点和服务器虚拟主机已为每个绑定域名配置完成。
 - 翻译失败会作为失败尝试保存，并显示源值；尚未实现重试管理和后台任务监控器。
+
+## 许可证
+
+Btranslate 使用 [GNU 通用公共许可证第 3 版](LICENSE)授权。

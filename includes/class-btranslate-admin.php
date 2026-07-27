@@ -18,7 +18,7 @@ class BTRANSLATE_Admin {
 	}
 
 	public function add_settings_page() {
-		add_options_page( __( 'Btranslate', 'wp-btranslate' ), __( 'Btranslate', 'wp-btranslate' ), 'manage_options', 'wp-btranslate', array( $this, 'render_settings_page' ) );
+		add_options_page( __( 'Btranslate', 'btranslate' ), __( 'Btranslate', 'btranslate' ), 'manage_options', 'btranslate', array( $this, 'render_settings_page' ) );
 	}
 
 	public function register_settings() {
@@ -213,7 +213,7 @@ class BTRANSLATE_Admin {
 			}
 		}
 
-		wp_safe_redirect( add_query_arg( 'btranslate_queued', $scheduled, admin_url( 'options-general.php?page=wp-btranslate' ) ) );
+		wp_safe_redirect( add_query_arg( 'btranslate_queued', $scheduled, admin_url( 'options-general.php?page=btranslate' ) ) );
 		exit;
 	}
 
@@ -235,7 +235,7 @@ class BTRANSLATE_Admin {
 		delete_option( 'btranslate_translation_task' );
 		delete_option( 'btranslate_retranslation_batch' );
 
-		wp_safe_redirect( add_query_arg( 'btranslate_cache_cleared', 1, admin_url( 'options-general.php?page=wp-btranslate' ) ) );
+		wp_safe_redirect( add_query_arg( 'btranslate_cache_cleared', 1, admin_url( 'options-general.php?page=btranslate' ) ) );
 		exit;
 	}
 
@@ -246,7 +246,7 @@ class BTRANSLATE_Admin {
 	}
 
 	public function add_plugin_settings_link( $links ) {
-		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=wp-btranslate' ) ) . '">设置</a>' );
+		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=btranslate' ) ) . '">设置</a>' );
 
 		return $links;
 	}

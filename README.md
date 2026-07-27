@@ -13,7 +13,7 @@ Btranslate is a WordPress plugin skeleton for persistent multilingual content us
 
 ## Installation
 
-1. Copy this directory to `wp-content/plugins/wp-btranslate`.
+1. Copy this directory to `wp-content/plugins/btranslate`.
 2. Activate **Btranslate** in WordPress Admin.
 3. Open **Settings > Btranslate**.
 4. Enter the Baidu credentials, source language, target-language codes, and URL routing mode.
@@ -90,3 +90,7 @@ The **清除已翻译的缓存** action deletes every persisted translation, can
 - Taxonomy and SEO values are queued but the current rendering filters cover only a subset of SEO plugins and term views.
 - Domain binding assumes the WordPress site and server virtual hosts are already configured for every bound domain.
 - Translation failures are stored as failed attempts and render the source value; retry management and an admin job monitor are not implemented yet.
+
+## License
+
+Btranslate is licensed under the [GNU General Public License version 3](LICENSE).
