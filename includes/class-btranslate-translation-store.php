@@ -39,13 +39,14 @@ class BTRANSLATE_Translation_Store {
 	public function find_valid( $identity_key ) {
 		global $wpdb;
 
-		$table_name = self::table_name();
-		$sql        = $wpdb->prepare(
-			"SELECT * FROM {$table_name} WHERE identity_key = %s AND status = 'complete' LIMIT 1",
-			$identity_key
+		return $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The custom translation table is the plugin's persistent cache.
+			$wpdb->prepare(
+				"SELECT * FROM %i WHERE identity_key = %s AND status = 'complete' LIMIT 1",
+				self::table_name(),
+				$identity_key
+			),
+			ARRAY_A
 		);
-
-		return $wpdb->get_row( $sql, ARRAY_A );
 	}
 
 	public function save( $identity_key, $source_language, $target_language, $field_context, $source_fingerprint, $translated_value, $status ) {
@@ -53,7 +54,7 @@ class BTRANSLATE_Translation_Store {
 
 		$now = current_time( 'mysql', true );
 
-		return $wpdb->replace(
+		return $wpdb->replace( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Writes to the plugin-owned persistent translation cache.
 			self::table_name(),
 			array(
 				'identity_key'       => $identity_key,
@@ -73,29 +74,30 @@ class BTRANSLATE_Translation_Store {
 	public function clear() {
 		global $wpdb;
 
-		return $wpdb->query( 'DELETE FROM ' . self::table_name() );
+		return $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- This explicitly clears the plugin's persistent translation cache.
+			$wpdb->prepare( 'DELETE FROM %i', self::table_name() )
+		);
 	}
 
 	public function get_post_language_status( $post_id, $target_language ) {
 		global $wpdb;
 
-		$table_name = self::table_name();
-		$sql        = $wpdb->prepare(
-			"SELECT COUNT(*) AS translated_fields, MAX(updated_at) AS last_translated_at
-			FROM {$table_name}
-			WHERE target_language = %s
-			AND status = 'complete'
-			AND field_context LIKE %s",
-			$target_language,
-			'post:' . absint( $post_id ) . ':%'
+		return $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The custom translation table is the plugin's persistent cache.
+			$wpdb->prepare(
+				"SELECT COUNT(*) AS translated_fields, MAX(updated_at) AS last_translated_at
+				FROM %i
+				WHERE target_language = %s
+				AND status = 'complete'
+				AND field_context LIKE %s",
+				self::table_name(),
+				$target_language,
+				'post:' . absint( $post_id ) . ':%'
+			),
+			ARRAY_A
 		);
-
-		return $wpdb->get_row( $sql, ARRAY_A );
 	}
 
 	public function get_completed_item_counts( $target_languages, $post_ids, $term_ids, $since = '' ) {
-		global $wpdb;
-
 		$target_languages = array_values( array_filter( array_map( 'sanitize_key', (array) $target_languages ) ) );
 		$post_ids         = array_values( array_filter( array_map( 'absint', (array) $post_ids ) ) );
 		$term_ids         = array_values( array_filter( array_map( 'absint', (array) $term_ids ) ) );
@@ -106,23 +108,19 @@ class BTRANSLATE_Translation_Store {
 			);
 		}
 
-		$table_name           = self::table_name();
 		$language_placeholders = implode( ',', array_fill( 0, count( $target_languages ), '%s' ) );
-		$since_clause          = '' === $since ? '' : ' AND updated_at >= %s';
-		$post_sql              = $this->get_completed_item_count_sql( 'post', $post_ids, $target_languages, $language_placeholders, $since, $since_clause, $table_name );
-		$term_sql              = $this->get_completed_item_count_sql( 'term', $term_ids, $target_languages, $language_placeholders, $since, $since_clause, $table_name );
 
 		return array(
-			'posts' => (int) $wpdb->get_var( $post_sql ),
-			'terms' => (int) $wpdb->get_var( $term_sql ),
+			'posts' => $this->get_completed_item_count( 'post', $post_ids, $target_languages, $language_placeholders, $since ),
+			'terms' => $this->get_completed_item_count( 'term', $term_ids, $target_languages, $language_placeholders, $since ),
 		);
 	}
 
-	private function get_completed_item_count_sql( $item_type, $item_ids, $target_languages, $language_placeholders, $since, $since_clause, $table_name ) {
+	private function get_completed_item_count( $item_type, $item_ids, $target_languages, $language_placeholders, $since ) {
 		global $wpdb;
 
 		if ( empty( $item_ids ) ) {
-			return 'SELECT 0';
+			return 0;
 		}
 
 		$contexts             = array_map(
@@ -137,13 +135,16 @@ class BTRANSLATE_Translation_Store {
 			$query_args[] = $since;
 		}
 
-		return $wpdb->prepare(
-			"SELECT COUNT(DISTINCT CONCAT(target_language, '|', SUBSTRING_INDEX(field_context, ':', 2)))
-			FROM {$table_name}
-			WHERE status = 'complete'
-			AND target_language IN ({$language_placeholders})
-			AND SUBSTRING_INDEX(field_context, ':', 2) IN ({$context_placeholders}){$since_clause}",
-			$query_args
+		$since_clause = '' === $since ? '' : ' AND updated_at >= %s';
+		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The custom translation table is the plugin's persistent cache.
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- IN clauses contain only generated %s placeholders; the optional clause is a fixed SQL fragment.
+				"SELECT COUNT(DISTINCT CONCAT(target_language, '|', SUBSTRING_INDEX(field_context, ':', 2)))
+				FROM %i
+				WHERE status = 'complete'
+				AND target_language IN ({$language_placeholders})
+				AND SUBSTRING_INDEX(field_context, ':', 2) IN ({$context_placeholders}){$since_clause}",
+				array_merge( array( self::table_name() ), $query_args )
+			)
 		);
 	}
 }

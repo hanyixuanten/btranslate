@@ -57,7 +57,7 @@ After changing routing settings, rewrite rules are refreshed. The initial implem
 
 Credentials are stored in the WordPress `btranslate_settings` option and are not rendered on the front end. The plugin stores the translation identity, language pair, field context, source fingerprint, translated value, status, and timestamps. It does not store full Baidu response payloads.
 
-The **Log every Baidu translation request** setting is disabled by default. When enabled, each request writes safe metadata to the PHP error log: language pair, field context, source fingerprint and length, result status, and an error code when applicable. Credentials, signatures, source text, translated text, and complete API responses are never logged.
+The **Log every Baidu translation request** setting is disabled by default. When enabled, each request fires the `btranslate_translation_request_logged` action with safe metadata: language pair, field context, source fingerprint and length, result status, and an error code when applicable. A site-specific logging integration can subscribe to this action. Credentials, signatures, source text, translated text, and complete API responses are never included.
 
 Use HTTPS and restrict database access appropriately because WordPress options are database-backed. Production sites should configure a real cron runner for reliable translation processing.
 

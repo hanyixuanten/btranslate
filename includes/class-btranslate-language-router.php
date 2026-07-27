@@ -27,7 +27,7 @@ class BTRANSLATE_Language_Router {
 			return $do_parse_request;
 		}
 
-		$request_uri = wp_unslash( $_SERVER['REQUEST_URI'] );
+		$request_uri = sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) );
 		$path        = wp_parse_url( $request_uri, PHP_URL_PATH );
 		$query       = wp_parse_url( $request_uri, PHP_URL_QUERY );
 
@@ -54,7 +54,7 @@ class BTRANSLATE_Language_Router {
 
 	public function resolve_domain_language( $wp ) {
 		$settings = BTRANSLATE_Settings::get();
-		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
 		$bindings = (array) $settings['domain_bindings'];
 
 		if ( '' !== $this->request_language ) {
@@ -130,14 +130,14 @@ class BTRANSLATE_Language_Router {
 	}
 
 	private function request_uses_domain( $language ) {
-		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
 		$bindings = (array) BTRANSLATE_Settings::get()['domain_bindings'];
 
 		return '' !== $host && isset( $bindings[ $host ] ) && sanitize_key( $bindings[ $host ] ) === $language;
 	}
 
 	private function source_origin_parts( $parts ) {
-		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
 		$bindings = (array) BTRANSLATE_Settings::get()['domain_bindings'];
 
 		if ( '' === $host || ! isset( $bindings[ $host ] ) ) {

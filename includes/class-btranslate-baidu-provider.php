@@ -79,6 +79,6 @@ class BTRANSLATE_Baidu_Provider implements BTRANSLATE_Translation_Provider {
 			'error_code'         => sanitize_key( $error_code ),
 		);
 
-		error_log( 'BTRANSLATE translation request: ' . wp_json_encode( $entry ) );
+		do_action( 'btranslate_translation_request_logged', $entry );
 	}
 }

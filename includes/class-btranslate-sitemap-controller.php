@@ -65,7 +65,7 @@ class BTRANSLATE_Sitemap_Controller {
 	}
 
 	private function request_path() {
-		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 		$path        = wp_parse_url( $request_uri, PHP_URL_PATH );
 
 		return is_string( $path ) ? '/' . ltrim( $path, '/' ) : '';
@@ -80,7 +80,7 @@ class BTRANSLATE_Sitemap_Controller {
 		}
 
 		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'domain' ) && '/sitemap.xml' === untrailingslashit( $path ) ) {
-			$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+			$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
 			$bindings = (array) $settings['domain_bindings'];
 			$language = isset( $bindings[ $host ] ) ? sanitize_key( $bindings[ $host ] ) : '';
 

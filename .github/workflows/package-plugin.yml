@@ -33,7 +33,7 @@ jobs:
 
           rm -rf build
           mkdir -p "build/${plugin_slug}"
-          cp btranslate.php README.md "build/${plugin_slug}/"
+          cp btranslate.php uninstall.php readme.txt README.md README.zh-CN.md LICENSE "build/${plugin_slug}/"
           cp -R includes "build/${plugin_slug}/"
           (
             cd build
@@ -41,6 +41,7 @@ jobs:
           )
 
           unzip -p "${archive_name}" "${plugin_slug}/btranslate.php" | grep -q '^ \* Plugin Name: Btranslate$'
+          unzip -p "${archive_name}" "${plugin_slug}/readme.txt" | grep -q "^Stable tag: ${version}$"
 
           printf 'archive=%s\n' "${archive_name}" >> "$GITHUB_OUTPUT"
 
