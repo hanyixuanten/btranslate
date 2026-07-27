@@ -4,43 +4,31 @@ defined( 'ABSPATH' ) || exit;
 
 class BTRANSLATE_Sitemap_Controller {
 	private $router;
+	private $target_language = '';
 
 	public function __construct( BTRANSLATE_Language_Router $router ) {
 		$this->router = $router;
 	}
 
 	public function register() {
-		add_filter( 'query_vars', array( $this, 'query_vars' ) );
-		add_action( 'parse_request', array( $this, 'capture_request' ), 20 );
-		add_action( 'template_redirect', array( $this, 'maybe_serve_localized_sitemap' ), 0 );
+		add_filter( 'do_parse_request', array( $this, 'intercept_request' ), 0, 3 );
 	}
 
-	public function query_vars( $query_vars ) {
-		$query_vars[] = 'btranslate_sitemap';
-
-		return $query_vars;
-	}
-
-	public function capture_request( $wp ) {
+	public function intercept_request( $do_parse_request, $wp, $extra_query_vars ) {
 		$settings = BTRANSLATE_Settings::get();
 		$language = $this->requested_language( $this->request_path(), $settings );
 
 		if ( '' === $language ) {
-			return;
+			return $do_parse_request;
 		}
 
-		$wp->query_vars['btranslate_language'] = $language;
-		$wp->query_vars['btranslate_sitemap']  = '1';
+		$this->target_language = $language;
+		$this->serve_localized_sitemap();
+
+		return $do_parse_request;
 	}
 
-	public function maybe_serve_localized_sitemap() {
-		$settings = BTRANSLATE_Settings::get();
-		$language = $this->router->current_language();
-
-		if ( '1' !== (string) get_query_var( 'btranslate_sitemap' ) || $language === sanitize_key( $settings['source_language'] ) || ! in_array( $language, BTRANSLATE_Settings::target_languages(), true ) ) {
-			return;
-		}
-
+	private function serve_localized_sitemap() {
 		$source_url = $this->source_sitemap_url();
 		if ( '' === $source_url ) {
 			return;
@@ -48,13 +36,13 @@ class BTRANSLATE_Sitemap_Controller {
 
 		$context = stream_context_create(
 			array(
-				'http' => array(
-					'method'        => 'GET',
-					'timeout'       => 10,
-					'ignore_errors' => false,
+				'http'  => array(
+					'method'          => 'GET',
+					'timeout'         => 10,
+					'ignore_errors'   => false,
 					'follow_location' => 0,
-					'max_redirects' => 0,
-					'header'        => "Accept: application/xml, text/xml;q=0.9\r\n",
+					'max_redirects'   => 0,
+					'header'          => "Accept: application/xml, text/xml;q=0.9\r\n",
 				),
 			)
 		);
@@ -84,6 +72,13 @@ class BTRANSLATE_Sitemap_Controller {
 	}
 
 	private function requested_language( $path, $settings ) {
+		$home_path = wp_parse_url( (string) get_option( 'home', '' ), PHP_URL_PATH );
+
+		if ( is_string( $home_path ) && '' !== untrailingslashit( $home_path ) ) {
+			$path = preg_replace( '#^' . preg_quote( untrailingslashit( $home_path ), '#' ) . '(?=/|$)#', '', $path, 1 );
+			$path = '/' . ltrim( (string) $path, '/' );
+		}
+
 		if ( 'subdirectory' === $settings['routing_mode'] ) {
 			foreach ( BTRANSLATE_Settings::target_languages() as $language ) {
 				$language = sanitize_key( $language );
@@ -168,7 +163,7 @@ class BTRANSLATE_Sitemap_Controller {
 					return $matches[0];
 				}
 
-				return $this->router->localized_url( $matches[0] );
+				return $this->router->localized_url( $matches[0], $this->target_language );
 			},
 			$value
 		);

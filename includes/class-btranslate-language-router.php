@@ -54,9 +54,9 @@ class BTRANSLATE_Language_Router {
 		return sanitize_key( $settings['source_language'] );
 	}
 
-	public function localized_url( $url ) {
+	public function localized_url( $url, $language = '' ) {
 		$settings = BTRANSLATE_Settings::get();
-		$language = $this->current_language();
+		$language = '' === $language ? $this->current_language() : sanitize_key( $language );
 
 		if ( $language === $settings['source_language'] || ! BTRANSLATE_Settings::is_supported_language( $language ) ) {
 			return $url;
