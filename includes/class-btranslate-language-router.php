@@ -11,11 +11,11 @@ class BTRANSLATE_Language_Router {
 	}
 
 	public function register_rewrite_rules() {
-		if ( 'subdirectory' !== BTRANSLATE_Settings::get()['routing_mode'] ) {
+		if ( ! BTRANSLATE_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
 			return;
 		}
 
-		$language_pattern = implode( '|', array_map( 'preg_quote', array_map( 'strtolower', BTRANSLATE_Settings::target_languages() ) ) );
+		$language_pattern = implode( '|', array_map( 'preg_quote', array_map( 'strtolower', BTRANSLATE_Settings::subdirectory_languages() ) ) );
 
 		if ( '' === $language_pattern ) {
 			return;
@@ -38,7 +38,7 @@ class BTRANSLATE_Language_Router {
 		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
 		$bindings = (array) $settings['domain_bindings'];
 
-		if ( 'domain' === $settings['routing_mode'] && '' !== $host && isset( $bindings[ $host ] ) && BTRANSLATE_Settings::is_supported_language( $bindings[ $host ] ) ) {
+		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'domain' ) && '' !== $host && isset( $bindings[ $host ] ) && BTRANSLATE_Settings::is_supported_language( $bindings[ $host ] ) ) {
 			$wp->query_vars['btranslate_language'] = sanitize_key( $bindings[ $host ] );
 		}
 	}
@@ -62,20 +62,22 @@ class BTRANSLATE_Language_Router {
 			return $url;
 		}
 
-		if ( 'domain' === $settings['routing_mode'] ) {
+		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'domain' ) ) {
 			$domain = array_search( $language, (array) $settings['domain_bindings'], true );
 			$parts  = wp_parse_url( $url );
 
-			if ( false === $domain || ! is_array( $parts ) || empty( $parts['host'] ) ) {
-				return $url;
+			if ( false !== $domain && is_array( $parts ) && ! empty( $parts['host'] ) ) {
+				$scheme   = isset( $parts['scheme'] ) ? $parts['scheme'] : 'https';
+				$path     = isset( $parts['path'] ) ? $parts['path'] : '/';
+				$query    = isset( $parts['query'] ) ? '?' . $parts['query'] : '';
+				$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
+
+				return $scheme . '://' . $domain . $path . $query . $fragment;
 			}
+		}
 
-			$scheme   = isset( $parts['scheme'] ) ? $parts['scheme'] : 'https';
-			$path     = isset( $parts['path'] ) ? $parts['path'] : '/';
-			$query    = isset( $parts['query'] ) ? '?' . $parts['query'] : '';
-			$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
-
-			return $scheme . '://' . $domain . $path . $query . $fragment;
+		if ( ! BTRANSLATE_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
+			return $url;
 		}
 
 		$parts = wp_parse_url( $url );

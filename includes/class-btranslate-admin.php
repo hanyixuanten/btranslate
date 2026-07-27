@@ -28,6 +28,7 @@ class BTRANSLATE_Admin {
 	public function sanitize_settings( $settings ) {
 		$settings = (array) $settings;
 		$bindings = array();
+		$routing_modes = BTRANSLATE_Settings::routing_modes( $settings['routing_mode'] ?? array() );
 
 		foreach ( preg_split( '/\r\n|\r|\n/', (string) ( $settings['domain_bindings'] ?? '' ) ) as $line ) {
 			$parts = array_map( 'trim', explode( '=', $line, 2 ) );
@@ -41,7 +42,7 @@ class BTRANSLATE_Admin {
 		return array(
 			'source_language'   => sanitize_key( $settings['source_language'] ?? 'zh' ),
 			'target_languages'  => array_values( array_filter( array_map( 'sanitize_key', explode( ',', (string) ( $settings['target_languages'] ?? 'en' ) ) ) ) ),
-			'routing_mode'      => in_array( $settings['routing_mode'] ?? '', array( 'subdirectory', 'domain' ), true ) ? $settings['routing_mode'] : 'subdirectory',
+			'routing_mode'      => $routing_modes,
 			'domain_bindings'   => $bindings,
 			'fallback_language' => sanitize_key( $settings['fallback_language'] ?? 'zh' ),
 			'baidu_app_id'      => sanitize_text_field( $settings['baidu_app_id'] ?? '' ),
@@ -64,14 +65,26 @@ class BTRANSLATE_Admin {
 				<table class="form-table" role="presentation">
 					<tr><th scope="row"><label for="btranslate-source-language">源语言</label></th><td><input id="btranslate-source-language" name="btranslate_settings[source_language]" type="text" value="<?php echo esc_attr( $settings['source_language'] ); ?>" /><p class="description">使用百度翻译语言代码，例如 <code>zh</code>。</p></td></tr>
 					<tr><th scope="row"><label for="btranslate-target-languages">目标语言</label></th><td><input id="btranslate-target-languages" name="btranslate_settings[target_languages]" type="text" value="<?php echo esc_attr( implode( ',', $settings['target_languages'] ) ); ?>" class="regular-text" /><p class="description">多个语言代码用英文逗号分隔，例如 <code>en,ja</code>。</p></td></tr>
-					<tr><th scope="row"><label for="btranslate-routing-mode">网址模式</label></th><td><select id="btranslate-routing-mode" name="btranslate_settings[routing_mode]"><option value="subdirectory" <?php selected( $settings['routing_mode'], 'subdirectory' ); ?>>子目录</option><option value="domain" <?php selected( $settings['routing_mode'], 'domain' ); ?>>绑定域名</option></select></td></tr>
-					<tr><th scope="row"><label for="btranslate-domain-bindings">域名绑定</label></th><td><textarea id="btranslate-domain-bindings" name="btranslate_settings[domain_bindings]" rows="4" class="large-text" placeholder="en.example.com=en"><?php echo esc_textarea( implode( "\n", $bindings ) ); ?></textarea><p class="description">每行一个 <code>域名=语言代码</code>，例如 <code>en.example.com=en</code>。请勿填写 <code>https://</code>、路径或端口。</p></td></tr>
+					<tr><th scope="row">网址模式</th><td><fieldset id="btranslate-routing-mode"><label><input type="checkbox" name="btranslate_settings[routing_mode][]" value="subdirectory" <?php checked( in_array( 'subdirectory', $settings['routing_mode'], true ) ); ?> /> 子目录</label><br /><label><input type="checkbox" name="btranslate_settings[routing_mode][]" value="domain" <?php checked( in_array( 'domain', $settings['routing_mode'], true ) ); ?> /> 子域名</label></fieldset></td></tr>
+					<tr id="btranslate-domain-bindings-row"<?php echo in_array( 'domain', $settings['routing_mode'], true ) ? '' : ' style="display:none"'; ?>><th scope="row"><label for="btranslate-domain-bindings">域名绑定</label></th><td><textarea id="btranslate-domain-bindings" name="btranslate_settings[domain_bindings]" rows="4" class="large-text" placeholder="en.example.com=en"><?php echo esc_textarea( implode( "\n", $bindings ) ); ?></textarea><p class="description">每行一个 <code>域名=语言代码</code>，例如 <code>en.example.com=en</code>。请勿填写 <code>https://</code>、路径或端口。</p></td></tr>
 					<tr><th scope="row"><label for="btranslate-baidu-app-id">百度应用 ID</label></th><td><input id="btranslate-baidu-app-id" name="btranslate_settings[baidu_app_id]" type="text" value="<?php echo esc_attr( $settings['baidu_app_id'] ); ?>" class="regular-text" /></td></tr>
 					<tr><th scope="row"><label for="btranslate-baidu-secret-key">百度密钥</label></th><td><input id="btranslate-baidu-secret-key" name="btranslate_settings[baidu_secret_key]" type="password" value="<?php echo esc_attr( $settings['baidu_secret_key'] ); ?>" class="regular-text" autocomplete="new-password" /></td></tr>
 					<tr><th scope="row">请求日志</th><td><label for="btranslate-log-requests"><input id="btranslate-log-requests" name="btranslate_settings[log_requests]" type="checkbox" value="1" <?php checked( $settings['log_requests'] ); ?> /> 记录每次百度翻译请求</label><p class="description">日志写入 PHP 错误日志，包含语言、字段、文本指纹、长度和结果状态；不会记录密钥、原文、译文或完整 API 响应。</p></td></tr>
 				</table>
 				<?php submit_button(); ?>
 			</form>
+			<script>
+				(function () {
+					var domainMode = document.querySelector('#btranslate-routing-mode input[value="domain"]');
+					var bindingsRow = document.getElementById('btranslate-domain-bindings-row');
+
+					function toggleDomainBindings() {
+						bindingsRow.style.display = domainMode.checked ? '' : 'none';
+					}
+
+					domainMode.addEventListener('change', toggleDomainBindings);
+				}());
+			</script>
 			<hr />
 			<h2>重新翻译所有内容</h2>
 			<p>此操作会将所有已发布文章、页面、分类和标签重新加入翻译队列。</p>

@@ -79,27 +79,27 @@ class BTRANSLATE_Sitemap_Controller {
 			$path = '/' . ltrim( (string) $path, '/' );
 		}
 
-		if ( 'subdirectory' === $settings['routing_mode'] ) {
-			foreach ( BTRANSLATE_Settings::target_languages() as $language ) {
+		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'domain' ) && '/sitemap.xml' === untrailingslashit( $path ) ) {
+			$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+			$bindings = (array) $settings['domain_bindings'];
+			$language = isset( $bindings[ $host ] ) ? sanitize_key( $bindings[ $host ] ) : '';
+
+			if ( in_array( $language, BTRANSLATE_Settings::target_languages(), true ) ) {
+				return $language;
+			}
+		}
+
+		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
+			foreach ( BTRANSLATE_Settings::subdirectory_languages() as $language ) {
 				$language = sanitize_key( $language );
 
 				if ( '/' . $language . '/sitemap.xml' === untrailingslashit( $path ) ) {
 					return $language;
 				}
 			}
-
-			return '';
 		}
 
-		if ( '/sitemap.xml' !== untrailingslashit( $path ) ) {
-			return '';
-		}
-
-		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
-		$bindings = (array) $settings['domain_bindings'];
-		$language = isset( $bindings[ $host ] ) ? sanitize_key( $bindings[ $host ] ) : '';
-
-		return in_array( $language, BTRANSLATE_Settings::target_languages(), true ) ? $language : '';
+		return '';
 	}
 
 	private function source_sitemap_url() {

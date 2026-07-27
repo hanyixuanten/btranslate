@@ -35,7 +35,7 @@ class BTRANSLATE_Plugin {
 			array(
 				'source_language'   => 'zh',
 				'target_languages'  => array( 'en' ),
-				'routing_mode'      => 'subdirectory',
+				'routing_mode'      => array( 'subdirectory' ),
 				'domain_bindings'   => array(),
 				'fallback_language' => 'zh',
 			),

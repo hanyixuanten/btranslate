@@ -43,7 +43,7 @@ Category and tag names are translated when they are created, edited, or included
 
 ## Routing
 
-The **Subdirectory** mode resolves configured language paths such as `/en/example-post/`. The **Domain binding** mode maps a request host to a language using one `domain=language` entry per line in Settings. Use one canonical strategy for each language to avoid duplicate URLs. In domain mode, the plugin does not register front-end rewrite rules, so the primary site URL is not affected.
+The **Subdirectory** mode resolves configured language paths such as `/en/example-post/`. The **Domain binding** mode maps a request host to a language using one `domain=language` entry per line in Settings. Both modes can be enabled together: a language with a domain binding uses that domain, while an unbound target language uses its subdirectory. This keeps one URL strategy per language and avoids duplicate URLs. When only subdirectory mode is enabled, the domain-binding field is hidden.
 
 Post, page, term, and home links are generated for the active language. For example, a theme's "back to home" link that uses `home_url()` resolves to the bound language domain or language subdirectory.
 
