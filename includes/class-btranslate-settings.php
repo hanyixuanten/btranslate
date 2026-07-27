@@ -26,9 +26,7 @@ class BTRANSLATE_Settings {
 			$routing_mode = self::get()['routing_mode'];
 		}
 
-		$modes = array_values( array_intersect( (array) $routing_mode, array( 'subdirectory', 'domain' ) ) );
-
-		return empty( $modes ) ? array( 'subdirectory' ) : $modes;
+		return array_values( array_intersect( (array) $routing_mode, array( 'subdirectory', 'domain' ) ) );
 	}
 
 	public static function is_routing_mode_enabled( $mode ) {
