@@ -3,28 +3,17 @@
 defined( 'ABSPATH' ) || exit;
 
 class BTRANSLATE_Language_Router {
+	private $request_language = '';
+
 	public function register() {
 		add_filter( 'query_vars', array( $this, 'query_vars' ) );
+		add_filter( 'do_parse_request', array( $this, 'strip_language_prefix' ), 1, 3 );
 		add_action( 'parse_request', array( $this, 'resolve_domain_language' ) );
 		add_filter( 'home_url', array( $this, 'localize_home_url' ), 20, 4 );
-		$this->register_rewrite_rules();
 	}
 
 	public function register_rewrite_rules() {
-		if ( ! BTRANSLATE_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
-			return;
-		}
-
-		$language_pattern = implode( '|', array_map( 'preg_quote', array_map( 'strtolower', BTRANSLATE_Settings::subdirectory_languages() ) ) );
-
-		if ( '' === $language_pattern ) {
-			return;
-		}
-
-		add_rewrite_tag( '%btranslate_language%', '(' . $language_pattern . ')' );
-		add_rewrite_rule( '^(' . $language_pattern . ')/sitemap\.xml$', 'index.php?btranslate_language=$matches[1]&btranslate_sitemap=1', 'top' );
-		add_rewrite_rule( '^(' . $language_pattern . ')/(.*)$', 'index.php?btranslate_language=$matches[1]&pagename=$matches[2]', 'top' );
-		add_rewrite_rule( '^(' . $language_pattern . ')/?$', 'index.php?btranslate_language=$matches[1]', 'top' );
+		// Subdirectory requests reuse WordPress's existing rewrite rules after their language prefix is removed.
 	}
 
 	public function query_vars( $query_vars ) {
@@ -33,13 +22,47 @@ class BTRANSLATE_Language_Router {
 		return $query_vars;
 	}
 
+	public function strip_language_prefix( $do_parse_request, $wp, $extra_query_vars ) {
+		if ( ! $do_parse_request || ! BTRANSLATE_Settings::is_routing_mode_enabled( 'subdirectory' ) || empty( $_SERVER['REQUEST_URI'] ) ) {
+			return $do_parse_request;
+		}
+
+		$request_uri = wp_unslash( $_SERVER['REQUEST_URI'] );
+		$path        = wp_parse_url( $request_uri, PHP_URL_PATH );
+		$query       = wp_parse_url( $request_uri, PHP_URL_QUERY );
+
+		if ( ! is_string( $path ) ) {
+			return $do_parse_request;
+		}
+
+		$home_path = $this->home_path();
+		$relative  = ltrim( (string) preg_replace( '#^' . preg_quote( $home_path, '#' ) . '(?=/|$)#', '', $path, 1 ), '/' );
+		$segments  = explode( '/', $relative, 2 );
+		$language  = sanitize_key( $segments[0] );
+
+		if ( ! in_array( $language, BTRANSLATE_Settings::subdirectory_languages(), true ) ) {
+			return $do_parse_request;
+		}
+
+		$this->request_language = $language;
+		$remaining_path         = isset( $segments[1] ) ? $segments[1] : '';
+		$source_path            = '/' . ( '' !== $home_path ? trim( $home_path, '/' ) . '/' : '' ) . ltrim( $remaining_path, '/' );
+		$_SERVER['REQUEST_URI'] = $source_path . ( is_string( $query ) && '' !== $query ? '?' . $query : '' );
+
+		return $do_parse_request;
+	}
+
 	public function resolve_domain_language( $wp ) {
 		$settings = BTRANSLATE_Settings::get();
 		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
 		$bindings = (array) $settings['domain_bindings'];
 
+		if ( '' !== $this->request_language ) {
+			$wp->query_vars['btranslate_language'] = $this->request_language;
+		}
+
 		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'domain' ) && '' !== $host && isset( $bindings[ $host ] ) && BTRANSLATE_Settings::is_supported_language( $bindings[ $host ] ) ) {
-			if ( ! empty( $wp->query_vars['btranslate_language'] ) ) {
+			if ( '' !== $this->request_language ) {
 				$wp->query_vars = array( 'error' => '404' );
 
 				return;
