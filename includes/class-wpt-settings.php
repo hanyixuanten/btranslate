@@ -12,6 +12,7 @@ class WPT_Settings {
 			'fallback_language' => 'zh',
 			'baidu_app_id'      => '',
 			'baidu_secret_key'  => '',
+			'log_requests'      => false,
 		);
 
 		return wp_parse_args( (array) get_option( 'wpt_settings', array() ), $defaults );

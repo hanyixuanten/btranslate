@@ -228,11 +228,23 @@ class WPT_Content_Controller {
 	}
 
 	public function translate_wordpress_ai_meta_description_metadata( $value, $post_id, $meta_key, $single ) {
-		if ( 'wpai_meta_description' !== $meta_key || ! $single ) {
+		static $resolving_raw_value = false;
+
+		if ( 'wpai_meta_description' !== $meta_key || ! $single || $resolving_raw_value ) {
 			return $value;
 		}
 
-		$source_value = is_string( $value ) ? $value : get_metadata_raw( 'post', $post_id, $meta_key, true );
+		if ( is_string( $value ) ) {
+			$source_value = $value;
+		} else {
+			$resolving_raw_value = true;
+			try {
+				$source_value = get_metadata_raw( 'post', $post_id, $meta_key, true );
+			} finally {
+				$resolving_raw_value = false;
+			}
+		}
+
 		if ( ! is_string( $source_value ) ) {
 			return $value;
 		}

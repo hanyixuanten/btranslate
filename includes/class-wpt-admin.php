@@ -46,6 +46,7 @@ class WPT_Admin {
 			'fallback_language' => sanitize_key( $settings['fallback_language'] ?? 'zh' ),
 			'baidu_app_id'      => sanitize_text_field( $settings['baidu_app_id'] ?? '' ),
 			'baidu_secret_key'  => sanitize_text_field( $settings['baidu_secret_key'] ?? '' ),
+			'log_requests'      => ! empty( $settings['log_requests'] ),
 		);
 	}
 
@@ -67,6 +68,7 @@ class WPT_Admin {
 					<tr><th scope="row"><label for="wpt-domain-bindings">域名绑定</label></th><td><textarea id="wpt-domain-bindings" name="wpt_settings[domain_bindings]" rows="4" class="large-text" placeholder="en.example.com=en"><?php echo esc_textarea( implode( "\n", $bindings ) ); ?></textarea><p class="description">每行一个 <code>域名=语言代码</code>，例如 <code>en.example.com=en</code>。请勿填写 <code>https://</code>、路径或端口。</p></td></tr>
 					<tr><th scope="row"><label for="wpt-baidu-app-id">百度应用 ID</label></th><td><input id="wpt-baidu-app-id" name="wpt_settings[baidu_app_id]" type="text" value="<?php echo esc_attr( $settings['baidu_app_id'] ); ?>" class="regular-text" /></td></tr>
 					<tr><th scope="row"><label for="wpt-baidu-secret-key">百度密钥</label></th><td><input id="wpt-baidu-secret-key" name="wpt_settings[baidu_secret_key]" type="password" value="<?php echo esc_attr( $settings['baidu_secret_key'] ); ?>" class="regular-text" autocomplete="new-password" /></td></tr>
+					<tr><th scope="row">请求日志</th><td><label for="wpt-log-requests"><input id="wpt-log-requests" name="wpt_settings[log_requests]" type="checkbox" value="1" <?php checked( $settings['log_requests'] ); ?> /> 记录每次百度翻译请求</label><p class="description">日志写入 PHP 错误日志，包含语言、字段、文本指纹、长度和结果状态；不会记录密钥、原文、译文或完整 API 响应。</p></td></tr>
 				</table>
 				<?php submit_button(); ?>
 			</form>
