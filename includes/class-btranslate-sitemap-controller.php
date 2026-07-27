@@ -132,7 +132,7 @@ class BTRANSLATE_Sitemap_Controller {
 		}
 
 		$xpath = new DOMXPath( $document );
-		$nodes = $xpath->query( '//text() | //@*' );
+		$nodes = $xpath->query( '//text() | //@* | //processing-instruction("xml-stylesheet")' );
 
 		if ( false === $nodes ) {
 			return '';
