@@ -48,7 +48,9 @@ Btranslate 是一个 WordPress 插件骨架，使用百度翻译 API 持久化�
 
 对于已绑定的子域名，请填写类似 `en.example.com=en` 的值。服务器和 DNS 必须先将该主机名指向同一 WordPress 安装，WordPress 才能解析该语言。
 
-路由设置变更后会刷新重写规则。初始实现尚不生成翻译固定链接、规范 URL、`hreflang` 替代链接、重定向或站点地图条目。
+通过已配置目标语言子目录或绑定域名发起的 sitemap 请求，会代理到源站相同路径的 sitemap。插件会改写 sitemap 索引和 URL 集中的标准 `<loc>` 条目，使索引内的子 sitemap 链接继续使用同一语言路由。源站 sitemap 获取失败时不会造成致命错误，而是交回 WordPress 按普通请求处理。源 sitemap 必须可从 WordPress `home` 配置的源站访问，且插件不会跟随上游重定向。
+
+路由设置变更后会刷新重写规则。初始实现尚不生成翻译固定链接、规范 URL、`hreflang` 替代链接或重定向。
 
 ## 安全和数据保留
 

@@ -5,11 +5,13 @@ defined( 'ABSPATH' ) || exit;
 class WPT_Plugin {
 	private static $instance;
 	private $router;
+	private $sitemap_controller;
 	private $content_controller;
 	private $admin;
 
 	private function __construct() {
 		$this->router             = new WPT_Language_Router();
+		$this->sitemap_controller = new WPT_Sitemap_Controller( $this->router );
 		$this->content_controller = new WPT_Content_Controller( new WPT_Translation_Store(), $this->router );
 		$this->admin              = new WPT_Admin();
 
@@ -52,6 +54,7 @@ class WPT_Plugin {
 
 	public function register() {
 		$this->router->register();
+		$this->sitemap_controller->register();
 		$this->content_controller->register();
 	}
 

@@ -24,6 +24,7 @@ require_once WPT_PATH . 'includes/class-wpt-translation-service.php';
 require_once WPT_PATH . 'includes/class-wpt-content-translator.php';
 require_once WPT_PATH . 'includes/class-wpt-settings.php';
 require_once WPT_PATH . 'includes/class-wpt-language-router.php';
+require_once WPT_PATH . 'includes/class-wpt-sitemap-controller.php';
 require_once WPT_PATH . 'includes/class-wpt-content-controller.php';
 require_once WPT_PATH . 'includes/class-wpt-admin.php';
 require_once WPT_PATH . 'includes/class-wpt-plugin.php';
