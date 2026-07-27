@@ -58,12 +58,16 @@ class BTRANSLATE_Plugin {
 		$this->router->register();
 		$this->sitemap_controller->register();
 		$this->content_controller->register();
+
+		if ( get_option( 'btranslate_flush_rewrite_rules', false ) ) {
+			delete_option( 'btranslate_flush_rewrite_rules' );
+			flush_rewrite_rules();
+		}
 	}
 
 	public function refresh_rewrite_rules( $old_value, $new_value ) {
 		if ( (array) $old_value !== (array) $new_value ) {
-			$this->router->register_rewrite_rules();
-			flush_rewrite_rules();
+			update_option( 'btranslate_flush_rewrite_rules', 1, false );
 		}
 	}
 }

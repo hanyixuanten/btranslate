@@ -5,6 +5,7 @@ defined( 'ABSPATH' ) || exit;
 class BTRANSLATE_Uninstaller {
 	private const OPTION_NAMES = array(
 		'btranslate_settings',
+		'btranslate_flush_rewrite_rules',
 		'btranslate_translation_task',
 		'btranslate_retranslation_batch',
 	);

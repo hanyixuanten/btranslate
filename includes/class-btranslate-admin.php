@@ -29,19 +29,20 @@ class BTRANSLATE_Admin {
 		$settings = (array) $settings;
 		$bindings = array();
 		$routing_modes = BTRANSLATE_Settings::routing_modes( $settings['routing_mode'] ?? array() );
+		$target_languages = array_values( array_filter( array_map( 'sanitize_key', explode( ',', (string) ( $settings['target_languages'] ?? 'en' ) ) ) ) );
 
 		foreach ( preg_split( '/\r\n|\r|\n/', (string) ( $settings['domain_bindings'] ?? '' ) ) as $line ) {
 			$parts = array_map( 'trim', explode( '=', $line, 2 ) );
 			$domain = 2 === count( $parts ) ? BTRANSLATE_Settings::normalize_domain( $parts[0] ) : '';
 			$language = 2 === count( $parts ) ? sanitize_key( $parts[1] ) : '';
-			if ( '' !== $domain && '' !== $language ) {
+			if ( '' !== $domain && in_array( $language, $target_languages, true ) && ! in_array( $language, $bindings, true ) ) {
 				$bindings[ $domain ] = $language;
 			}
 		}
 
 		return array(
 			'source_language'   => sanitize_key( $settings['source_language'] ?? 'zh' ),
-			'target_languages'  => array_values( array_filter( array_map( 'sanitize_key', explode( ',', (string) ( $settings['target_languages'] ?? 'en' ) ) ) ) ),
+			'target_languages'  => $target_languages,
 			'routing_mode'      => $routing_modes,
 			'domain_bindings'   => $bindings,
 			'fallback_language' => sanitize_key( $settings['fallback_language'] ?? 'zh' ),

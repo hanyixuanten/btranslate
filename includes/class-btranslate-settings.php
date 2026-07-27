@@ -40,13 +40,7 @@ class BTRANSLATE_Settings {
 	}
 
 	public static function subdirectory_languages() {
-		$languages = self::target_languages();
-
-		if ( self::is_routing_mode_enabled( 'domain' ) ) {
-			$languages = array_diff( $languages, array_values( (array) self::get()['domain_bindings'] ) );
-		}
-
-		return array_values( $languages );
+		return self::target_languages();
 	}
 
 	public static function is_supported_language( $language ) {

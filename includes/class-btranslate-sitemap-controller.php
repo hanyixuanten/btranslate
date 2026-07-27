@@ -111,8 +111,9 @@ class BTRANSLATE_Sitemap_Controller {
 		}
 
 		$port = isset( $parts['port'] ) ? ':' . $parts['port'] : '';
+		$path = isset( $parts['path'] ) ? '/' . trim( $parts['path'], '/' ) : '';
 
-		return $parts['scheme'] . '://' . $parts['host'] . $port . '/sitemap.xml';
+		return $parts['scheme'] . '://' . $parts['host'] . $port . $path . '/sitemap.xml';
 	}
 
 	private function rewrite_sitemap( $xml, $source_url ) {
