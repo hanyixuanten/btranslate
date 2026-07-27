@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class WPT_Settings {
+class BTRANSLATE_Settings {
 	public static function get() {
 		$defaults = array(
 			'source_language'   => 'zh',
@@ -15,7 +15,7 @@ class WPT_Settings {
 			'log_requests'      => false,
 		);
 
-		return wp_parse_args( (array) get_option( 'wpt_settings', array() ), $defaults );
+		return wp_parse_args( (array) get_option( 'btranslate_settings', array() ), $defaults );
 	}
 
 	public static function target_languages() {

@@ -1,4 +1,4 @@
-# wp-translate Agent Guide
+# btranslate Agent Guide
 
 ## Project Scope
 
@@ -44,6 +44,6 @@ Unless a user explicitly requests a refresh, each translatable value must be tra
 - Add focused tests for language selection, routing, translation cache reuse and invalidation, persistence, provider signing/error handling, and content/meta filtering.
 - Mock Baidu API calls in every test. Tests must not require live credentials or outbound network access.
 - Keep changes narrow and avoid unrelated refactors or formatting churn.
-- Plugin slug and PHP prefix: `wp-translate` and `wpt_`/`WPT_`. The current minimum supported PHP version is 8.1 and the current minimum WordPress version is 6.4.
+- Plugin slug and PHP prefix: `btranslate` and `btranslate_`/`BTRANSLATE_`. The current minimum supported PHP version is 8.1 and the current minimum WordPress version is 6.4.
 - The repository has no Composer-managed development dependencies or bundled automated test suite. Validate PHP syntax with `find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l`. Any future automated tests must mock WordPress API calls and must not require live credentials, external network access, or a WordPress database.
 - Document supported languages, routing modes, data retention, translation lifecycle, and known limitations in the README whenever the implementation changes.

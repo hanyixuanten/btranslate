@@ -28,19 +28,19 @@ jobs:
         run: |
           set -eu
           plugin_slug="btranslate"
-          version="$(grep -E '^ \* Version:' wp-translate.php | sed -E 's/^ \* Version: *//')"
+          version="$(grep -E '^ \* Version:' btranslate.php | sed -E 's/^ \* Version: *//')"
           archive_name="${plugin_slug}-${version}.zip"
 
           rm -rf build
           mkdir -p "build/${plugin_slug}"
-          cp wp-translate.php README.md "build/${plugin_slug}/"
+          cp btranslate.php README.md "build/${plugin_slug}/"
           cp -R includes "build/${plugin_slug}/"
           (
             cd build
             zip -qr "../${archive_name}" "${plugin_slug}"
           )
 
-          unzip -p "${archive_name}" "${plugin_slug}/wp-translate.php" | grep -q '^ \* Plugin Name: Btranslate$'
+          unzip -p "${archive_name}" "${plugin_slug}/btranslate.php" | grep -q '^ \* Plugin Name: Btranslate$'
 
           printf 'archive=%s\n' "${archive_name}" >> "$GITHUB_OUTPUT"
 

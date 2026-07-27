@@ -2,24 +2,24 @@
 /**
  * Removes all data created by Btranslate.
  *
- * @package WPT
+ * @package BTRANSLATE
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-function wpt_uninstall_site_data() {
+function btranslate_uninstall_site_data() {
 	global $wpdb;
 
-	wp_clear_scheduled_hook( 'wpt_process_translation' );
-	wp_clear_scheduled_hook( 'wpt_process_term_translation' );
-	wp_clear_scheduled_hook( 'wpt_process_seo_output_translation' );
-	delete_option( 'wpt_settings' );
-	delete_option( 'wpt_translation_task' );
-	delete_option( 'wpt_retranslation_batch' );
+	wp_clear_scheduled_hook( 'btranslate_process_translation' );
+	wp_clear_scheduled_hook( 'btranslate_process_term_translation' );
+	wp_clear_scheduled_hook( 'btranslate_process_seo_output_translation' );
+	delete_option( 'btranslate_settings' );
+	delete_option( 'btranslate_translation_task' );
+	delete_option( 'btranslate_retranslation_batch' );
 
-	$table_name = $wpdb->prefix . 'wpt_translations';
+	$table_name = $wpdb->prefix . 'btranslate_translations';
 	$wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
 }
 
@@ -33,9 +33,9 @@ if ( is_multisite() ) {
 
 	foreach ( $site_ids as $site_id ) {
 		switch_to_blog( $site_id );
-		wpt_uninstall_site_data();
+		btranslate_uninstall_site_data();
 		restore_current_blog();
 	}
 } else {
-	wpt_uninstall_site_data();
+	btranslate_uninstall_site_data();
 }

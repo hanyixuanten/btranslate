@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class WPT_Plugin {
+class BTRANSLATE_Plugin {
 	private static $instance;
 	private $router;
 	private $sitemap_controller;
@@ -10,13 +10,13 @@ class WPT_Plugin {
 	private $admin;
 
 	private function __construct() {
-		$this->router             = new WPT_Language_Router();
-		$this->sitemap_controller = new WPT_Sitemap_Controller( $this->router );
-		$this->content_controller = new WPT_Content_Controller( new WPT_Translation_Store(), $this->router );
-		$this->admin              = new WPT_Admin();
+		$this->router             = new BTRANSLATE_Language_Router();
+		$this->sitemap_controller = new BTRANSLATE_Sitemap_Controller( $this->router );
+		$this->content_controller = new BTRANSLATE_Content_Controller( new BTRANSLATE_Translation_Store(), $this->router );
+		$this->admin              = new BTRANSLATE_Admin();
 
 		add_action( 'init', array( $this, 'register' ) );
-		add_action( 'update_option_wpt_settings', array( $this, 'refresh_rewrite_rules' ), 10, 2 );
+		add_action( 'update_option_btranslate_settings', array( $this, 'refresh_rewrite_rules' ), 10, 2 );
 		$this->admin->register();
 	}
 
@@ -29,9 +29,9 @@ class WPT_Plugin {
 	}
 
 	public static function activate() {
-		WPT_Translation_Store::install();
+		BTRANSLATE_Translation_Store::install();
 		add_option(
-			'wpt_settings',
+			'btranslate_settings',
 			array(
 				'source_language'   => 'zh',
 				'target_languages'  => array( 'en' ),
@@ -42,13 +42,15 @@ class WPT_Plugin {
 			'',
 			false
 		);
-		$router = new WPT_Language_Router();
+		$router = new BTRANSLATE_Language_Router();
 		$router->register_rewrite_rules();
 		flush_rewrite_rules();
 	}
 
 	public static function deactivate() {
-		wp_clear_scheduled_hook( 'wpt_process_translation' );
+		wp_clear_scheduled_hook( 'btranslate_process_translation' );
+		wp_clear_scheduled_hook( 'btranslate_process_term_translation' );
+		wp_clear_scheduled_hook( 'btranslate_process_seo_output_translation' );
 		flush_rewrite_rules();
 	}
 

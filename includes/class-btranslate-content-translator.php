@@ -2,17 +2,17 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class WPT_Content_Translator {
+class BTRANSLATE_Content_Translator {
 	private $service;
 
-	public function __construct( WPT_Translation_Service $service ) {
+	public function __construct( BTRANSLATE_Translation_Service $service ) {
 		$this->service = $service;
 	}
 
 	public function translate( $content, $source_language, $target_language, $context, $force_refresh = false ) {
 		$segments = self::segments( $content );
 		if ( false === $segments ) {
-			return WPT_Translation_Result::failure( 'content_parse_failed', 'Unable to protect links before translation.' );
+			return BTRANSLATE_Translation_Result::failure( 'content_parse_failed', 'Unable to protect links before translation.' );
 		}
 
 		$text_index = 0;
@@ -29,7 +29,7 @@ class WPT_Content_Translator {
 			++$text_index;
 		}
 
-		return WPT_Translation_Result::success( $content );
+		return BTRANSLATE_Translation_Result::success( $content );
 	}
 
 	public static function segments( $content ) {

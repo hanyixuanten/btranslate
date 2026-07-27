@@ -2,10 +2,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class WPT_Sitemap_Controller {
+class BTRANSLATE_Sitemap_Controller {
 	private $router;
 
-	public function __construct( WPT_Language_Router $router ) {
+	public function __construct( BTRANSLATE_Language_Router $router ) {
 		$this->router = $router;
 	}
 
@@ -14,10 +14,10 @@ class WPT_Sitemap_Controller {
 	}
 
 	public function maybe_serve_localized_sitemap() {
-		$settings = WPT_Settings::get();
+		$settings = BTRANSLATE_Settings::get();
 		$language = $this->router->current_language();
 
-		if ( $language === sanitize_key( $settings['source_language'] ) || ! in_array( $language, WPT_Settings::target_languages(), true ) ) {
+		if ( $language === sanitize_key( $settings['source_language'] ) || ! in_array( $language, BTRANSLATE_Settings::target_languages(), true ) ) {
 			return;
 		}
 

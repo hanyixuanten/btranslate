@@ -2,11 +2,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class WPT_Translation_Store {
+class BTRANSLATE_Translation_Store {
 	public static function table_name() {
 		global $wpdb;
 
-		return $wpdb->prefix . 'wpt_translations';
+		return $wpdb->prefix . 'btranslate_translations';
 	}
 
 	public static function install() {

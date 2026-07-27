@@ -2,20 +2,20 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class WPT_Content_Controller {
+class BTRANSLATE_Content_Controller {
 	private $store;
 	private $router;
 
-	public function __construct( WPT_Translation_Store $store, WPT_Language_Router $router ) {
+	public function __construct( BTRANSLATE_Translation_Store $store, BTRANSLATE_Language_Router $router ) {
 		$this->store  = $store;
 		$this->router = $router;
 	}
 
 	public function register() {
 		add_action( 'save_post', array( $this, 'schedule_post_translation' ), 20, 3 );
-		add_action( 'wpt_process_translation', array( $this, 'translate_post' ), 10, 3 );
-		add_action( 'wpt_process_term_translation', array( $this, 'translate_term' ), 10, 3 );
-		add_action( 'wpt_process_seo_output_translation', array( $this, 'translate_seo_output' ), 10, 4 );
+		add_action( 'btranslate_process_translation', array( $this, 'translate_post' ), 10, 3 );
+		add_action( 'btranslate_process_term_translation', array( $this, 'translate_term' ), 10, 3 );
+		add_action( 'btranslate_process_seo_output_translation', array( $this, 'translate_seo_output' ), 10, 4 );
 		add_action( 'created_term', array( $this, 'schedule_term_translation' ), 20, 3 );
 		add_action( 'edited_term', array( $this, 'schedule_term_translation' ), 20, 3 );
 		add_filter( 'the_title', array( $this, 'translate_title' ), 20, 2 );
@@ -47,24 +47,24 @@ class WPT_Content_Controller {
 			return;
 		}
 
-		foreach ( WPT_Settings::target_languages() as $target_language ) {
-			if ( ! wp_next_scheduled( 'wpt_process_translation', array( $post_id, $target_language ) ) ) {
-				wp_schedule_single_event( time() + 30, 'wpt_process_translation', array( $post_id, $target_language ) );
+		foreach ( BTRANSLATE_Settings::target_languages() as $target_language ) {
+			if ( ! wp_next_scheduled( 'btranslate_process_translation', array( $post_id, $target_language ) ) ) {
+				wp_schedule_single_event( time() + 30, 'btranslate_process_translation', array( $post_id, $target_language ) );
 			}
 		}
 	}
 
 	public function translate_post( $post_id, $target_language, $force_refresh = false ) {
 		$post     = get_post( $post_id );
-		$settings = WPT_Settings::get();
+		$settings = BTRANSLATE_Settings::get();
 
-		if ( ! $post || ! WPT_Settings::is_supported_language( $target_language ) ) {
+		if ( ! $post || ! BTRANSLATE_Settings::is_supported_language( $target_language ) ) {
 			return;
 		}
 
-		$service = new WPT_Translation_Service(
+		$service = new BTRANSLATE_Translation_Service(
 			$this->store,
-			new WPT_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] )
+			new BTRANSLATE_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] )
 		);
 
 		$fields = array(
@@ -91,7 +91,7 @@ class WPT_Content_Controller {
 			if ( '' !== $value ) {
 				$context = 'post:' . $post_id . ':' . $field;
 				if ( 'post_content' === $field ) {
-					( new WPT_Content_Translator( $service ) )->translate( $value, $settings['source_language'], $target_language, $context, $force_refresh );
+					( new BTRANSLATE_Content_Translator( $service ) )->translate( $value, $settings['source_language'], $target_language, $context, $force_refresh );
 				} else {
 					$service->get_or_translate( $value, $settings['source_language'], $target_language, $context, $force_refresh );
 				}
@@ -107,24 +107,24 @@ class WPT_Content_Controller {
 			return;
 		}
 
-		foreach ( WPT_Settings::target_languages() as $target_language ) {
-			if ( ! wp_next_scheduled( 'wpt_process_term_translation', array( $term_id, $target_language, false ) ) ) {
-				wp_schedule_single_event( time() + 30, 'wpt_process_term_translation', array( $term_id, $target_language, false ) );
+		foreach ( BTRANSLATE_Settings::target_languages() as $target_language ) {
+			if ( ! wp_next_scheduled( 'btranslate_process_term_translation', array( $term_id, $target_language, false ) ) ) {
+				wp_schedule_single_event( time() + 30, 'btranslate_process_term_translation', array( $term_id, $target_language, false ) );
 			}
 		}
 	}
 
 	public function translate_term( $term_id, $target_language, $force_refresh = false ) {
 		$term     = get_term( $term_id );
-		$settings = WPT_Settings::get();
+		$settings = BTRANSLATE_Settings::get();
 
-		if ( ! $term || is_wp_error( $term ) || ! in_array( $term->taxonomy, array( 'category', 'post_tag' ), true ) || ! WPT_Settings::is_supported_language( $target_language ) ) {
+		if ( ! $term || is_wp_error( $term ) || ! in_array( $term->taxonomy, array( 'category', 'post_tag' ), true ) || ! BTRANSLATE_Settings::is_supported_language( $target_language ) ) {
 			return;
 		}
 
-		$service = new WPT_Translation_Service(
+		$service = new BTRANSLATE_Translation_Service(
 			$this->store,
-			new WPT_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] )
+			new BTRANSLATE_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] )
 		);
 
 		if ( '' !== $term->name ) {
@@ -136,15 +136,15 @@ class WPT_Content_Controller {
 	}
 
 	public function translate_seo_output( $post_id, $source_value, $target_language, $context ) {
-		$settings = WPT_Settings::get();
+		$settings = BTRANSLATE_Settings::get();
 
-		if ( ! get_post( $post_id ) || ! WPT_Settings::is_supported_language( $target_language ) || '' === $source_value ) {
+		if ( ! get_post( $post_id ) || ! BTRANSLATE_Settings::is_supported_language( $target_language ) || '' === $source_value ) {
 			return;
 		}
 
-		$service = new WPT_Translation_Service(
+		$service = new BTRANSLATE_Translation_Service(
 			$this->store,
-			new WPT_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] )
+			new BTRANSLATE_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] )
 		);
 
 		$service->get_or_translate( $source_value, $settings['source_language'], $target_language, $context );
@@ -160,18 +160,18 @@ class WPT_Content_Controller {
 			return $this->translated_value( $content, 'post:' . $post_id . ':post_content' );
 		}
 
-		$segments = WPT_Content_Translator::segments( $content );
+		$segments = BTRANSLATE_Content_Translator::segments( $content );
 		if ( false === $segments ) {
 			return $content;
 		}
 
 		$text_index = 0;
 		foreach ( $segments as $index => $segment ) {
-			if ( WPT_Content_Translator::is_tag( $segment ) || '' === trim( $segment ) ) {
+			if ( BTRANSLATE_Content_Translator::is_tag( $segment ) || '' === trim( $segment ) ) {
 				continue;
 			}
 
-			$whitespace = WPT_Content_Translator::surrounding_whitespace( $segment );
+			$whitespace = BTRANSLATE_Content_Translator::surrounding_whitespace( $segment );
 			$translated = $this->translated_value( $whitespace['text'], 'post:' . $post_id . ':post_content:text:' . $text_index );
 			$segments[ $index ] = $whitespace['leading'] . $translated . $whitespace['trailing'];
 			++$text_index;
@@ -306,22 +306,22 @@ class WPT_Content_Controller {
 	}
 
 	private function translated_value( $source_value, $context ) {
-		$settings        = WPT_Settings::get();
+		$settings        = BTRANSLATE_Settings::get();
 		$target_language = $this->router->current_language();
 
 		if ( $target_language === $settings['source_language'] || '' === $source_value ) {
 			return $source_value;
 		}
 
-		$provider     = new WPT_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] );
-		$identity_key = WPT_Translation_Identity::key( $source_value, $settings['source_language'], $target_language, $context, $provider->get_version() );
+		$provider     = new BTRANSLATE_Baidu_Provider( $settings['baidu_app_id'], $settings['baidu_secret_key'] );
+		$identity_key = BTRANSLATE_Translation_Identity::key( $source_value, $settings['source_language'], $target_language, $context, $provider->get_version() );
 		$translation  = $this->store->find_valid( $identity_key );
 
 		return ! empty( $translation['translated_value'] ) ? $translation['translated_value'] : $source_value;
 	}
 
 	private function translated_or_schedule_seo_output( $source_value, $post_id, $field_context ) {
-		$settings        = WPT_Settings::get();
+		$settings        = BTRANSLATE_Settings::get();
 		$target_language = $this->router->current_language();
 		$context         = 'post:' . $post_id . ':' . $field_context;
 
@@ -335,8 +335,8 @@ class WPT_Content_Controller {
 		}
 
 		$event_args = array( $post_id, $source_value, $target_language, $context );
-		if ( ! wp_next_scheduled( 'wpt_process_seo_output_translation', $event_args ) ) {
-			wp_schedule_single_event( time() + 5, 'wpt_process_seo_output_translation', $event_args );
+		if ( ! wp_next_scheduled( 'btranslate_process_seo_output_translation', $event_args ) ) {
+			wp_schedule_single_event( time() + 5, 'btranslate_process_seo_output_translation', $event_args );
 		}
 
 		return $source_value;
