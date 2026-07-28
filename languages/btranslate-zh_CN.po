@@ -1,0 +1,171 @@
+# Simplified Chinese translations for Btranslate.
+# Copyright (C) 2026 Btranslate contributors
+# This file is distributed under the same license as the Btranslate package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Btranslate 0.2.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-28 14:41+0800\n"
+"PO-Revision-Date: 2026-07-28 14:45+0800\n"
+"Last-Translator: Btranslate contributors\n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Btranslate"
+msgstr "Btranslate"
+
+#, php-format
+msgid "(%1$s / %2$s content items)"
+msgstr "（%1$s / %2$s 个内容项）"
+
+#, php-format
+msgid "Latest task: %1$s. Posts and pages: %2$s / %3$s; categories and tags: %4$s / %5$s. Updates automatically every 5 seconds."
+msgstr "最近任务：%1$s。文章和页面：%2$s / %3$s；分类和标签：%4$s / %5$s。每 5 秒自动更新。"
+
+msgid "Unable to load translation progress at this time."
+msgstr "暂时无法读取翻译进度。"
+
+msgid "Source language"
+msgstr "源语言"
+
+msgid "Use a Baidu Translate language code, for example zh."
+msgstr "使用百度翻译语言代码，例如 zh。"
+
+msgid "Target languages"
+msgstr "目标语言"
+
+msgid "Separate multiple language codes with commas, for example en,ja."
+msgstr "多个语言代码用英文逗号分隔，例如 en,ja。"
+
+msgid "URL mode"
+msgstr "网址模式"
+
+msgid "Subdirectory"
+msgstr "子目录"
+
+msgid "Domain"
+msgstr "域名"
+
+msgid "Domain bindings"
+msgstr "域名绑定"
+
+msgid "Enter one domain=language code pair per line, for example en.example.com=en. Do not include https://, a path, or a port."
+msgstr "每行一个域名=语言代码，例如 en.example.com=en。请勿填写 https://、路径或端口。"
+
+msgid "Baidu application ID"
+msgstr "百度应用 ID"
+
+msgid "Baidu secret key"
+msgstr "百度密钥"
+
+msgid "Request logging"
+msgstr "请求日志"
+
+msgid "Log each Baidu Translate request"
+msgstr "记录每次百度翻译请求"
+
+msgid "When enabled, fires the btranslate_translation_request_logged action with the language, field, text fingerprint, length, and result status. Credentials, source text, translated text, and full API responses are never included."
+msgstr "启用后触发 btranslate_translation_request_logged 操作，提供语言、字段、文本指纹、长度和结果状态；不会提供密钥、原文、译文或完整 API 响应。"
+
+msgid "Retranslate content"
+msgstr "重新翻译内容"
+
+msgid "Queue all published posts, pages, categories, and tags for translation again."
+msgstr "将所有已发布文章、页面、分类和标签重新加入翻译队列。"
+
+msgid "This will retranslate all content and use your API quota. Continue?"
+msgstr "这将重新翻译所有内容，请注意 API 消耗。确认继续吗？"
+
+msgid "Retranslate all content"
+msgstr "重新翻译所有内容"
+
+msgid "You can also retranslate a single content type."
+msgstr "也可以只重新翻译一种内容类型。"
+
+msgid "This will retranslate all posts and pages and use your API quota. Continue?"
+msgstr "这将重新翻译所有文章和页面，请注意 API 消耗。确认继续吗？"
+
+msgid "Translate all posts"
+msgstr "翻译所有文章"
+
+msgid "This will retranslate all categories and tags and use your API quota. Continue?"
+msgstr "这将重新翻译所有分类和标签，请注意 API 消耗。确认继续吗？"
+
+msgid "Translate all categories and tags"
+msgstr "翻译所有分类和标签"
+
+msgid "Translation cache"
+msgstr "翻译缓存"
+
+msgid "After clearing the cache, the front end temporarily displays source content. Baidu Translate API calls resume when content is translated again."
+msgstr "清除后，前台会暂时显示源文；重新翻译时将再次调用百度翻译 API。"
+
+msgid "This will delete all saved translations, cancel pending translation tasks, and reset progress. Continue?"
+msgstr "这将删除所有已保存的翻译、取消待执行翻译任务并重置进度。确认继续吗？"
+
+msgid "Clear translation cache"
+msgstr "清除已翻译的缓存"
+
+msgid "Translation progress"
+msgstr "翻译进度"
+
+msgid "Loading translation progress..."
+msgstr "正在读取翻译进度..."
+
+msgid "You do not have permission to perform this action."
+msgstr "您没有执行此操作的权限。"
+
+msgid "Invalid translation scope."
+msgstr "无效的翻译范围。"
+
+msgid "Failed to clear the translation cache."
+msgstr "翻译缓存清除失败。"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "Translation status"
+msgstr "翻译状态"
+
+msgid "Retranslate"
+msgstr "重新翻译"
+
+msgid "Translate"
+msgstr "翻译"
+
+msgid "Translated"
+msgstr "已翻译"
+
+msgid "Not translated"
+msgstr "未翻译"
+
+msgid "Last translated:"
+msgstr "上次翻译："
+
+msgid "Invalid translation request."
+msgstr "无效的翻译请求。"
+
+msgid "Full translation"
+msgstr "全量翻译"
+
+msgid "Single post translation"
+msgstr "单篇文章翻译"
+
+msgid "Posts and pages translation"
+msgstr "文章和页面翻译"
+
+msgid "Categories and tags translation"
+msgstr "分类和标签翻译"
+
+msgid "No translation task"
+msgstr "暂无翻译任务"
+
+msgid "Baidu Translate credentials are not configured."
+msgstr "尚未配置百度翻译凭据。"
+
+msgid "Baidu Translate returned an invalid response."
+msgstr "百度翻译返回了无效响应。"

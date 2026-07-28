@@ -27,12 +27,18 @@
 		parent.appendChild(document.createTextNode(text));
 	}
 
+	function format(template, values) {
+		return template.replace(/%([1-9]\d*)\$s/g, function (match, position) {
+			return values[Number(position) - 1];
+		});
+	}
+
 	function renderProgress(progress) {
 		var summary = document.createElement('p');
 		var percent = document.createElement('strong');
 		percent.textContent = progress.percent + '%';
 		summary.appendChild(percent);
-		appendText(summary, '（' + progress.completed + ' / ' + progress.total + ' 个内容项）');
+		appendText(summary, ' ' + format(btranslateAdmin.i18n.contentItems, [progress.completed, progress.total]));
 
 		var progressBar = document.createElement('div');
 		progressBar.style.cssText = 'max-width:480px;height:12px;background:#dcdcde';
@@ -43,14 +49,14 @@
 
 		var description = document.createElement('p');
 		description.className = 'description';
-		description.textContent = '最近任务：' + progress.task_label + '。文章和页面：' + progress.posts_completed + ' / ' + progress.posts_total + '；分类和标签：' + progress.terms_completed + ' / ' + progress.terms_total + '。每 5 秒自动更新。';
+		description.textContent = format(btranslateAdmin.i18n.latestTask, [progress.task_label, progress.posts_completed, progress.posts_total, progress.terms_completed, progress.terms_total]);
 
 		container.replaceChildren(summary, progressBar, description);
 	}
 
 	function renderProgressError() {
 		var message = document.createElement('p');
-		message.textContent = '暂时无法读取翻译进度。';
+		message.textContent = btranslateAdmin.i18n.progressError;
 		container.replaceChildren(message);
 	}
 

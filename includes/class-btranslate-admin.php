@@ -44,6 +44,11 @@ class BTRANSLATE_Admin {
 			array(
 				'progressUrl'   => admin_url( 'admin-ajax.php' ),
 				'progressNonce' => wp_create_nonce( 'btranslate_translation_progress' ),
+				'i18n'          => array(
+					'contentItems'  => __( '(%1$s / %2$s content items)', 'btranslate' ),
+					'latestTask'    => __( 'Latest task: %1$s. Posts and pages: %2$s / %3$s; categories and tags: %4$s / %5$s. Updates automatically every 5 seconds.', 'btranslate' ),
+					'progressError' => __( 'Unable to load translation progress at this time.', 'btranslate' ),
+				),
 			)
 		);
 	}
@@ -87,49 +92,49 @@ class BTRANSLATE_Admin {
 			<form action="options.php" method="post">
 				<?php settings_fields( 'btranslate_settings' ); ?>
 				<table class="form-table" role="presentation">
-					<tr><th scope="row"><label for="btranslate-source-language">源语言</label></th><td><input id="btranslate-source-language" name="btranslate_settings[source_language]" type="text" value="<?php echo esc_attr( $settings['source_language'] ); ?>" /><p class="description">使用百度翻译语言代码，例如 <code>zh</code>。</p></td></tr>
-					<tr><th scope="row"><label for="btranslate-target-languages">目标语言</label></th><td><input id="btranslate-target-languages" name="btranslate_settings[target_languages]" type="text" value="<?php echo esc_attr( implode( ',', $settings['target_languages'] ) ); ?>" class="regular-text" /><p class="description">多个语言代码用英文逗号分隔，例如 <code>en,ja</code>。</p></td></tr>
-					<tr><th scope="row">网址模式</th><td><fieldset id="btranslate-routing-mode"><label><input type="checkbox" name="btranslate_settings[routing_mode][]" value="subdirectory" <?php checked( in_array( 'subdirectory', $settings['routing_mode'], true ) ); ?> /> 子目录</label><br /><label><input type="checkbox" name="btranslate_settings[routing_mode][]" value="domain" <?php checked( in_array( 'domain', $settings['routing_mode'], true ) ); ?> /> 子域名</label></fieldset></td></tr>
-					<tr id="btranslate-domain-bindings-row"<?php echo in_array( 'domain', $settings['routing_mode'], true ) ? '' : ' style="display:none"'; ?>><th scope="row"><label for="btranslate-domain-bindings">域名绑定</label></th><td><textarea id="btranslate-domain-bindings" name="btranslate_settings[domain_bindings]" rows="4" class="large-text" placeholder="en.example.com=en"><?php echo esc_textarea( implode( "\n", $bindings ) ); ?></textarea><p class="description">每行一个 <code>域名=语言代码</code>，例如 <code>en.example.com=en</code>。请勿填写 <code>https://</code>、路径或端口。</p></td></tr>
-					<tr><th scope="row"><label for="btranslate-baidu-app-id">百度应用 ID</label></th><td><input id="btranslate-baidu-app-id" name="btranslate_settings[baidu_app_id]" type="text" value="<?php echo esc_attr( $settings['baidu_app_id'] ); ?>" class="regular-text" /></td></tr>
-					<tr><th scope="row"><label for="btranslate-baidu-secret-key">百度密钥</label></th><td><input id="btranslate-baidu-secret-key" name="btranslate_settings[baidu_secret_key]" type="password" value="<?php echo esc_attr( $settings['baidu_secret_key'] ); ?>" class="regular-text" autocomplete="new-password" /></td></tr>
-					<tr><th scope="row">请求日志</th><td><label for="btranslate-log-requests"><input id="btranslate-log-requests" name="btranslate_settings[log_requests]" type="checkbox" value="1" <?php checked( $settings['log_requests'] ); ?> /> 记录每次百度翻译请求</label><p class="description">启用后触发 <code>btranslate_translation_request_logged</code> 操作，提供语言、字段、文本指纹、长度和结果状态；不会提供密钥、原文、译文或完整 API 响应。</p></td></tr>
+					<tr><th scope="row"><label for="btranslate-source-language"><?php esc_html_e( 'Source language', 'btranslate' ); ?></label></th><td><input id="btranslate-source-language" name="btranslate_settings[source_language]" type="text" value="<?php echo esc_attr( $settings['source_language'] ); ?>" /><p class="description"><?php esc_html_e( 'Use a Baidu Translate language code, for example zh.', 'btranslate' ); ?></p></td></tr>
+					<tr><th scope="row"><label for="btranslate-target-languages"><?php esc_html_e( 'Target languages', 'btranslate' ); ?></label></th><td><input id="btranslate-target-languages" name="btranslate_settings[target_languages]" type="text" value="<?php echo esc_attr( implode( ',', $settings['target_languages'] ) ); ?>" class="regular-text" /><p class="description"><?php esc_html_e( 'Separate multiple language codes with commas, for example en,ja.', 'btranslate' ); ?></p></td></tr>
+					<tr><th scope="row"><?php esc_html_e( 'URL mode', 'btranslate' ); ?></th><td><fieldset id="btranslate-routing-mode"><label><input type="checkbox" name="btranslate_settings[routing_mode][]" value="subdirectory" <?php checked( in_array( 'subdirectory', $settings['routing_mode'], true ) ); ?> /> <?php esc_html_e( 'Subdirectory', 'btranslate' ); ?></label><br /><label><input type="checkbox" name="btranslate_settings[routing_mode][]" value="domain" <?php checked( in_array( 'domain', $settings['routing_mode'], true ) ); ?> /> <?php esc_html_e( 'Domain', 'btranslate' ); ?></label></fieldset></td></tr>
+					<tr id="btranslate-domain-bindings-row"<?php echo in_array( 'domain', $settings['routing_mode'], true ) ? '' : ' style="display:none"'; ?>><th scope="row"><label for="btranslate-domain-bindings"><?php esc_html_e( 'Domain bindings', 'btranslate' ); ?></label></th><td><textarea id="btranslate-domain-bindings" name="btranslate_settings[domain_bindings]" rows="4" class="large-text" placeholder="en.example.com=en"><?php echo esc_textarea( implode( "\n", $bindings ) ); ?></textarea><p class="description"><?php esc_html_e( 'Enter one domain=language code pair per line, for example en.example.com=en. Do not include https://, a path, or a port.', 'btranslate' ); ?></p></td></tr>
+					<tr><th scope="row"><label for="btranslate-baidu-app-id"><?php esc_html_e( 'Baidu application ID', 'btranslate' ); ?></label></th><td><input id="btranslate-baidu-app-id" name="btranslate_settings[baidu_app_id]" type="text" value="<?php echo esc_attr( $settings['baidu_app_id'] ); ?>" class="regular-text" /></td></tr>
+					<tr><th scope="row"><label for="btranslate-baidu-secret-key"><?php esc_html_e( 'Baidu secret key', 'btranslate' ); ?></label></th><td><input id="btranslate-baidu-secret-key" name="btranslate_settings[baidu_secret_key]" type="password" value="<?php echo esc_attr( $settings['baidu_secret_key'] ); ?>" class="regular-text" autocomplete="new-password" /></td></tr>
+					<tr><th scope="row"><?php esc_html_e( 'Request logging', 'btranslate' ); ?></th><td><label for="btranslate-log-requests"><input id="btranslate-log-requests" name="btranslate_settings[log_requests]" type="checkbox" value="1" <?php checked( $settings['log_requests'] ); ?> /> <?php esc_html_e( 'Log each Baidu Translate request', 'btranslate' ); ?></label><p class="description"><?php esc_html_e( 'When enabled, fires the btranslate_translation_request_logged action with the language, field, text fingerprint, length, and result status. Credentials, source text, translated text, and full API responses are never included.', 'btranslate' ); ?></p></td></tr>
 				</table>
 				<?php submit_button(); ?>
 			</form>
 			<hr />
-			<h2>重新翻译所有内容</h2>
-			<p>此操作会将所有已发布文章、页面、分类和标签重新加入翻译队列。</p>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" data-btranslate-confirm="这将重新翻译所有内容，请注意 API 消耗。确认继续吗？">
+			<h2><?php esc_html_e( 'Retranslate content', 'btranslate' ); ?></h2>
+			<p><?php esc_html_e( 'Queue all published posts, pages, categories, and tags for translation again.', 'btranslate' ); ?></p>
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" data-btranslate-confirm="<?php echo esc_attr__( 'This will retranslate all content and use your API quota. Continue?', 'btranslate' ); ?>">
 				<input type="hidden" name="action" value="btranslate_queue_existing_translations" />
 				<?php wp_nonce_field( 'btranslate_queue_existing_translations' ); ?>
-				<?php submit_button( '重新翻译所有内容', 'secondary', 'submit', false ); ?>
+				<?php submit_button( __( 'Retranslate all content', 'btranslate' ), 'secondary', 'submit', false ); ?>
 			</form>
-			<p>也可以只重新翻译一种内容类型。</p>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block;margin-right:8px" data-btranslate-confirm="这将重新翻译所有文章和页面，请注意 API 消耗。确认继续吗？">
+			<p><?php esc_html_e( 'You can also retranslate a single content type.', 'btranslate' ); ?></p>
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block;margin-right:8px" data-btranslate-confirm="<?php echo esc_attr__( 'This will retranslate all posts and pages and use your API quota. Continue?', 'btranslate' ); ?>">
 				<input type="hidden" name="action" value="btranslate_queue_existing_translations" />
 				<input type="hidden" name="scope" value="posts" />
 				<?php wp_nonce_field( 'btranslate_queue_existing_translations' ); ?>
-				<?php submit_button( '翻译所有文章', 'secondary', 'submit', false ); ?>
+				<?php submit_button( __( 'Translate all posts', 'btranslate' ), 'secondary', 'submit', false ); ?>
 			</form>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block" data-btranslate-confirm="这将重新翻译所有分类和标签，请注意 API 消耗。确认继续吗？">
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block" data-btranslate-confirm="<?php echo esc_attr__( 'This will retranslate all categories and tags and use your API quota. Continue?', 'btranslate' ); ?>">
 				<input type="hidden" name="action" value="btranslate_queue_existing_translations" />
 				<input type="hidden" name="scope" value="terms" />
 				<?php wp_nonce_field( 'btranslate_queue_existing_translations' ); ?>
-				<?php submit_button( '翻译所有分类标签', 'secondary', 'submit', false ); ?>
+				<?php submit_button( __( 'Translate all categories and tags', 'btranslate' ), 'secondary', 'submit', false ); ?>
 			</form>
 			<hr />
-			<h2>翻译缓存</h2>
-			<p>清除后，前台会暂时显示源文；重新翻译时将再次调用百度翻译 API。</p>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" data-btranslate-confirm="这将删除所有已保存的翻译、取消待执行翻译任务并重置进度。确认继续吗？">
+			<h2><?php esc_html_e( 'Translation cache', 'btranslate' ); ?></h2>
+			<p><?php esc_html_e( 'After clearing the cache, the front end temporarily displays source content. Baidu Translate API calls resume when content is translated again.', 'btranslate' ); ?></p>
+			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" data-btranslate-confirm="<?php echo esc_attr__( 'This will delete all saved translations, cancel pending translation tasks, and reset progress. Continue?', 'btranslate' ); ?>">
 				<input type="hidden" name="action" value="btranslate_clear_translation_cache" />
 				<?php wp_nonce_field( 'btranslate_clear_translation_cache' ); ?>
-				<?php submit_button( '清除已翻译的缓存', 'delete', 'submit', false ); ?>
+				<?php submit_button( __( 'Clear translation cache', 'btranslate' ), 'delete', 'submit', false ); ?>
 			</form>
 			<hr />
-			<h2>翻译进度</h2>
+			<h2><?php esc_html_e( 'Translation progress', 'btranslate' ); ?></h2>
 			<div id="btranslate-translation-progress" aria-live="polite">
-				<p>正在读取翻译进度...</p>
+				<p><?php esc_html_e( 'Loading translation progress...', 'btranslate' ); ?></p>
 			</div>
 		</div>
 		<?php
@@ -137,13 +142,13 @@ class BTRANSLATE_Admin {
 
 	public function queue_existing_translations() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( '您没有执行此操作的权限。' );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'btranslate' ) );
 		}
 
 		check_admin_referer( 'btranslate_queue_existing_translations' );
 		$scope = isset( $_POST['scope'] ) ? sanitize_key( wp_unslash( $_POST['scope'] ) ) : 'all';
 		if ( ! in_array( $scope, array( 'all', 'posts', 'terms' ), true ) ) {
-			wp_die( '无效的翻译范围。' );
+			wp_die( esc_html__( 'Invalid translation scope.', 'btranslate' ) );
 		}
 
 		$scheduled = 0;
@@ -203,14 +208,14 @@ class BTRANSLATE_Admin {
 
 	public function clear_translation_cache() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( '您没有执行此操作的权限。' );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'btranslate' ) );
 		}
 
 		check_admin_referer( 'btranslate_clear_translation_cache' );
 		$deleted = ( new BTRANSLATE_Translation_Store() )->clear();
 
 		if ( false === $deleted ) {
-			wp_die( '翻译缓存清除失败。' );
+			wp_die( esc_html__( 'Failed to clear the translation cache.', 'btranslate' ) );
 		}
 
 		wp_clear_scheduled_hook( 'btranslate_process_translation' );
@@ -230,7 +235,7 @@ class BTRANSLATE_Admin {
 	}
 
 	public function add_plugin_settings_link( $links ) {
-		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=btranslate' ) ) . '">设置</a>' );
+		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=btranslate' ) ) . '">' . esc_html__( 'Settings', 'btranslate' ) . '</a>' );
 
 		return $links;
 	}
@@ -273,7 +278,7 @@ class BTRANSLATE_Admin {
 	}
 
 	public function add_translation_column( $columns ) {
-		$columns['btranslate_translation'] = '翻译状态';
+		$columns['btranslate_translation'] = __( 'Translation status', 'btranslate' );
 
 		return $columns;
 	}
@@ -288,7 +293,7 @@ class BTRANSLATE_Admin {
 		foreach ( BTRANSLATE_Settings::target_languages() as $target_language ) {
 			$status      = $store->get_post_language_status( $post_id, $target_language );
 			$translated  = ! empty( $status['translated_fields'] );
-			$button_text = $translated ? '重新翻译' : '翻译';
+			$button_text = $translated ? __( 'Retranslate', 'btranslate' ) : __( 'Translate', 'btranslate' );
 			$action_url  = wp_nonce_url(
 				add_query_arg(
 					array(
@@ -303,9 +308,9 @@ class BTRANSLATE_Admin {
 			);
 
 			echo '<p><strong>' . esc_html( strtoupper( $target_language ) ) . '</strong>: ';
-			echo $translated ? '<span style="color:#008a20">已翻译</span>' : '<span>未翻译</span>';
+			echo $translated ? '<span style="color:#008a20">' . esc_html__( 'Translated', 'btranslate' ) . '</span>' : '<span>' . esc_html__( 'Not translated', 'btranslate' ) . '</span>';
 			if ( $translated && ! empty( $status['last_translated_at'] ) ) {
-				echo '<br><small>上次翻译：' . esc_html( get_date_from_gmt( $status['last_translated_at'], 'Y-m-d H:i' ) ) . '</small>';
+				echo '<br><small>' . esc_html__( 'Last translated:', 'btranslate' ) . ' ' . esc_html( get_date_from_gmt( $status['last_translated_at'], 'Y-m-d H:i' ) ) . '</small>';
 			}
 			echo '<br><a class="button button-small" href="' . esc_url( $action_url ) . '">' . esc_html( $button_text ) . '</a></p>';
 		}
@@ -317,7 +322,7 @@ class BTRANSLATE_Admin {
 		$force_refresh   = ! empty( $_GET['force'] );
 
 		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) || ! BTRANSLATE_Settings::is_supported_language( $target_language ) || $target_language === BTRANSLATE_Settings::get()['source_language'] ) {
-			wp_die( '无效的翻译请求。' );
+			wp_die( esc_html__( 'Invalid translation request.', 'btranslate' ) );
 		}
 
 		check_admin_referer( 'btranslate_translate_post_' . $post_id . '_' . $target_language );
@@ -343,21 +348,21 @@ class BTRANSLATE_Admin {
 
 	private function translation_task_label( $post_ids, $term_ids ) {
 		if ( ! empty( $post_ids ) && ! empty( $term_ids ) ) {
-			return '全量翻译';
+			return __( 'Full translation', 'btranslate' );
 		}
 
 		if ( 1 === count( $post_ids ) ) {
-			return '单篇文章翻译';
+			return __( 'Single post translation', 'btranslate' );
 		}
 
 		if ( ! empty( $post_ids ) ) {
-			return '文章和页面翻译';
+			return __( 'Posts and pages translation', 'btranslate' );
 		}
 
 		if ( ! empty( $term_ids ) ) {
-			return '分类和标签翻译';
+			return __( 'Categories and tags translation', 'btranslate' );
 		}
 
-		return '暂无翻译任务';
+		return __( 'No translation task', 'btranslate' );
 	}
 }

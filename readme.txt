@@ -13,6 +13,8 @@ Persistent multilingual WordPress translations powered by the Baidu Translate AP
 
 Btranslate translates supported WordPress content with the Baidu Translate API and persists each translation for reuse. It supports language-specific subdirectory URLs and domain bindings.
 
+The WordPress admin interface follows the current WordPress locale. English is the default, and a bundled Simplified Chinese translation is used when WordPress is set to `zh_CN`.
+
 Supported values include published post and page titles, content, excerpts, image alternative text, categories, tags, and selected SEO fields. Automatic translation is only scheduled for posts and pages with the `publish` status. Completed translations are stored in the plugin's custom database table. Front-end rendering reuses stored values and never calls the translation provider dynamically.
 
 Subdirectory routing supports paths such as `/en/example-post/`. Domain routing maps configured hostnames to target languages. Translation failures are non-fatal and fall back to source-language content.

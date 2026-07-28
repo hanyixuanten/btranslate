@@ -4,6 +4,8 @@
 
 Btranslate 是一个 WordPress 插件骨架，使用百度翻译 API 持久化管理多语言内容。
 
+WordPress 后台界面会跟随当前 WordPress 语言：默认显示英文，WordPress 设为 `zh_CN` 时使用插件内置的简体中文翻译。
+
 ## 要求
 
 - WordPress 6.4 或更高版本。
