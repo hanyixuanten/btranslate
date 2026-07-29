@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: HTBD
+ * Plugin Name: HTBD - hyx Translator powered by Baidu Translate
  * Plugin URI: https://github.com/hanyixuanten/HTBD
  * Description: Persistent multilingual WordPress translations powered by Baidu Translate.
  * Version: 0.2.2
