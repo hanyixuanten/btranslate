@@ -33,7 +33,7 @@ body:
     id: plugin-version
     attributes:
       label: Btranslate version
-      placeholder: "For example: 0.2.1"
+      placeholder: "For example: 0.2.2"
     validations:
       required: true
 

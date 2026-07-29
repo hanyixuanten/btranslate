@@ -4,7 +4,7 @@ Homepage: https://github.com/hanyixuanten/btranslate
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.1
+Stable tag: 0.2.2
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -57,6 +57,6 @@ Uninstalling removes plugin settings, scheduled tasks, and the custom translatio
 
 == Changelog ==
 
-= 0.2.1 =
+= 0.2.2 =
 
 * Declare GPLv3 licensing and WordPress.org plugin metadata.

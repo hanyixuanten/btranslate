@@ -4,7 +4,7 @@ Homepage: https://github.com/hanyixuanten/btranslate
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.1
+Stable tag: 0.2.2
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -62,6 +62,6 @@ Btranslate 将百度返回的译文保存在 WordPress 数据库中，但不保�
 
 == Changelog ==
 
-= 0.2.1 =
+= 0.2.2 =
 
 * 声明 GPLv3 许可证并补充 WordPress.org 插件元数据。

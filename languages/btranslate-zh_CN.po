@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the Btranslate package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Btranslate 0.2.1\n"
+"Project-Id-Version: Btranslate 0.2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-28 14:41+0800\n"
 "PO-Revision-Date: 2026-07-28 14:45+0800\n"
