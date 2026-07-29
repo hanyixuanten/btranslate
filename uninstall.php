@@ -1,14 +1,14 @@
 <?php
 /**
- * Removes all data created by Btranslate.
+ * Removes all data created by HTBD.
  *
- * @package BTRANSLATE
+ * @package HTBD
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/includes/class-btranslate-uninstaller.php';
+require_once __DIR__ . '/includes/class-uninstaller.php';
 
-BTRANSLATE_Uninstaller::uninstall();
+HTBD_Uninstaller::uninstall();

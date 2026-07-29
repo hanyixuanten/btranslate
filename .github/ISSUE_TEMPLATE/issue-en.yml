@@ -1,5 +1,5 @@
 name: Bug Report and Feature Request
-description: Report a Btranslate issue or suggest a feature or documentation improvement
+description: Report a HTBD issue or suggest a feature or documentation improvement
 title: "[Issue]: "
 body:
   - type: markdown
@@ -32,7 +32,7 @@ body:
   - type: input
     id: plugin-version
     attributes:
-      label: Btranslate version
+      label: HTBD version
       placeholder: "For example: 0.2.2"
     validations:
       required: true

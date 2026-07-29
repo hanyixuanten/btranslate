@@ -30,15 +30,15 @@ jobs:
         id: package
         run: |
           set -eu
-          version="$(grep -E '^ \* Version:' btranslate.php | sed -E 's/^ \* Version: *//')"
-          archive_name="btranslate-${version}.zip"
+          version="$(grep -E '^ \* Version:' hyx-translator-for-baidu-translate.php | sed -E 's/^ \* Version: *//')"
+          archive_name="hyx-translator-for-baidu-translate-${version}.zip"
           ./build.sh build
           printf 'archive=%s\n' "${archive_name}" >> "$GITHUB_OUTPUT"
 
       - name: Upload plugin archive
         uses: actions/upload-artifact@v4
         with:
-          name: btranslate-plugin
+          name: hyx-translator-for-baidu-translate-plugin
           path: ${{ steps.package.outputs.archive }}
           if-no-files-found: error
           retention-days: 30

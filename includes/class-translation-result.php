@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Translation_Result {
+class HTBD_Translation_Result {
 	public $success;
 	public $value;
 	public $error_code;

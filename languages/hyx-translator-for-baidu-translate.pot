@@ -1,12 +1,12 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Btranslate contributors
-# This file is distributed under the same license as the Btranslate package.
+# Copyright (C) YEAR HTBD contributors
+# This file is distributed under the same license as the hyx-translator-for-baidu-translate package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Btranslate 0.2.2\n"
+"Project-Id-Version: hyx-translator-for-baidu-translate 0.2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-28 14:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -17,204 +17,204 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: includes/class-btranslate-admin.php:22
-msgid "Btranslate"
+#: includes/class-admin.php:22
+msgid "HTBD"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:48
+#: includes/class-admin.php:48
 #, php-format
 msgid "(%1$s / %2$s content items)"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:49
+#: includes/class-admin.php:49
 #, php-format
 msgid ""
 "Latest task: %1$s. Posts and pages: %2$s / %3$s; categories and tags: %4$s / "
 "%5$s. Updates automatically every 5 seconds."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:50
+#: includes/class-admin.php:50
 msgid "Unable to load translation progress at this time."
 msgstr ""
 
 msgid "Failed translations"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:95
+#: includes/class-admin.php:95
 msgid "Source language"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:95
+#: includes/class-admin.php:95
 msgid "Use a Baidu Translate language code, for example zh."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:96
+#: includes/class-admin.php:96
 msgid "Target languages"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:96
+#: includes/class-admin.php:96
 msgid "Separate multiple language codes with commas, for example en,ja."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:97
+#: includes/class-admin.php:97
 msgid "URL mode"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:97
+#: includes/class-admin.php:97
 msgid "Subdirectory"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:97
+#: includes/class-admin.php:97
 msgid "Domain"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:98
+#: includes/class-admin.php:98
 msgid "Domain bindings"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:98
+#: includes/class-admin.php:98
 msgid ""
 "Enter one domain=language code pair per line, for example en.example.com=en. "
 "Do not include https://, a path, or a port."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:99
+#: includes/class-admin.php:99
 msgid "Baidu application ID"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:100
+#: includes/class-admin.php:100
 msgid "Baidu secret key"
 msgstr ""
 
 msgid "After saving settings for the first time, manually run \"Retranslate all content\" below."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:101
+#: includes/class-admin.php:101
 msgid "Request logging"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:101
+#: includes/class-admin.php:101
 msgid "Log each Baidu Translate request"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:101
+#: includes/class-admin.php:101
 msgid ""
-"When enabled, fires the btranslate_translation_request_logged action with "
+"When enabled, fires the htbd_translation_request_logged action with "
 "the language, field, text fingerprint, length, and result status. "
 "Credentials, source text, translated text, and full API responses are never "
 "included."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:106
+#: includes/class-admin.php:106
 msgid "Retranslate content"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:107
+#: includes/class-admin.php:107
 msgid ""
 "Queue all published posts, pages, categories, and tags for translation again."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:108
+#: includes/class-admin.php:108
 msgid "This will retranslate all content and use your API quota. Continue?"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:111
+#: includes/class-admin.php:111
 msgid "Retranslate all content"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:113
+#: includes/class-admin.php:113
 msgid "You can also retranslate a single content type."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:114
+#: includes/class-admin.php:114
 msgid ""
 "This will retranslate all posts and pages and use your API quota. Continue?"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:118
+#: includes/class-admin.php:118
 msgid "Translate all posts"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:120
+#: includes/class-admin.php:120
 msgid ""
 "This will retranslate all categories and tags and use your API quota. "
 "Continue?"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:124
+#: includes/class-admin.php:124
 msgid "Translate all categories and tags"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:127
+#: includes/class-admin.php:127
 msgid "Translation cache"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:128
+#: includes/class-admin.php:128
 msgid ""
 "After clearing the cache, the front end temporarily displays source content. "
 "Baidu Translate API calls resume when content is translated again."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:129
+#: includes/class-admin.php:129
 msgid ""
 "This will delete all saved translations, cancel pending translation tasks, "
 "and reset progress. Continue?"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:132
+#: includes/class-admin.php:132
 msgid "Clear translation cache"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:135
+#: includes/class-admin.php:135
 msgid "Translation progress"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:137
+#: includes/class-admin.php:137
 msgid "Loading translation progress..."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:145
-#: includes/class-btranslate-admin.php:211
+#: includes/class-admin.php:145
+#: includes/class-admin.php:211
 msgid "You do not have permission to perform this action."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:151
+#: includes/class-admin.php:151
 msgid "Invalid translation scope."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:218
+#: includes/class-admin.php:218
 msgid "Failed to clear the translation cache."
 msgstr ""
 
-#: includes/class-btranslate-admin.php:238
+#: includes/class-admin.php:238
 msgid "Settings"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:281
+#: includes/class-admin.php:281
 msgid "Translation status"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:296
+#: includes/class-admin.php:296
 msgid "Retranslate"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:296
+#: includes/class-admin.php:296
 msgid "Translate"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:311
+#: includes/class-admin.php:311
 msgid "Translated"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:311
+#: includes/class-admin.php:311
 msgid "Not translated"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:313
+#: includes/class-admin.php:313
 msgid "Last translated:"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:325
+#: includes/class-admin.php:325
 msgid "Invalid translation request."
 msgstr ""
 
@@ -222,30 +222,30 @@ msgstr ""
 msgid "Content #%d"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:351
+#: includes/class-admin.php:351
 msgid "Full translation"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:355
+#: includes/class-admin.php:355
 msgid "Single post translation"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:359
+#: includes/class-admin.php:359
 msgid "Posts and pages translation"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:363
+#: includes/class-admin.php:363
 msgid "Categories and tags translation"
 msgstr ""
 
-#: includes/class-btranslate-admin.php:366
+#: includes/class-admin.php:366
 msgid "No translation task"
 msgstr ""
 
-#: includes/class-btranslate-baidu-provider.php:22
+#: includes/class-baidu-provider.php:22
 msgid "Baidu Translate credentials are not configured."
 msgstr ""
 
-#: includes/class-btranslate-baidu-provider.php:52
+#: includes/class-baidu-provider.php:52
 msgid "Baidu Translate returned an invalid response."
 msgstr ""

@@ -2,17 +2,17 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Content_Translator {
+class HTBD_Content_Translator {
 	private $service;
 
-	public function __construct( BTRANSLATE_Translation_Service $service ) {
+	public function __construct( HTBD_Translation_Service $service ) {
 		$this->service = $service;
 	}
 
 	public function translate( $content, $source_language, $target_language, $context, $force_refresh = false ) {
 		$segments = self::segments( $content );
 		if ( false === $segments ) {
-			return BTRANSLATE_Translation_Result::failure( 'content_parse_failed', 'Unable to protect links before translation.' );
+			return HTBD_Translation_Result::failure( 'content_parse_failed', 'Unable to protect links before translation.' );
 		}
 
 		$text_index = 0;
@@ -29,7 +29,7 @@ class BTRANSLATE_Content_Translator {
 			++$text_index;
 		}
 
-		return BTRANSLATE_Translation_Result::success( $content );
+		return HTBD_Translation_Result::success( $content );
 	}
 
 	public static function segments( $content ) {

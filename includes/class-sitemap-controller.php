@@ -2,11 +2,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Sitemap_Controller {
+class HTBD_Sitemap_Controller {
 	private $router;
 	private $target_language = '';
 
-	public function __construct( BTRANSLATE_Language_Router $router ) {
+	public function __construct( HTBD_Language_Router $router ) {
 		$this->router = $router;
 	}
 
@@ -15,7 +15,7 @@ class BTRANSLATE_Sitemap_Controller {
 	}
 
 	public function intercept_request( $do_parse_request, $wp, $extra_query_vars ) {
-		$settings = BTRANSLATE_Settings::get();
+		$settings = HTBD_Settings::get();
 		$language = $this->requested_language( $this->request_path(), $settings );
 
 		if ( '' === $language ) {
@@ -52,7 +52,7 @@ class BTRANSLATE_Sitemap_Controller {
 	}
 
 	private function source_sitemap_xml( $source_url ) {
-		$cache_key = 'btranslate_sitemap_' . md5( $source_url );
+		$cache_key = 'htbd_sitemap_' . md5( $source_url );
 		$cached    = get_transient( $cache_key );
 
 		if ( is_string( $cached ) && '' !== $cached ) {
@@ -98,18 +98,18 @@ class BTRANSLATE_Sitemap_Controller {
 			$path = '/' . ltrim( (string) $path, '/' );
 		}
 
-		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'domain' ) && '/sitemap.xml' === untrailingslashit( $path ) ) {
-			$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
+		if ( HTBD_Settings::is_routing_mode_enabled( 'domain' ) && '/sitemap.xml' === untrailingslashit( $path ) ) {
+			$host     = isset( $_SERVER['HTTP_HOST'] ) ? HTBD_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
 			$bindings = (array) $settings['domain_bindings'];
 			$language = isset( $bindings[ $host ] ) ? sanitize_key( $bindings[ $host ] ) : '';
 
-			if ( in_array( $language, BTRANSLATE_Settings::target_languages(), true ) ) {
+			if ( in_array( $language, HTBD_Settings::target_languages(), true ) ) {
 				return $language;
 			}
 		}
 
-		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
-			foreach ( BTRANSLATE_Settings::subdirectory_languages() as $language ) {
+		if ( HTBD_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
+			foreach ( HTBD_Settings::subdirectory_languages() as $language ) {
 				$language = sanitize_key( $language );
 
 				if ( '/' . $language . '/sitemap.xml' === untrailingslashit( $path ) ) {

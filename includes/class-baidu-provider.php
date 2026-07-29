@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Baidu_Provider implements BTRANSLATE_Translation_Provider {
+class HTBD_Baidu_Provider implements HTBD_Translation_Provider {
 	private $app_id;
 	private $secret_key;
 
@@ -19,7 +19,7 @@ class BTRANSLATE_Baidu_Provider implements BTRANSLATE_Translation_Provider {
 		if ( '' === $this->app_id || '' === $this->secret_key ) {
 			$this->log_request( $source_value, $source_language, $target_language, $context, 'missing_credentials' );
 
-			return BTRANSLATE_Translation_Result::failure( 'missing_credentials', __( 'Baidu Translate credentials are not configured.', 'btranslate' ) );
+			return HTBD_Translation_Result::failure( 'missing_credentials', __( 'Baidu Translate credentials are not configured.', 'hyx-translator-for-baidu-translate' ) );
 		}
 
 		$salt      = (string) wp_rand( 100000, 999999 );
@@ -42,27 +42,27 @@ class BTRANSLATE_Baidu_Provider implements BTRANSLATE_Translation_Provider {
 		if ( is_wp_error( $response ) ) {
 			$this->log_request( $source_value, $source_language, $target_language, $context, 'request_failed', $response->get_error_code() );
 
-			return BTRANSLATE_Translation_Result::failure( 'request_failed', $response->get_error_message() );
+			return HTBD_Translation_Result::failure( 'request_failed', $response->get_error_message() );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( ! is_array( $body ) || empty( $body['trans_result'] ) || ! is_array( $body['trans_result'] ) ) {
 			$error_code    = isset( $body['error_code'] ) ? sanitize_key( $body['error_code'] ) : 'invalid_response';
-			$error_message = isset( $body['error_msg'] ) ? sanitize_text_field( $body['error_msg'] ) : __( 'Baidu Translate returned an invalid response.', 'btranslate' );
+			$error_message = isset( $body['error_msg'] ) ? sanitize_text_field( $body['error_msg'] ) : __( 'Baidu Translate returned an invalid response.', 'hyx-translator-for-baidu-translate' );
 			$this->log_request( $source_value, $source_language, $target_language, $context, 'failed', $error_code );
 
-			return BTRANSLATE_Translation_Result::failure( $error_code, $error_message );
+			return HTBD_Translation_Result::failure( $error_code, $error_message );
 		}
 
 		$translated_parts = wp_list_pluck( $body['trans_result'], 'dst' );
 		$this->log_request( $source_value, $source_language, $target_language, $context, 'complete' );
 
-		return BTRANSLATE_Translation_Result::success( implode( "\n", $translated_parts ) );
+		return HTBD_Translation_Result::success( implode( "\n", $translated_parts ) );
 	}
 
 	private function log_request( $source_value, $source_language, $target_language, $context, $status, $error_code = '' ) {
-		$settings = BTRANSLATE_Settings::get();
+		$settings = HTBD_Settings::get();
 
 		if ( empty( $settings['log_requests'] ) ) {
 			return;
@@ -73,12 +73,12 @@ class BTRANSLATE_Baidu_Provider implements BTRANSLATE_Translation_Provider {
 			'source_language'    => sanitize_key( $source_language ),
 			'target_language'    => sanitize_key( $target_language ),
 			'context'            => sanitize_key( $context ),
-			'source_fingerprint' => BTRANSLATE_Translation_Identity::source_fingerprint( (string) $source_value ),
+			'source_fingerprint' => HTBD_Translation_Identity::source_fingerprint( (string) $source_value ),
 			'source_length'      => strlen( (string) $source_value ),
 			'status'             => sanitize_key( $status ),
 			'error_code'         => sanitize_key( $error_code ),
 		);
 
-		do_action( 'btranslate_translation_request_logged', $entry );
+		do_action( 'htbd_translation_request_logged', $entry );
 	}
 }

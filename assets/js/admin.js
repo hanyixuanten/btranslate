@@ -1,8 +1,8 @@
 (function () {
 	'use strict';
 
-	var domainMode = document.querySelector('#btranslate-routing-mode input[value="domain"]');
-	var bindingsRow = document.getElementById('btranslate-domain-bindings-row');
+	var domainMode = document.querySelector('#htbd-routing-mode input[value="domain"]');
+	var bindingsRow = document.getElementById('htbd-domain-bindings-row');
 
 	if (domainMode && bindingsRow) {
 		domainMode.addEventListener('change', function () {
@@ -10,16 +10,16 @@
 		});
 	}
 
-	document.querySelectorAll('form[data-btranslate-confirm]').forEach(function (form) {
+	document.querySelectorAll('form[data-htbd-confirm]').forEach(function (form) {
 		form.addEventListener('submit', function (event) {
-			if (!window.confirm(form.getAttribute('data-btranslate-confirm'))) {
+			if (!window.confirm(form.getAttribute('data-htbd-confirm'))) {
 				event.preventDefault();
 			}
 		});
 	});
 
-	var container = document.getElementById('btranslate-translation-progress');
-	if (!container || typeof btranslateAdmin === 'undefined') {
+	var container = document.getElementById('htbd-translation-progress');
+	if (!container || typeof htbdAdmin === 'undefined') {
 		return;
 	}
 
@@ -38,7 +38,7 @@
 		var percent = document.createElement('strong');
 		percent.textContent = progress.percent + '%';
 		summary.appendChild(percent);
-		appendText(summary, ' ' + format(btranslateAdmin.i18n.contentItems, [progress.completed, progress.total]));
+		appendText(summary, ' ' + format(htbdAdmin.i18n.contentItems, [progress.completed, progress.total]));
 
 		var progressBar = document.createElement('div');
 		progressBar.style.cssText = 'max-width:480px;height:12px;background:#dcdcde';
@@ -49,12 +49,12 @@
 
 		var description = document.createElement('p');
 		description.className = 'description';
-		description.textContent = format(btranslateAdmin.i18n.latestTask, [progress.task_label, progress.posts_completed, progress.posts_total, progress.terms_completed, progress.terms_total]);
+		description.textContent = format(htbdAdmin.i18n.latestTask, [progress.task_label, progress.posts_completed, progress.posts_total, progress.terms_completed, progress.terms_total]);
 
 		var children = [summary, progressBar, description];
 		if (progress.failed_items.length) {
 			var failedHeading = document.createElement('h3');
-			failedHeading.textContent = btranslateAdmin.i18n.failedItems;
+			failedHeading.textContent = htbdAdmin.i18n.failedItems;
 			children.push(failedHeading);
 
 			var failedList = document.createElement('ul');
@@ -65,7 +65,7 @@
 				var retryLink = document.createElement('a');
 				retryLink.className = 'button button-small';
 				retryLink.href = item.retry_url;
-				retryLink.textContent = btranslateAdmin.i18n.retranslate;
+				retryLink.textContent = htbdAdmin.i18n.retranslate;
 				failedItem.appendChild(retryLink);
 				failedList.appendChild(failedItem);
 			});
@@ -77,12 +77,12 @@
 
 	function renderProgressError() {
 		var message = document.createElement('p');
-		message.textContent = btranslateAdmin.i18n.progressError;
+		message.textContent = htbdAdmin.i18n.progressError;
 		container.replaceChildren(message);
 	}
 
 	function updateProgress() {
-		var url = btranslateAdmin.progressUrl + '?action=btranslate_translation_progress&_ajax_nonce=' + encodeURIComponent(btranslateAdmin.progressNonce);
+		var url = htbdAdmin.progressUrl + '?action=htbd_translation_progress&_ajax_nonce=' + encodeURIComponent(htbdAdmin.progressNonce);
 
 		window.fetch(url, { credentials: 'same-origin' })
 			.then(function (response) {

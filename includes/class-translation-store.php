@@ -2,11 +2,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Translation_Store {
+class HTBD_Translation_Store {
 	public static function table_name() {
 		global $wpdb;
 
-		return $wpdb->prefix . 'btranslate_translations';
+		return $wpdb->prefix . 'hyx_bd_translations';
 	}
 
 	public static function install() {
@@ -15,6 +15,13 @@ class BTRANSLATE_Translation_Store {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		$table_name      = self::table_name();
+		$legacy_table    = $wpdb->prefix . 'btranslate_translations';
+		$table_exists    = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table_name ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Checks the plugin-owned table during activation.
+		$legacy_exists   = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $legacy_table ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Checks for the legacy plugin-owned table during activation.
+		if ( $legacy_exists === $legacy_table && $table_exists !== $table_name ) {
+			$wpdb->query( $wpdb->prepare( 'RENAME TABLE %i TO %i', $legacy_table, $table_name ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Migrates persisted translations to the renamed table.
+		}
+
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql             = "CREATE TABLE {$table_name} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,

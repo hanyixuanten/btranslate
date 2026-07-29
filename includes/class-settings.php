@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Settings {
+class HTBD_Settings {
 	public static function get() {
 		$defaults = array(
 			'source_language'   => 'zh',
@@ -15,7 +15,16 @@ class BTRANSLATE_Settings {
 			'log_requests'      => false,
 		);
 
-		$settings                 = wp_parse_args( (array) get_option( 'btranslate_settings', array() ), $defaults );
+		$stored_settings = get_option( 'htbd_settings', false );
+		if ( false === $stored_settings ) {
+			$legacy_settings = get_option( 'btranslate_settings', false );
+			if ( false !== $legacy_settings ) {
+				$stored_settings = $legacy_settings;
+				add_option( 'htbd_settings', $legacy_settings, '', false );
+			}
+		}
+
+		$settings                 = wp_parse_args( (array) $stored_settings, $defaults );
 		$settings['routing_mode'] = self::routing_modes( $settings['routing_mode'] );
 
 		return $settings;

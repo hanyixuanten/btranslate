@@ -1,13 +1,13 @@
-# Simplified Chinese translations for Btranslate.
-# Copyright (C) 2026 Btranslate contributors
-# This file is distributed under the same license as the Btranslate package.
+# Simplified Chinese translations for HTBD.
+# Copyright (C) 2026 HTBD contributors
+# This file is distributed under the same license as the hyx-translator-for-baidu-translate package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Btranslate 0.2.2\n"
+"Project-Id-Version: hyx-translator-for-baidu-translate 0.2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-28 14:41+0800\n"
 "PO-Revision-Date: 2026-07-28 14:45+0800\n"
-"Last-Translator: Btranslate contributors\n"
+"Last-Translator: HTBD contributors\n"
 "Language-Team: Chinese (Simplified)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-msgid "Btranslate"
-msgstr "Btranslate"
+msgid "HTBD"
+msgstr "HTBD"
 
 #, php-format
 msgid "(%1$s / %2$s content items)"
@@ -74,8 +74,8 @@ msgstr "请求日志"
 msgid "Log each Baidu Translate request"
 msgstr "记录每次百度翻译请求"
 
-msgid "When enabled, fires the btranslate_translation_request_logged action with the language, field, text fingerprint, length, and result status. Credentials, source text, translated text, and full API responses are never included."
-msgstr "启用后触发 btranslate_translation_request_logged 操作，提供语言、字段、文本指纹、长度和结果状态；不会提供密钥、原文、译文或完整 API 响应。"
+msgid "When enabled, fires the htbd_translation_request_logged action with the language, field, text fingerprint, length, and result status. Credentials, source text, translated text, and full API responses are never included."
+msgstr "启用后触发 htbd_translation_request_logged 操作，提供语言、字段、文本指纹、长度和结果状态；不会提供密钥、原文、译文或完整 API 响应。"
 
 msgid "Retranslate content"
 msgstr "重新翻译内容"

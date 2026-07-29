@@ -1,4 +1,4 @@
-# btranslate Agent Guide
+# hyx-translator-for-baidu-translate Agent Guide
 
 ## Project Scope
 
@@ -45,6 +45,6 @@ Unless a user explicitly requests a refresh, each translatable value must be tra
 - Mock Baidu API calls in every test. Tests must not require live credentials or outbound network access.
 - Keep changes narrow and avoid unrelated refactors or formatting churn.
 - After every file change, review `.github/workflows/package-plugin.yml` and ensure the automated packaging Action includes all runtime files required by the change. Validate the packaging commands locally when practical.
-- Plugin slug and PHP prefix: `btranslate` and `btranslate_`/`BTRANSLATE_`. The current minimum supported PHP version is 8.1 and the current minimum WordPress version is 6.4.
+- Plugin slug and PHP prefix: `hyx-translator-for-baidu-translate` and `htbd_`/`HTBD_`. The custom translation table is `{$wpdb->prefix}hyx_bd_translations`. The current minimum supported PHP version is 8.1 and the current minimum WordPress version is 6.4.
 - The repository has no Composer-managed development dependencies or bundled automated test suite. Validate PHP syntax with `find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l`. Any future automated tests must mock WordPress API calls and must not require live credentials, external network access, or a WordPress database.
 - Document supported languages, routing modes, data retention, translation lifecycle, and known limitations in the README whenever the implementation changes.

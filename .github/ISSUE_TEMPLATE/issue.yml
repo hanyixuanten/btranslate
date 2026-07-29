@@ -1,5 +1,5 @@
 name: 问题反馈与功能建议
-description: 反馈 Btranslate 的问题，或提出功能和文档改进建议
+description: 反馈 HTBD 的问题，或提出功能和文档改进建议
 title: "[Issue]: "
 body:
   - type: markdown
@@ -32,7 +32,7 @@ body:
   - type: input
     id: plugin-version
     attributes:
-      label: Btranslate 版本
+      label: HTBD 版本
       placeholder: 例如：0.2.2
     validations:
       required: true

@@ -2,23 +2,23 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Translation_Service {
+class HTBD_Translation_Service {
 	private $store;
 	private $provider;
 
-	public function __construct( BTRANSLATE_Translation_Store $store, BTRANSLATE_Translation_Provider $provider ) {
+	public function __construct( HTBD_Translation_Store $store, HTBD_Translation_Provider $provider ) {
 		$this->store    = $store;
 		$this->provider = $provider;
 	}
 
 	public function get_or_translate( $source_value, $source_language, $target_language, $context, $force_refresh = false ) {
 		$source_value       = (string) $source_value;
-		$source_fingerprint = BTRANSLATE_Translation_Identity::source_fingerprint( $source_value );
-		$identity_key       = BTRANSLATE_Translation_Identity::key( $source_value, $source_language, $target_language, $context, $this->provider->get_version() );
+		$source_fingerprint = HTBD_Translation_Identity::source_fingerprint( $source_value );
+		$identity_key       = HTBD_Translation_Identity::key( $source_value, $source_language, $target_language, $context, $this->provider->get_version() );
 		$existing           = $this->store->find_valid( $identity_key );
 
 		if ( ! $force_refresh && ! empty( $existing['translated_value'] ) ) {
-			return BTRANSLATE_Translation_Result::success( $existing['translated_value'] );
+			return HTBD_Translation_Result::success( $existing['translated_value'] );
 		}
 
 		$result = $this->provider->translate( $source_value, $source_language, $target_language, $context );

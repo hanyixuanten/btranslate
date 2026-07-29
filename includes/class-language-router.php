@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Language_Router {
+class HTBD_Language_Router {
 	private $request_language = '';
 
 	public function register() {
@@ -17,13 +17,13 @@ class BTRANSLATE_Language_Router {
 	}
 
 	public function query_vars( $query_vars ) {
-		$query_vars[] = 'btranslate_language';
+		$query_vars[] = 'htbd_language';
 
 		return $query_vars;
 	}
 
 	public function strip_language_prefix( $do_parse_request, $wp, $extra_query_vars ) {
-		if ( ! $do_parse_request || ! BTRANSLATE_Settings::is_routing_mode_enabled( 'subdirectory' ) || empty( $_SERVER['REQUEST_URI'] ) ) {
+		if ( ! $do_parse_request || ! HTBD_Settings::is_routing_mode_enabled( 'subdirectory' ) || empty( $_SERVER['REQUEST_URI'] ) ) {
 			return $do_parse_request;
 		}
 
@@ -40,7 +40,7 @@ class BTRANSLATE_Language_Router {
 		$segments  = explode( '/', $relative, 2 );
 		$language  = sanitize_key( $segments[0] );
 
-		if ( ! in_array( $language, BTRANSLATE_Settings::subdirectory_languages(), true ) ) {
+		if ( ! in_array( $language, HTBD_Settings::subdirectory_languages(), true ) ) {
 			return $do_parse_request;
 		}
 
@@ -53,30 +53,30 @@ class BTRANSLATE_Language_Router {
 	}
 
 	public function resolve_domain_language( $wp ) {
-		$settings = BTRANSLATE_Settings::get();
-		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
+		$settings = HTBD_Settings::get();
+		$host     = isset( $_SERVER['HTTP_HOST'] ) ? HTBD_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
 		$bindings = (array) $settings['domain_bindings'];
 
 		if ( '' !== $this->request_language ) {
-			$wp->query_vars['btranslate_language'] = $this->request_language;
+			$wp->query_vars['htbd_language'] = $this->request_language;
 		}
 
-		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'domain' ) && '' !== $host && isset( $bindings[ $host ] ) && BTRANSLATE_Settings::is_supported_language( $bindings[ $host ] ) ) {
+		if ( HTBD_Settings::is_routing_mode_enabled( 'domain' ) && '' !== $host && isset( $bindings[ $host ] ) && HTBD_Settings::is_supported_language( $bindings[ $host ] ) ) {
 			if ( '' !== $this->request_language ) {
 				$wp->query_vars = array( 'error' => '404' );
 
 				return;
 			}
 
-			$wp->query_vars['btranslate_language'] = sanitize_key( $bindings[ $host ] );
+			$wp->query_vars['htbd_language'] = sanitize_key( $bindings[ $host ] );
 		}
 	}
 
 	public function current_language() {
-		$settings = BTRANSLATE_Settings::get();
-		$language = get_query_var( 'btranslate_language' );
+		$settings = HTBD_Settings::get();
+		$language = get_query_var( 'htbd_language' );
 
-		if ( $language && BTRANSLATE_Settings::is_supported_language( $language ) ) {
+		if ( $language && HTBD_Settings::is_supported_language( $language ) ) {
 			return sanitize_key( $language );
 		}
 
@@ -84,14 +84,14 @@ class BTRANSLATE_Language_Router {
 	}
 
 	public function localized_url( $url, $language = '' ) {
-		$settings = BTRANSLATE_Settings::get();
+		$settings = HTBD_Settings::get();
 		$language = '' === $language ? $this->current_language() : sanitize_key( $language );
 
-		if ( $language === $settings['source_language'] || ! BTRANSLATE_Settings::is_supported_language( $language ) ) {
+		if ( $language === $settings['source_language'] || ! HTBD_Settings::is_supported_language( $language ) ) {
 			return $url;
 		}
 
-		if ( BTRANSLATE_Settings::is_routing_mode_enabled( 'domain' ) && $this->request_uses_domain( $language ) ) {
+		if ( HTBD_Settings::is_routing_mode_enabled( 'domain' ) && $this->request_uses_domain( $language ) ) {
 			$domain = array_search( $language, (array) $settings['domain_bindings'], true );
 			$parts  = wp_parse_url( $url );
 
@@ -105,7 +105,7 @@ class BTRANSLATE_Language_Router {
 			}
 		}
 
-		if ( ! BTRANSLATE_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
+		if ( ! HTBD_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
 			return $url;
 		}
 
@@ -130,15 +130,15 @@ class BTRANSLATE_Language_Router {
 	}
 
 	private function request_uses_domain( $language ) {
-		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
-		$bindings = (array) BTRANSLATE_Settings::get()['domain_bindings'];
+		$host     = isset( $_SERVER['HTTP_HOST'] ) ? HTBD_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
+		$bindings = (array) HTBD_Settings::get()['domain_bindings'];
 
 		return '' !== $host && isset( $bindings[ $host ] ) && sanitize_key( $bindings[ $host ] ) === $language;
 	}
 
 	private function source_origin_parts( $parts ) {
-		$host     = isset( $_SERVER['HTTP_HOST'] ) ? BTRANSLATE_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
-		$bindings = (array) BTRANSLATE_Settings::get()['domain_bindings'];
+		$host     = isset( $_SERVER['HTTP_HOST'] ) ? HTBD_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
+		$bindings = (array) HTBD_Settings::get()['domain_bindings'];
 
 		if ( '' === $host || ! isset( $bindings[ $host ] ) ) {
 			return $parts;
@@ -164,7 +164,7 @@ class BTRANSLATE_Language_Router {
 	private function localized_path( $path, $language ) {
 		$home_path = $this->home_path();
 		$relative  = $this->relative_path( $path );
-		$languages = array_map( 'preg_quote', BTRANSLATE_Settings::target_languages() );
+		$languages = array_map( 'preg_quote', HTBD_Settings::target_languages() );
 
 		if ( ! empty( $languages ) ) {
 			$relative = preg_replace( '#^(?:' . implode( '|', $languages ) . ')(?=/|$)#', $language, $relative, 1 );
@@ -180,7 +180,7 @@ class BTRANSLATE_Language_Router {
 	private function source_path( $path ) {
 		$home_path = $this->home_path();
 		$relative  = $this->relative_path( $path );
-		$languages = array_map( 'preg_quote', BTRANSLATE_Settings::target_languages() );
+		$languages = array_map( 'preg_quote', HTBD_Settings::target_languages() );
 
 		if ( ! empty( $languages ) ) {
 			$relative = preg_replace( '#^(?:' . implode( '|', $languages ) . ')(?=/|$)/?#', '', $relative, 1 );

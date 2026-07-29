@@ -2,8 +2,12 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Uninstaller {
+class HTBD_Uninstaller {
 	private const OPTION_NAMES = array(
+		'htbd_settings',
+		'htbd_flush_rewrite_rules',
+		'htbd_translation_task',
+		'htbd_retranslation_batch',
 		'btranslate_settings',
 		'btranslate_flush_rewrite_rules',
 		'btranslate_translation_task',
@@ -11,6 +15,9 @@ class BTRANSLATE_Uninstaller {
 	);
 
 	private const CRON_HOOKS = array(
+		'htbd_process_translation',
+		'htbd_process_term_translation',
+		'htbd_process_seo_output_translation',
 		'btranslate_process_translation',
 		'btranslate_process_term_translation',
 		'btranslate_process_seo_output_translation',
@@ -50,7 +57,12 @@ class BTRANSLATE_Uninstaller {
 			delete_option( $option_name );
 		}
 
-		$table_name = $wpdb->prefix . 'btranslate_translations';
-		$wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
+		$table_names = array(
+			$wpdb->prefix . 'hyx_bd_translations',
+			$wpdb->prefix . 'btranslate_translations',
+		);
+		foreach ( $table_names as $table_name ) {
+			$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $table_name ) );
+		}
 	}
 }

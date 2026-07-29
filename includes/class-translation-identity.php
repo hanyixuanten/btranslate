@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class BTRANSLATE_Translation_Identity {
+class HTBD_Translation_Identity {
 	public static function source_fingerprint( $source_value ) {
 		return hash( 'sha256', (string) $source_value );
 	}

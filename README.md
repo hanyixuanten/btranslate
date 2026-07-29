@@ -1,21 +1,21 @@
-# Btranslate: A Free and Open-Source WordPress Multilingual Plugin Powered by the Baidu Translate API
+# HTBD: A Free and Open-Source WordPress Multilingual Plugin Powered by the Baidu Translate API
 
-BTranslate is a multilingual translation plugin for WordPress. It uses the Baidu Translate API to translate posts, pages, and other website content into different languages, with a dedicated URL for each translated version.
+HTBD is a multilingual translation plugin for WordPress. It uses the Baidu Translate API to translate posts, pages, and other website content into different languages, with a dedicated URL for each translated version.
 
-Translations are stored on the server. Unless a user explicitly refreshes a translation, the same content is translated only once for each target language. This avoids calling the translation API on every page visit, reducing API usage and improving page load performance.
+Translations are stored on the server in `{$wpdb->prefix}hyx_bd_translations`. Unless a user explicitly refreshes a translation, the same content is translated only once for each target language. Existing `{$wpdb->prefix}btranslate_translations` data is migrated when the renamed plugin is activated. This avoids calling the translation API on every page visit, reducing API usage and improving page load performance.
 
 ## Project Links
 
-- GitHub repository: [https://github.com/hanyixuanten/btranslate](https://github.com/hanyixuanten/btranslate)
-- WordPress plugin page: [https://wordpress.org/plugins/btranslate/](https://wordpress.org/plugins/btranslate/)
+- GitHub repository: [https://github.com/hanyixuanten/HTBD](https://github.com/hanyixuanten/HTBD)
+- WordPress plugin page: [https://wordpress.org/plugins/hyx-translator-for-baidu-translate/](https://wordpress.org/plugins/hyx-translator-for-baidu-translate/)
 
-> **Review status:** BTranslate has not yet been approved for the WordPress.org Plugin Directory, so it cannot currently be installed directly from the WordPress admin plugin marketplace. For now, download it from GitHub and install it manually.
+> **Review status:** HTBD has not yet been approved for the WordPress.org Plugin Directory, so it cannot currently be installed directly from the WordPress admin plugin marketplace. For now, download it from GitHub and install it manually.
 
 ## Key Features
 
 ### Baidu Translate API Integration
 
-BTranslate uses the translation API provided by the Baidu Translate Open Platform. Users can configure their own App ID and secret key in WordPress Admin, and the plugin handles request signing, API calls, and error handling.
+HTBD uses the translation API provided by the Baidu Translate Open Platform. Users can configure their own App ID and secret key in WordPress Admin, and the plugin handles request signing, API calls, and error handling.
 
 ### Post and Page Translation
 
@@ -32,7 +32,7 @@ The plugin supports translating the main content of WordPress posts and pages, i
 
 ### Multilingual URLs
 
-BTranslate can generate dedicated URLs for different languages, with support for:
+HTBD can generate dedicated URLs for different languages, with support for:
 
 - Language subdirectories such as `/en/` and `/ja/`
 - A separate domain for each language
@@ -57,7 +57,7 @@ When translating content, the plugin makes every effort to preserve:
 
 ### Multilingual SEO
 
-BTranslate provides essential SEO support for multilingual pages, including:
+HTBD provides essential SEO support for multilingual pages, including:
 
 - Multilingual permalinks
 - Canonical URLs
@@ -93,29 +93,29 @@ Because the plugin has not yet been approved for the WordPress.org Plugin Direct
 
 #### Method 1: Upload the ZIP Package
 
-1. Visit the [BTranslate GitHub repository](https://github.com/hanyixuanten/btranslate).
+1. Visit the [HTBD GitHub repository](https://github.com/hanyixuanten/HTBD).
 2. Select **Releases**.
-3. Download the **btranslate-*.zip** file from the latest release.
+3. Download the **hyx-translator-for-baidu-translate-*.zip** file from the latest release.
 4. Sign in to WordPress Admin.
 5. Open **Plugins > Add New Plugin**.
 6. Select **Upload Plugin**.
 7. Choose the downloaded ZIP file and start the installation.
-8. Activate BTranslate after installation is complete.
+8. Activate HTBD after installation is complete.
 
 #### Method 2: Upload to the Server
 
-1. Visit the [BTranslate GitHub repository](https://github.com/hanyixuanten/btranslate).
+1. Visit the [HTBD GitHub repository](https://github.com/hanyixuanten/HTBD).
 2. Select **Releases**.
-3. Download the **btranslate-*.zip** file from the latest release.
-4. Upload the `btranslate` directory to the WordPress plugin directory: `wp-content/plugins/btranslate/`.
+3. Download the **hyx-translator-for-baidu-translate-*.zip** file from the latest release.
+4. Upload the `hyx-translator-for-baidu-translate` directory to the WordPress plugin directory: `wp-content/plugins/hyx-translator-for-baidu-translate/`.
 5. Sign in to WordPress Admin.
 6. Open **Plugins > Installed Plugins**.
-7. Find BTranslate and select **Activate**.
+7. Find HTBD and select **Activate**.
 
 ### 3. Configure the Plugin
 
 1. Sign in to WordPress Admin.
-2. Open the BTranslate settings page.
+2. Open the HTBD settings page.
 3. Enter the **APP ID** and **secret key** provided by the Baidu Translate Open Platform.
 4. Set the website's source language.
 5. Add the target languages you want to enable.
@@ -128,7 +128,7 @@ After changing language routing settings, open **Settings > Permalinks** in Word
 
 1. Open the post or page you want to translate in WordPress Admin.
 2. Save or update the content.
-3. Use the translation feature provided by BTranslate to generate translations for the target languages.
+3. Use the translation feature provided by HTBD to generate translations for the target languages.
 4. Wait for the translation tasks to finish.
 5. Check each translation at its language-specific URL.
 
@@ -173,13 +173,13 @@ The plugin prioritizes saved translations. It calls the translation API again on
 
 To report a problem or suggest a feature, visit the GitHub repository:
 
-[https://github.com/hanyixuanten/btranslate](https://github.com/hanyixuanten/btranslate)
+[https://github.com/hanyixuanten/HTBD](https://github.com/hanyixuanten/HTBD)
 
 When opening an issue, consider including the following information:
 
 - WordPress version
 - PHP version
-- BTranslate version
+- HTBD version
 - Languages and routing mode in use
 - Steps to reproduce the problem
 - Error logs with sensitive information removed

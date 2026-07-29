@@ -1,21 +1,21 @@
-# Btranslate：基于百度翻译 API 的免费开源 Wordpress 多语言插件
+# HTBD：基于百度翻译 API 的免费开源 Wordpress 多语言插件
 
-BTranslate 是一款 WordPress 多语言翻译插件，通过百度翻译开放平台 API，将网站中的文章、页面及其他内容翻译为不同语言，并为译文生成独立的语言访问地址。
+HTBD 是一款 WordPress 多语言翻译插件，通过百度翻译开放平台 API，将网站中的文章、页面及其他内容翻译为不同语言，并为译文生成独立的语言访问地址。
 
-插件会将翻译结果保存在服务器中。除非用户主动刷新翻译，否则同一内容在同一目标语言下只需翻译一次，无需在每次访问页面时重复调用翻译 API，有助于减少 API 请求量并提高页面加载速度。
+插件会将翻译结果保存在服务器的 `{$wpdb->prefix}hyx_bd_translations` 表中。除非用户主动刷新翻译，否则同一内容在同一目标语言下只需翻译一次。启用改名后的插件时，已有 `{$wpdb->prefix}btranslate_translations` 数据会自动迁移，无需在每次访问页面时重复调用翻译 API，有助于减少 API 请求量并提高页面加载速度。
 
 ## 项目地址
 
-- GitHub 仓库：[https://github.com/hanyixuanten/btranslate](https://github.com/hanyixuanten/btranslate)
-- WordPress 插件主页：[https://wordpress.org/plugins/btranslate/](https://wordpress.org/plugins/btranslate/)
+- GitHub 仓库：[https://github.com/hanyixuanten/HTBD](https://github.com/hanyixuanten/HTBD)
+- WordPress 插件主页：[https://wordpress.org/plugins/hyx-translator-for-baidu-translate/](https://wordpress.org/plugins/hyx-translator-for-baidu-translate/)
 
-> **审核状态：** BTranslate 目前尚未通过 WordPress.org 插件目录审核，因此暂时无法直接通过 WordPress 后台插件市场安装。现阶段请从 GitHub 仓库下载并手动安装。
+> **审核状态：** HTBD 目前尚未通过 WordPress.org 插件目录审核，因此暂时无法直接通过 WordPress 后台插件市场安装。现阶段请从 GitHub 仓库下载并手动安装。
 
 ## 主要功能
 
 ### 百度翻译 API 集成
 
-BTranslate 使用百度翻译开放平台提供的翻译 API。用户可以在 WordPress 后台配置自己的 App ID 和密钥，由插件完成请求签名、翻译调用及错误处理。
+HTBD 使用百度翻译开放平台提供的翻译 API。用户可以在 WordPress 后台配置自己的 App ID 和密钥，由插件完成请求签名、翻译调用及错误处理。
 
 ### 文章和页面翻译
 
@@ -32,7 +32,7 @@ BTranslate 使用百度翻译开放平台提供的翻译 API。用户可以在 W
 
 ### 多语言访问地址
 
-BTranslate 可以为不同语言生成独立的访问地址，支持：
+HTBD 可以为不同语言生成独立的访问地址，支持：
 
 - 语言子目录，例如 `/en/`、`/ja/`
 - 不同语言绑定不同域名
@@ -57,7 +57,7 @@ BTranslate 可以为不同语言生成独立的访问地址，支持：
 
 ### 多语言 SEO
 
-BTranslate 为多语言页面提供必要的 SEO 支持，包括：
+HTBD 为多语言页面提供必要的 SEO 支持，包括：
 
 - 多语言固定链接
 - Canonical URL
@@ -93,29 +93,29 @@ BTranslate 为多语言页面提供必要的 SEO 支持，包括：
 
 #### 方法一：上传 ZIP 压缩包
 
-1. 访问 [BTranslate GitHub 仓库](https://github.com/hanyixuanten/btranslate)。
+1. 访问 [HTBD GitHub 仓库](https://github.com/hanyixuanten/HTBD)。
 2. 点击 **Releases**。
-3. 从最新版本下载 zip 文件 **btranslate-*.zip**
+3. 从最新版本下载 zip 文件 **hyx-translator-for-baidu-translate-*.zip**
 4. 登录 WordPress 管理后台。
 5. 打开“插件” → “安装插件”。
 6. 点击“上传插件”。
 7. 选择下载的 ZIP 文件并开始安装。
-8. 安装完成后启用 BTranslate。
+8. 安装完成后启用 HTBD。
 
 #### 方法二：上传到服务器
 
-1. 访问 [BTranslate GitHub 仓库](https://github.com/hanyixuanten/btranslate)。
+1. 访问 [HTBD GitHub 仓库](https://github.com/hanyixuanten/HTBD)。
 2. 点击 **Releases**。
-3. 从最新版本下载 zip 文件 **btranslate-*.zip**
-4. 将 `btranslate` 目录上传到 WordPress 的插件目录： `wp-content/plugins/btranslate/`
+3. 从最新版本下载 zip 文件 **hyx-translator-for-baidu-translate-*.zip**
+4. 将 `hyx-translator-for-baidu-translate` 目录上传到 WordPress 的插件目录： `wp-content/plugins/hyx-translator-for-baidu-translate/`
 5. 登录 WordPress 管理后台。
 6. 打开“插件” → “已安装插件”。
-7. 找到 BTranslate 并点击“启用”。
+7. 找到 HTBD 并点击“启用”。
 
 ### 三、配置插件
 
 1. 登录 WordPress 管理后台。
-2. 打开 BTranslate 设置页面。
+2. 打开 HTBD 设置页面。
 3. 填写百度翻译开放平台提供的 **APP ID** 和 **密钥**。
 4. 设置网站的源语言。
 5. 添加需要启用的目标语言。
@@ -128,7 +128,7 @@ BTranslate 为多语言页面提供必要的 SEO 支持，包括：
 
 1. 在 WordPress 后台打开需要翻译的文章或页面。
 2. 保存或更新内容。
-3. 使用 BTranslate 提供的翻译功能生成目标语言译文。
+3. 使用 HTBD 提供的翻译功能生成目标语言译文。
 4. 等待翻译任务完成。
 5. 通过对应语言的访问地址检查译文。
 
@@ -173,15 +173,15 @@ https://example.com/ja/about/
 
 如果在使用过程中遇到问题，或者希望提交功能建议，可以前往 GitHub 仓库反馈：
 
-[https://github.com/hanyixuanten/btranslate](https://github.com/hanyixuanten/btranslate)
+[https://github.com/hanyixuanten/HTBD](https://github.com/hanyixuanten/HTBD)
 
 提交问题时，建议提供以下信息：
 
 - WordPress 版本
 - PHP 版本
-- BTranslate 版本
+- HTBD 版本
 - 使用的语言和路由模式
 - 问题复现步骤
 - 已隐藏敏感信息的错误日志
 
-欢迎通过 Issue 或 Pull Request 参与 BTranslate 的改进。
+欢迎通过 Issue 或 Pull Request 参与 HTBD 的改进。
