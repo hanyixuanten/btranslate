@@ -104,7 +104,9 @@ class BTRANSLATE_Admin {
 					<tr><th scope="row"><?php esc_html_e( 'Request logging', 'btranslate' ); ?></th><td><label for="btranslate-log-requests"><input id="btranslate-log-requests" name="btranslate_settings[log_requests]" type="checkbox" value="1" <?php checked( $settings['log_requests'] ); ?> /> <?php esc_html_e( 'Log each Baidu Translate request', 'btranslate' ); ?></label><p class="description"><?php esc_html_e( 'When enabled, fires the btranslate_translation_request_logged action with the language, field, text fingerprint, length, and result status. Credentials, source text, translated text, and full API responses are never included.', 'btranslate' ); ?></p></td></tr>
 				</table>
 				<?php submit_button(); ?>
-				<p class="description"><?php esc_html_e( 'After saving settings for the first time, manually run "Retranslate all content" below.', 'btranslate' ); ?></p>
+				<div class="notice notice-warning inline">
+					<p><strong><?php esc_html_e( 'After saving settings for the first time, manually run "Retranslate all content" below.', 'btranslate' ); ?></strong></p>
+				</div>
 			</form>
 			<hr />
 			<h2><?php esc_html_e( 'Retranslate content', 'btranslate' ); ?></h2>

@@ -1,6 +1,7 @@
 <?php
 /**
  * Plugin Name: Btranslate
+ * Plugin URI: https://github.com/hanyixuanten/btranslate
  * Description: Persistent multilingual WordPress translations powered by Baidu Translate.
  * Version: 0.2.1
  * Requires at least: 6.4

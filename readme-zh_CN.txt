@@ -1,5 +1,6 @@
 === Btranslate ===
 Contributors: hanyixuanten
+Homepage: https://github.com/hanyixuanten/btranslate
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1

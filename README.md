@@ -2,6 +2,8 @@
 
 [中文](README.zh-CN.md)|English
 
+[GitHub Repository](https://github.com/hanyixuanten/btranslate)
+
 Btranslate is a WordPress plugin skeleton for persistent multilingual content using the Baidu Translate API.
 
 The WordPress admin interface follows the current WordPress locale. English is the default, and a bundled Simplified Chinese translation is used when WordPress is set to `zh_CN`.
