@@ -151,13 +151,13 @@ class BTRANSLATE_Content_Controller {
 	}
 
 	public function translate_title( $title, $post_id ) {
-		return $this->translated_value( $title, 'post:' . $post_id . ':post_title' );
+		return $this->escaped_translated_value( $title, 'post:' . $post_id . ':post_title' );
 	}
 
 	public function translate_content( $content ) {
 		$post_id = get_the_ID();
 		if ( ! $post_id || false === strpos( $content, '<' ) ) {
-			return $this->translated_value( $content, 'post:' . $post_id . ':post_content' );
+			return $this->escaped_translated_value( $content, 'post:' . $post_id . ':post_content' );
 		}
 
 		$segments = BTRANSLATE_Content_Translator::segments( $content );
@@ -172,7 +172,7 @@ class BTRANSLATE_Content_Controller {
 			}
 
 			$whitespace = BTRANSLATE_Content_Translator::surrounding_whitespace( $segment );
-			$translated = $this->translated_value( $whitespace['text'], 'post:' . $post_id . ':post_content:text:' . $text_index );
+			$translated = $this->escaped_translated_value( $whitespace['text'], 'post:' . $post_id . ':post_content:text:' . $text_index );
 			$segments[ $index ] = $whitespace['leading'] . $translated . $whitespace['trailing'];
 			++$text_index;
 		}
@@ -318,6 +318,12 @@ class BTRANSLATE_Content_Controller {
 		$translation  = $this->store->find_valid( $identity_key );
 
 		return ! empty( $translation['translated_value'] ) ? $translation['translated_value'] : $source_value;
+	}
+
+	private function escaped_translated_value( $source_value, $context ) {
+		$translated_value = $this->translated_value( $source_value, $context );
+
+		return $translated_value === $source_value ? $source_value : esc_html( $translated_value );
 	}
 
 	private function translated_or_schedule_seo_output( $source_value, $post_id, $field_context ) {
