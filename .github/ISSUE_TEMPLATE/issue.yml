@@ -1,0 +1,108 @@
+name: 问题反馈与功能建议
+description: 反馈 Btranslate 的问题，或提出功能和文档改进建议
+title: "[Issue]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请尽量完整填写以下信息，以便快速定位和处理。
+        请勿提交百度翻译 App ID、密钥、签名、Cookie 或其他敏感信息。
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue 类型
+      options:
+        - 缺陷报告
+        - 功能建议
+        - 文档问题
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 问题描述
+      description: 清楚说明遇到的问题或希望增加的功能。
+      placeholder: 请描述当前行为、预期行为及其影响。
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Btranslate 版本
+      placeholder: 例如：0.2.1
+    validations:
+      required: true
+
+  - type: input
+    id: wordpress-version
+    attributes:
+      label: WordPress 版本
+      placeholder: 例如：6.8.2
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP 版本
+      placeholder: 例如：8.3.20
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境信息
+      description: 请填写主题、相关插件、路由模式、源语言和目标语言等信息。
+      placeholder: |
+        主题：
+        相关插件：
+        路由模式：子目录 / 域名绑定
+        源语言与目标语言：
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤
+      description: 缺陷报告请提供可稳定复现问题的最少步骤；其他类型可填写“不适用”。
+      placeholder: |
+        1. 打开……
+        2. 配置……
+        3. 执行……
+        4. 出现……
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 预期行为
+      placeholder: 说明你期望发生什么。
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志或截图
+      description: 可粘贴已移除凭据和个人信息的错误日志，或拖入截图。没有可填写“无”。
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 补充信息
+      description: 添加其他可能有助于理解或定位问题的信息。
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已搜索现有 Issue，未发现相同问题或建议。
+          required: true
+        - label: 我已移除百度翻译凭据、签名、Cookie 和其他敏感信息。
+          required: true
