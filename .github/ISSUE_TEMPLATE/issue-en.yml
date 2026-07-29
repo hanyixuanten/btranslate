@@ -1,0 +1,108 @@
+name: Bug Report and Feature Request
+description: Report a Btranslate issue or suggest a feature or documentation improvement
+title: "[Issue]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to provide feedback. Please include as much information as possible so we can investigate efficiently.
+        Do not include your Baidu Translate App ID, secret key, signatures, cookies, or other sensitive information.
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue type
+      options:
+        - Bug report
+        - Feature request
+        - Documentation issue
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Description
+      description: Clearly describe the issue you encountered or the feature you would like to see.
+      placeholder: Describe the current behavior, expected behavior, and impact.
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Btranslate version
+      placeholder: "For example: 0.2.1"
+    validations:
+      required: true
+
+  - type: input
+    id: wordpress-version
+    attributes:
+      label: WordPress version
+      placeholder: "For example: 6.8.2"
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: "For example: 8.3.20"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include your theme, relevant plugins, routing mode, source language, and target languages.
+      placeholder: |
+        Theme:
+        Relevant plugins:
+        Routing mode: Subdirectory / Domain binding
+        Source and target languages:
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: For bug reports, provide the minimum steps that consistently reproduce the issue. Enter "Not applicable" for other issue types.
+      placeholder: |
+        1. Open ...
+        2. Configure ...
+        3. Run ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      placeholder: Describe what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Paste error logs with credentials and personal information removed, or drag in screenshots. Enter "None" if unavailable.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other information that may help us understand or investigate the issue.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I searched the existing issues and did not find the same issue or suggestion.
+          required: true
+        - label: I removed all Baidu Translate credentials, signatures, cookies, and other sensitive information.
+          required: true
