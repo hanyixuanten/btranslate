@@ -81,7 +81,7 @@ Before production use, test the plugin in a WordPress staging environment. Cover
 
 The Posts and Pages lists show a status column for every target language, including the latest successful translation time and a translation action. The Settings page provides **重新翻译所有内容**, **翻译所有文章**, and **翻译所有分类标签**. Each action shows a confirmation before scheduling a forced refresh of all supported content, only published posts and pages, or only categories and tags; this bypasses persisted translations and consumes Baidu API quota.
 
-The Settings page also shows a live progress panel. It refreshes every five seconds and reports the latest translation task: full translation, post/page translation, category/tag translation, or a single-post translation. It counts only completed items that belong to that task's queued content and target languages after the task began, so historical translations cannot make a new task appear complete. Forced retranslation jobs begin immediately and are scheduled two seconds apart, so a single WP-Cron request processes at most one task item instead of timing out while processing every post. Progress reads only local WordPress and translation-table data; it does not send additional requests to Baidu.
+After saving settings for the first time, manually run **Retranslate all content** to queue existing content. The Settings page also shows a live progress panel. It refreshes every five seconds and reports the latest translation task: full translation, post/page translation, category/tag translation, or a single-post translation. It counts only completed items that belong to that task's queued content and target languages after the task began, so historical translations cannot make a new task appear complete. Failed posts, pages, categories, or tags appear below the progress bar with an individual retranslation action. Forced retranslation jobs begin immediately and are scheduled two seconds apart, so a single WP-Cron request processes at most one task item instead of timing out while processing every post. Progress reads only local WordPress and translation-table data; it does not send additional requests to Baidu.
 
 The **清除已翻译的缓存** action deletes every persisted translation, cancels pending translation jobs, and resets batch progress. The front end then falls back to source content until translations are explicitly queued again; regenerating them consumes Baidu API quota.
 
@@ -91,7 +91,7 @@ The **清除已翻译的缓存** action deletes every persisted translation, can
 - API calls translate raw WordPress content. HTML, blocks, shortcodes, placeholders, and URLs need a protected-token pipeline before production use.
 - Taxonomy and SEO values are queued but the current rendering filters cover only a subset of SEO plugins and term views.
 - Domain binding assumes the WordPress site and server virtual hosts are already configured for every bound domain.
-- Translation failures are stored as failed attempts and render the source value; retry management and an admin job monitor are not implemented yet.
+- Translation failures are stored as failed attempts and render the source value. The Settings page supports individual retries, but automatic retries and a full admin job monitor are not implemented yet.
 
 ## License
 

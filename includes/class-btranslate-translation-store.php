@@ -116,6 +116,53 @@ class BTRANSLATE_Translation_Store {
 		);
 	}
 
+	public function get_failed_items( $target_languages, $post_ids, $term_ids, $since = '' ) {
+		global $wpdb;
+
+		$target_languages = array_values( array_filter( array_map( 'sanitize_key', (array) $target_languages ) ) );
+		$item_contexts     = array_merge(
+			array_map(
+				static function ( $post_id ) {
+					return 'post:' . absint( $post_id );
+				},
+				(array) $post_ids
+			),
+			array_map(
+				static function ( $term_id ) {
+					return 'term:' . absint( $term_id );
+				},
+				(array) $term_ids
+			)
+		);
+
+		if ( empty( $target_languages ) || empty( $item_contexts ) ) {
+			return array();
+		}
+
+		$language_placeholders = implode( ',', array_fill( 0, count( $target_languages ), '%s' ) );
+		$context_placeholders  = implode( ',', array_fill( 0, count( $item_contexts ), '%s' ) );
+		$query_args            = array_merge( $target_languages, $item_contexts );
+		if ( '' !== $since ) {
+			$query_args[] = $since;
+		}
+
+		$since_clause = '' === $since ? '' : ' AND updated_at >= %s';
+
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reads task failures from the plugin-owned translation table.
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- IN clauses contain only generated %s placeholders; the optional clause is fixed SQL.
+				"SELECT target_language, SUBSTRING_INDEX(field_context, ':', 2) AS item_context, MAX(updated_at) AS failed_at
+				FROM %i
+				WHERE status = 'failed'
+					AND target_language IN ({$language_placeholders})
+					AND SUBSTRING_INDEX(field_context, ':', 2) IN ({$context_placeholders}){$since_clause}
+				GROUP BY target_language, item_context
+				ORDER BY failed_at DESC",
+				array_merge( array( self::table_name() ), $query_args )
+			),
+			ARRAY_A
+		);
+	}
+
 	private function get_completed_item_count( $item_type, $item_ids, $target_languages, $language_placeholders, $since ) {
 		global $wpdb;
 

@@ -11,3 +11,4 @@
 /wp-content/
 .DS_Store
 *.zip
+/languages/*.mo

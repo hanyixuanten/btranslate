@@ -51,7 +51,28 @@
 		description.className = 'description';
 		description.textContent = format(btranslateAdmin.i18n.latestTask, [progress.task_label, progress.posts_completed, progress.posts_total, progress.terms_completed, progress.terms_total]);
 
-		container.replaceChildren(summary, progressBar, description);
+		var children = [summary, progressBar, description];
+		if (progress.failed_items.length) {
+			var failedHeading = document.createElement('h3');
+			failedHeading.textContent = btranslateAdmin.i18n.failedItems;
+			children.push(failedHeading);
+
+			var failedList = document.createElement('ul');
+			progress.failed_items.forEach(function (item) {
+				var failedItem = document.createElement('li');
+				appendText(failedItem, item.name + ' (' + item.language + ') ');
+
+				var retryLink = document.createElement('a');
+				retryLink.className = 'button button-small';
+				retryLink.href = item.retry_url;
+				retryLink.textContent = btranslateAdmin.i18n.retranslate;
+				failedItem.appendChild(retryLink);
+				failedList.appendChild(failedItem);
+			});
+			children.push(failedList);
+		}
+
+		container.replaceChildren.apply(container, children);
 	}
 
 	function renderProgressError() {

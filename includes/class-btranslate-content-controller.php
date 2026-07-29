@@ -49,7 +49,7 @@ class BTRANSLATE_Content_Controller {
 
 		foreach ( BTRANSLATE_Settings::target_languages() as $target_language ) {
 			if ( ! wp_next_scheduled( 'btranslate_process_translation', array( $post_id, $target_language ) ) ) {
-				wp_schedule_single_event( time() + 30, 'btranslate_process_translation', array( $post_id, $target_language ) );
+				wp_schedule_single_event( time() + 10, 'btranslate_process_translation', array( $post_id, $target_language ) );
 			}
 		}
 	}
@@ -109,7 +109,7 @@ class BTRANSLATE_Content_Controller {
 
 		foreach ( BTRANSLATE_Settings::target_languages() as $target_language ) {
 			if ( ! wp_next_scheduled( 'btranslate_process_term_translation', array( $term_id, $target_language, false ) ) ) {
-				wp_schedule_single_event( time() + 30, 'btranslate_process_term_translation', array( $term_id, $target_language, false ) );
+				wp_schedule_single_event( time() + 10, 'btranslate_process_term_translation', array( $term_id, $target_language, false ) );
 			}
 		}
 	}

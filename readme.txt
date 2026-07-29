@@ -24,6 +24,7 @@ Subdirectory routing supports paths such as `/en/example-post/`. Domain routing 
 1. Upload the `btranslate` directory to `/wp-content/plugins/`.
 2. Activate Btranslate through the Plugins screen in WordPress.
 3. Open Settings > Btranslate and configure the Baidu credentials, languages, and routing mode.
+4. After saving settings for the first time, manually run Retranslate all content to queue existing content.
 
 == External Services ==
 
@@ -44,6 +45,10 @@ Btranslate stores the returned translated text in the WordPress database but doe
 = Does the plugin translate content on every page request? =
 
 No. Each value is translated by a scheduled task and persisted for reuse. Front-end requests read stored translations only.
+
+= How do I retry a failed translation? =
+
+Failed posts, pages, categories, or tags appear below the progress bar on the Settings page. Use the Retranslate button beside an item to retry it.
 
 = What data is removed during uninstall? =
 

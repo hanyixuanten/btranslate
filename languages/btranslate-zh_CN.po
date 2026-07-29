@@ -29,6 +29,9 @@ msgstr "最近任务：%1$s。文章和页面：%2$s / %3$s；分类和标签：
 msgid "Unable to load translation progress at this time."
 msgstr "暂时无法读取翻译进度。"
 
+msgid "Failed translations"
+msgstr "翻译失败的内容"
+
 msgid "Source language"
 msgstr "源语言"
 
@@ -61,6 +64,9 @@ msgstr "百度应用 ID"
 
 msgid "Baidu secret key"
 msgstr "百度密钥"
+
+msgid "After saving settings for the first time, manually run \"Retranslate all content\" below."
+msgstr "第一次保存设置后，请手动执行下方的“重新翻译所有内容”。"
 
 msgid "Request logging"
 msgstr "请求日志"
@@ -148,6 +154,10 @@ msgstr "上次翻译："
 
 msgid "Invalid translation request."
 msgstr "无效的翻译请求。"
+
+#, php-format
+msgid "Content #%d"
+msgstr "内容 #%d"
 
 msgid "Full translation"
 msgstr "全量翻译"

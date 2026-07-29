@@ -10,6 +10,7 @@ class BTRANSLATE_Admin {
 		add_action( 'admin_post_btranslate_queue_existing_translations', array( $this, 'queue_existing_translations' ) );
 		add_action( 'admin_post_btranslate_clear_translation_cache', array( $this, 'clear_translation_cache' ) );
 		add_action( 'admin_post_btranslate_translate_post', array( $this, 'queue_post_translation' ) );
+		add_action( 'admin_post_btranslate_retry_failed_translation', array( $this, 'retry_failed_translation' ) );
 		add_action( 'wp_ajax_btranslate_translation_progress', array( $this, 'translation_progress' ) );
 		add_filter( 'manage_post_posts_columns', array( $this, 'add_translation_column' ) );
 		add_filter( 'manage_page_posts_columns', array( $this, 'add_translation_column' ) );
@@ -47,6 +48,8 @@ class BTRANSLATE_Admin {
 				'i18n'          => array(
 					'contentItems'  => __( '(%1$s / %2$s content items)', 'btranslate' ),
 					'latestTask'    => __( 'Latest task: %1$s. Posts and pages: %2$s / %3$s; categories and tags: %4$s / %5$s. Updates automatically every 5 seconds.', 'btranslate' ),
+					'failedItems'   => __( 'Failed translations', 'btranslate' ),
+					'retranslate'   => __( 'Retranslate', 'btranslate' ),
 					'progressError' => __( 'Unable to load translation progress at this time.', 'btranslate' ),
 				),
 			)
@@ -101,6 +104,7 @@ class BTRANSLATE_Admin {
 					<tr><th scope="row"><?php esc_html_e( 'Request logging', 'btranslate' ); ?></th><td><label for="btranslate-log-requests"><input id="btranslate-log-requests" name="btranslate_settings[log_requests]" type="checkbox" value="1" <?php checked( $settings['log_requests'] ); ?> /> <?php esc_html_e( 'Log each Baidu Translate request', 'btranslate' ); ?></label><p class="description"><?php esc_html_e( 'When enabled, fires the btranslate_translation_request_logged action with the language, field, text fingerprint, length, and result status. Credentials, source text, translated text, and full API responses are never included.', 'btranslate' ); ?></p></td></tr>
 				</table>
 				<?php submit_button(); ?>
+				<p class="description"><?php esc_html_e( 'After saving settings for the first time, manually run "Retranslate all content" below.', 'btranslate' ); ?></p>
 			</form>
 			<hr />
 			<h2><?php esc_html_e( 'Retranslate content', 'btranslate' ); ?></h2>
@@ -252,7 +256,9 @@ class BTRANSLATE_Admin {
 		$term_ids  = array_values( array_filter( array_map( 'absint', (array) ( $task['term_ids'] ?? array() ) ) ) );
 		$languages = array_values( array_filter( array_map( 'sanitize_key', (array) ( $task['target_languages'] ?? array() ) ) ) );
 		$started_at = isset( $task['started_at'] ) ? sanitize_text_field( $task['started_at'] ) : '';
-		$counts     = ( new BTRANSLATE_Translation_Store() )->get_completed_item_counts( $languages, $post_ids, $term_ids, $started_at );
+		$store      = new BTRANSLATE_Translation_Store();
+		$counts     = $store->get_completed_item_counts( $languages, $post_ids, $term_ids, $started_at );
+		$failures   = $this->prepare_failed_items( $store->get_failed_items( $languages, $post_ids, $term_ids, $started_at ) );
 
 		$posts_total      = count( $post_ids ) * count( $languages );
 		$terms_total      = count( $term_ids ) * count( $languages );
@@ -273,6 +279,7 @@ class BTRANSLATE_Admin {
 				'percent'         => $percent,
 				'batch_started_at' => $started_at,
 				'task_label'      => $this->translation_task_label( $post_ids, $term_ids ),
+				'failed_items'    => $failures,
 			)
 		);
 	}
@@ -331,6 +338,74 @@ class BTRANSLATE_Admin {
 
 		wp_safe_redirect( wp_get_referer() ? wp_get_referer() : admin_url( 'edit.php?post_type=' . get_post_type( $post_id ) ) );
 		exit;
+	}
+
+	public function retry_failed_translation() {
+		$item_type       = isset( $_GET['item_type'] ) ? sanitize_key( wp_unslash( $_GET['item_type'] ) ) : '';
+		$item_id         = isset( $_GET['item_id'] ) ? absint( $_GET['item_id'] ) : 0;
+		$target_language = isset( $_GET['language'] ) ? sanitize_key( wp_unslash( $_GET['language'] ) ) : '';
+
+		if ( ! current_user_can( 'manage_options' ) || ! $item_id || ! in_array( $item_type, array( 'post', 'term' ), true ) || ! in_array( $target_language, BTRANSLATE_Settings::target_languages(), true ) ) {
+			wp_die( esc_html__( 'Invalid translation request.', 'btranslate' ) );
+		}
+
+		check_admin_referer( 'btranslate_retry_failed_translation_' . $item_type . '_' . $item_id . '_' . $target_language );
+
+		if ( 'post' === $item_type ) {
+			wp_schedule_single_event( time() + 5, 'btranslate_process_translation', array( $item_id, $target_language, true ) );
+		} else {
+			wp_schedule_single_event( time() + 5, 'btranslate_process_term_translation', array( $item_id, $target_language, true ) );
+		}
+
+		wp_safe_redirect( admin_url( 'options-general.php?page=btranslate' ) );
+		exit;
+	}
+
+	private function prepare_failed_items( $failures ) {
+		$items = array();
+
+		foreach ( (array) $failures as $failure ) {
+			$context_parts  = explode( ':', $failure['item_context'], 2 );
+			$item_type      = $context_parts[0] ?? '';
+			$item_id        = isset( $context_parts[1] ) ? absint( $context_parts[1] ) : 0;
+			$target_language = sanitize_key( $failure['target_language'] ?? '' );
+
+			if ( ! $item_id || ! in_array( $item_type, array( 'post', 'term' ), true ) || '' === $target_language ) {
+				continue;
+			}
+
+			if ( 'post' === $item_type ) {
+				$name = get_the_title( $item_id );
+			} else {
+				$term = get_term( $item_id );
+				$name = $term && ! is_wp_error( $term ) ? $term->name : '';
+			}
+
+			if ( '' === $name ) {
+				$name = sprintf( __( 'Content #%d', 'btranslate' ), $item_id );
+			}
+
+			$retry_url = wp_nonce_url(
+				add_query_arg(
+					array(
+						'action'    => 'btranslate_retry_failed_translation',
+						'item_type' => $item_type,
+						'item_id'   => $item_id,
+						'language'  => $target_language,
+					),
+					admin_url( 'admin-post.php' )
+				),
+				'btranslate_retry_failed_translation_' . $item_type . '_' . $item_id . '_' . $target_language
+			);
+
+			$items[] = array(
+				'name'      => $name,
+				'language'  => strtoupper( $target_language ),
+				'retry_url' => $retry_url,
+			);
+		}
+
+		return $items;
 	}
 
 	private function update_translation_task( $post_ids, $term_ids, $target_languages ) {

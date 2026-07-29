@@ -37,6 +37,9 @@ msgstr ""
 msgid "Unable to load translation progress at this time."
 msgstr ""
 
+msgid "Failed translations"
+msgstr ""
+
 #: includes/class-btranslate-admin.php:95
 msgid "Source language"
 msgstr ""
@@ -81,6 +84,9 @@ msgstr ""
 
 #: includes/class-btranslate-admin.php:100
 msgid "Baidu secret key"
+msgstr ""
+
+msgid "After saving settings for the first time, manually run \"Retranslate all content\" below."
 msgstr ""
 
 #: includes/class-btranslate-admin.php:101
@@ -210,6 +216,10 @@ msgstr ""
 
 #: includes/class-btranslate-admin.php:325
 msgid "Invalid translation request."
+msgstr ""
+
+#, php-format
+msgid "Content #%d"
 msgstr ""
 
 #: includes/class-btranslate-admin.php:351

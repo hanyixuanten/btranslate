@@ -23,6 +23,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Install gettext
+        run: sudo apt-get update && sudo apt-get install --yes gettext
+
       - name: Build installable plugin archive
         id: package
         run: |
@@ -37,6 +40,9 @@ jobs:
           cp -R includes "build/${plugin_slug}/"
           cp -R assets "build/${plugin_slug}/"
           cp -R languages "build/${plugin_slug}/"
+          msgfmt --check --check-format \
+            --output-file="build/${plugin_slug}/languages/btranslate-zh_CN.mo" \
+            languages/btranslate-zh_CN.po
           (
             cd build
             zip -qr "../${archive_name}" "${plugin_slug}"
