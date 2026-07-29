@@ -30,30 +30,9 @@ jobs:
         id: package
         run: |
           set -eu
-          plugin_slug="btranslate"
           version="$(grep -E '^ \* Version:' btranslate.php | sed -E 's/^ \* Version: *//')"
-          archive_name="${plugin_slug}-${version}.zip"
-
-          rm -rf build
-          mkdir -p "build/${plugin_slug}"
-          cp btranslate.php uninstall.php readme.txt readme-zh_CN.txt LICENSE "build/${plugin_slug}/"
-          cp -R includes "build/${plugin_slug}/"
-          cp -R assets "build/${plugin_slug}/"
-          cp -R languages "build/${plugin_slug}/"
-          msgfmt --check --check-format \
-            --output-file="build/${plugin_slug}/languages/btranslate-zh_CN.mo" \
-            languages/btranslate-zh_CN.po
-          (
-            cd build
-            zip -qr "../${archive_name}" "${plugin_slug}"
-          )
-
-          unzip -p "${archive_name}" "${plugin_slug}/btranslate.php" | grep -q '^ \* Plugin Name: Btranslate$'
-          unzip -p "${archive_name}" "${plugin_slug}/readme.txt" | grep -q "^Stable tag: ${version}$"
-          unzip -p "${archive_name}" "${plugin_slug}/readme-zh_CN.txt" | grep -q "^Stable tag: ${version}$"
-          unzip -Z1 "${archive_name}" | grep -q "^${plugin_slug}/languages/btranslate-zh_CN.mo$"
-          ! unzip -Z1 "${archive_name}" | grep -Eq '/README(\.zh-CN)?\.md$'
-
+          archive_name="btranslate-${version}.zip"
+          ./build.sh build
           printf 'archive=%s\n' "${archive_name}" >> "$GITHUB_OUTPUT"
 
       - name: Upload plugin archive

@@ -76,6 +76,8 @@ WordPress 后台界面会跟随当前 WordPress 语言：默认显示英文，Wo
 find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 ```
 
+运行 `./build.sh build` 可在本地构建可安装的 ZIP。该命令会编译简体中文翻译目录，在仓库根目录生成带版本号的 `btranslate-<版本>.zip`，并校验压缩包内容。运行 `./build.sh clean` 可删除构建目录和生成的插件 ZIP。构建依赖 `gettext`、`zip` 和 `unzip`。
+
 投入生产前，应在 WordPress 预发布环境中测试插件，覆盖语言解析、重写行为、持久化复用与失效、百度请求签名和错误处理、内容过滤和回退渲染。任何自动化测试都应模拟 `wp_remote_post` 响应，避免依赖真实凭据、数据库或外部网络访问。
 
 ## 重新翻译

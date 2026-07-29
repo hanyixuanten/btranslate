@@ -77,6 +77,8 @@ The repository has no Composer or PHPUnit dependency. Validate PHP syntax with t
 find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 ```
 
+Build the installable ZIP locally with `./build.sh build`. The command compiles the Simplified Chinese translation catalog, creates a versioned `btranslate-<version>.zip` in the repository root, and validates its contents. Run `./build.sh clean` to remove the build directory and generated plugin ZIP files. The build requires `gettext`, `zip`, and `unzip`.
+
 Before production use, test the plugin in a WordPress staging environment. Cover language resolution, rewrite behavior, persistence reuse and invalidation, Baidu request signing and errors, content filtering, and fallback rendering. Mock `wp_remote_post` responses for any automated tests so they do not need live credentials, a database, or outbound network access.
 
 ## Retranslation
