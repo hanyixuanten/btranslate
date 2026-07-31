@@ -44,7 +44,7 @@ build() {
 		zip -qr "${archive_path}" "${plugin_slug}"
 	)
 
-	unzip -p "${archive_path}" "${plugin_slug}/${plugin_file}" | grep -q '^ \* Plugin Name: HTBD$'
+	unzip -p "${archive_path}" "${plugin_slug}/${plugin_file}" | grep -q '^ \* Plugin Name: HTBD - hyx Translator powered by Baidu Translate$'
 	unzip -p "${archive_path}" "${plugin_slug}/readme.txt" | grep -q "^Stable tag: ${version}$"
 	unzip -p "${archive_path}" "${plugin_slug}/readme-zh_CN.txt" | grep -q "^Stable tag: ${version}$"
 	unzip -Z1 "${archive_path}" | grep -q "^${plugin_slug}/languages/${plugin_slug}-zh_CN.mo$"
