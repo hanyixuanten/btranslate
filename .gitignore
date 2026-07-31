@@ -12,3 +12,4 @@
 .DS_Store
 *.zip
 /languages/*.mo
+/svn/
