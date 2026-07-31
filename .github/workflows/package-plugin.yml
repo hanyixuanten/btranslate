@@ -12,6 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
 
 jobs:
@@ -48,3 +49,13 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.package.outputs.archive }}
+
+      - name: Deploy GitHub Release to WordPress.org SVN
+        if: startsWith( github.ref, 'refs/tags/v' )
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy-wordpress-svn.yml \
+            --ref "${DEFAULT_BRANCH}" \
+            --field release_tag="${GITHUB_REF_NAME}"

@@ -1,0 +1,147 @@
+name: Deploy to WordPress.org SVN
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: GitHub Release tag to deploy (for example, v0.2.4)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wordpress-svn-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy release to WordPress.org
+    runs-on: ubuntu-latest
+
+    env:
+      PLUGIN_SLUG: hyx-translator-for-baidu-translate
+      SVN_URL: https://plugins.svn.wordpress.org/hyx-translator-for-baidu-translate
+      SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+      SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+
+    steps:
+      - name: Resolve release tag and archive name
+        id: release
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_EVENT_TAG: ${{ github.event.release.tag_name }}
+          MANUAL_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+
+          case "${EVENT_NAME}" in
+            release) release_tag="${RELEASE_EVENT_TAG}" ;;
+            workflow_dispatch) release_tag="${MANUAL_TAG}" ;;
+            *) printf 'Unsupported event: %s\n' "${EVENT_NAME}" >&2; exit 1 ;;
+          esac
+
+          if [[ ! "${release_tag}" =~ ^v?([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            printf 'Release tag must be vX.Y.Z or X.Y.Z, got: %s\n' "${release_tag}" >&2
+            exit 1
+          fi
+
+          version="${BASH_REMATCH[1]}"
+          archive="${PLUGIN_SLUG}-${version}.zip"
+          printf 'tag=%s\nversion=%s\narchive=%s\n' \
+            "${release_tag}" "${version}" "${archive}" >> "${GITHUB_OUTPUT}"
+
+      - name: Install deployment tools
+        run: sudo apt-get update && sudo apt-get install --yes rsync subversion unzip
+
+      - name: Download ZIP from GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          ARCHIVE: ${{ steps.release.outputs.archive }}
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          gh release download "${RELEASE_TAG}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern "${ARCHIVE}" \
+            --dir release
+          test -f "release/${ARCHIVE}"
+
+      - name: Extract and validate plugin package
+        env:
+          ARCHIVE: ${{ steps.release.outputs.archive }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p package
+          unzip -q "release/${ARCHIVE}" -d package
+
+          plugin_dir="package/${PLUGIN_SLUG}"
+          plugin_file="${plugin_dir}/${PLUGIN_SLUG}.php"
+          test -f "${plugin_file}"
+          test -f "${plugin_dir}/readme.txt"
+
+          package_version="$(sed -nE 's/^ \* Version: *([^ ]+) *$/\1/p' "${plugin_file}")"
+          stable_tag="$(sed -nE 's/^Stable tag: *([^ ]+) *$/\1/p' "${plugin_dir}/readme.txt")"
+          if [[ "${package_version}" != "${VERSION}" || "${stable_tag}" != "${VERSION}" ]]; then
+            printf 'Version mismatch: release=%s, plugin=%s, stable tag=%s\n' \
+              "${VERSION}" "${package_version}" "${stable_tag}" >&2
+            exit 1
+          fi
+
+      - name: Check out WordPress.org SVN repository
+        run: |
+          set -euo pipefail
+          svn checkout "${SVN_URL}" wordpress-svn \
+            --non-interactive \
+            --no-auth-cache \
+            --username "${SVN_USERNAME}" \
+            --password "${SVN_PASSWORD}"
+
+      - name: Update trunk and create SVN tag
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          source_dir="${GITHUB_WORKSPACE}/package/${PLUGIN_SLUG}/"
+          trunk_dir="${GITHUB_WORKSPACE}/wordpress-svn/trunk"
+          tag_dir="${GITHUB_WORKSPACE}/wordpress-svn/tags/${VERSION}"
+
+          if svn info "${SVN_URL}/tags/${VERSION}" \
+            --non-interactive \
+            --no-auth-cache \
+            --username "${SVN_USERNAME}" \
+            --password "${SVN_PASSWORD}" >/dev/null 2>&1; then
+            printf 'SVN tag %s already exists; refusing to overwrite it.\n' "${VERSION}" >&2
+            exit 1
+          fi
+
+          rsync -a --delete --exclude='.svn' "${source_dir}" "${trunk_dir}/"
+          svn add --force "${trunk_dir}" --parents
+
+          svn status "${trunk_dir}" | while IFS= read -r status_line; do
+            if [[ "${status_line:0:1}" == '!' ]]; then
+              svn rm --force "${status_line:8}"
+            fi
+          done
+
+          svn copy "${trunk_dir}" "${tag_dir}"
+
+      - name: Commit release to WordPress.org SVN
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        working-directory: wordpress-svn
+        run: |
+          set -euo pipefail
+          svn status
+          svn commit . \
+            --message "Release ${VERSION}" \
+            --non-interactive \
+            --no-auth-cache \
+            --username "${SVN_USERNAME}" \
+            --password "${SVN_PASSWORD}"
