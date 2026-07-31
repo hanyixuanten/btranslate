@@ -1,4 +1,4 @@
-=== HTBD ===
+=== HTBD - hyx Translator powered by Baidu Translate ===
 Contributors: hanyixuanten
 Homepage: https://github.com/hanyixuanten/HTBD
 Requires at least: 6.4

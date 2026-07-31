@@ -181,7 +181,7 @@ class HTBD_Content_Controller {
 	}
 
 	public function translate_excerpt( $excerpt, $post ) {
-		return $this->translated_value( $excerpt, 'post:' . $post->ID . ':post_excerpt' );
+		return $this->kses_translated_value( $excerpt, 'post:' . $post->ID . ':post_excerpt' );
 	}
 
 	public function translate_image_alt( $attributes, $attachment ) {
@@ -195,11 +195,11 @@ class HTBD_Content_Controller {
 	}
 
 	public function translate_term_title( $term_name, $term ) {
-		return $this->translated_value( $term_name, 'term:' . $term->term_id . ':name' );
+		return $this->escaped_translated_value( $term_name, 'term:' . $term->term_id . ':name' );
 	}
 
 	public function translate_term_description( $description, $term_id, $taxonomy ) {
-		return $this->translated_value( $description, 'term:' . $term_id . ':description' );
+		return $this->kses_translated_value( $description, 'term:' . $term_id . ':description' );
 	}
 
 	public function translate_document_title_parts( $parts ) {
@@ -258,8 +258,8 @@ class HTBD_Content_Controller {
 		}
 
 		$translated_term = clone $term;
-		$translated_term->name = $this->translated_value( $term->name, 'term:' . $term->term_id . ':name' );
-		$translated_term->description = $this->translated_value( $term->description, 'term:' . $term->term_id . ':description' );
+		$translated_term->name = sanitize_text_field( $this->translated_value( $term->name, 'term:' . $term->term_id . ':name' ) );
+		$translated_term->description = $this->kses_translated_value( $term->description, 'term:' . $term->term_id . ':description' );
 
 		return $translated_term;
 	}
@@ -323,7 +323,13 @@ class HTBD_Content_Controller {
 	private function escaped_translated_value( $source_value, $context ) {
 		$translated_value = $this->translated_value( $source_value, $context );
 
-		return $translated_value === $source_value ? $source_value : esc_html( $translated_value );
+		return esc_html( $translated_value );
+	}
+
+	private function kses_translated_value( $source_value, $context ) {
+		$translated_value = $this->translated_value( $source_value, $context );
+
+		return wp_kses_post( $translated_value );
 	}
 
 	private function translated_or_schedule_seo_output( $source_value, $post_id, $field_context ) {
