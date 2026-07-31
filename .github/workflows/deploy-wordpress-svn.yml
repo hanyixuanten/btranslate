@@ -1,9 +1,6 @@
 name: Deploy to WordPress.org SVN
 
 on:
-  release:
-    types:
-      - published
   workflow_dispatch:
     inputs:
       release_tag:
@@ -33,17 +30,11 @@ jobs:
       - name: Resolve release tag and archive name
         id: release
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          RELEASE_EVENT_TAG: ${{ github.event.release.tag_name }}
           MANUAL_TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
 
-          case "${EVENT_NAME}" in
-            release) release_tag="${RELEASE_EVENT_TAG}" ;;
-            workflow_dispatch) release_tag="${MANUAL_TAG}" ;;
-            *) printf 'Unsupported event: %s\n' "${EVENT_NAME}" >&2; exit 1 ;;
-          esac
+          release_tag="${MANUAL_TAG}"
 
           if [[ ! "${release_tag}" =~ ^v?([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
             printf 'Release tag must be vX.Y.Z or X.Y.Z, got: %s\n' "${release_tag}" >&2
