@@ -4,7 +4,7 @@ Homepage: https://www.vblg.top/index.php/archives/147
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.4
+Stable tag: 0.3.0
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -67,6 +67,12 @@ HTBD 将百度返回的译文保存在 WordPress 数据库中，但不保存完�
 卸载会删除插件设置、计划任务和自建翻译表，包括所有已持久化的翻译。停用插件不会删除这些数据。
 
 == Changelog ==
+
+= 0.3.0 =
+
+* 新增使用百度翻译 `auto` 模式自动识别源语言的功能。
+* 将目标语言路由中的 `wp-admin` 和 `wp-login.php` 请求重定向到源站，并保留查询参数。
+* 新增 GitHub Release 自动打包及 WordPress.org SVN 自动部署工作流。
 
 = 0.2.4 =
 

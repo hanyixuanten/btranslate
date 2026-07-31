@@ -4,7 +4,7 @@ Homepage: https://www.vblg.top/index.php/archives/147
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.4
+Stable tag: 0.3.0
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -62,6 +62,12 @@ Failed posts, pages, categories, or tags appear below the progress bar on the Se
 Uninstalling removes plugin settings, scheduled tasks, and the custom translation table, including all persisted translations.
 
 == Changelog ==
+
+= 0.3.0 =
+
+* Add automatic source-language detection using Baidu's `auto` mode.
+* Redirect target-language `wp-admin` and `wp-login.php` requests to the source site while preserving query parameters.
+* Add automated GitHub Release packaging and WordPress.org SVN deployment workflows.
 
 = 0.2.4 =
 
