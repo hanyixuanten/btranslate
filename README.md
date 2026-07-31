@@ -56,6 +56,7 @@ When translating content, the plugin makes every effort to preserve:
 - Shortcodes
 - Placeholders
 - URLs
+- Content inside `<pre>` and `<code>` elements, which is left untranslated
 - Protected special content
 
 ### Multilingual SEO

@@ -181,9 +181,15 @@ class HTBD_Content_Controller {
 			return $content;
 		}
 
-		$text_index = 0;
+		$text_index      = 0;
+		$protected_depth = 0;
 		foreach ( $segments as $index => $segment ) {
-			if ( HTBD_Content_Translator::is_tag( $segment ) || '' === trim( $segment ) ) {
+			if ( HTBD_Content_Translator::is_tag( $segment ) ) {
+				$protected_depth = HTBD_Content_Translator::protected_depth_after_tag( $segment, $protected_depth );
+				continue;
+			}
+
+			if ( 0 < $protected_depth || '' === trim( $segment ) ) {
 				continue;
 			}
 

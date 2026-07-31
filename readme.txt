@@ -47,6 +47,10 @@ HTBD stores the returned translated text in the WordPress database but does not 
 
 No. Each value is translated by a scheduled task and persisted for reuse. Front-end requests read stored translations only.
 
+= Does the plugin translate code in posts or pages? =
+
+No. Content inside HTML `<pre>` and `<code>` elements is preserved in the source language and is not sent for translation.
+
 = How do I retry a failed translation? =
 
 Failed posts, pages, categories, or tags appear below the progress bar on the Settings page. Use the Retranslate button beside an item to retry it.
