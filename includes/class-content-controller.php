@@ -151,7 +151,23 @@ class HTBD_Content_Controller {
 	}
 
 	public function translate_title( $title, $post_id ) {
-		return $this->escaped_translated_value( $title, 'post:' . $post_id . ':post_title' );
+		$post_id = absint( $post_id );
+		if ( ! $post_id && is_singular() ) {
+			$post_id = get_queried_object_id();
+		}
+
+		if ( ! $post_id ) {
+			return $title;
+		}
+
+		$source_title = get_post_field( 'post_title', $post_id, 'raw' );
+		if ( ! is_string( $source_title ) || '' === $source_title ) {
+			return $title;
+		}
+
+		$translated_title = $this->translated_value( $source_title, 'post:' . $post_id . ':post_title' );
+
+		return $translated_title !== $source_title ? esc_html( $translated_title ) : $title;
 	}
 
 	public function translate_content( $content ) {
