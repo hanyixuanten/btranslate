@@ -48,3 +48,11 @@ Unless a user explicitly requests a refresh, each translatable value must be tra
 - Plugin slug and PHP prefix: `hyx-translator-for-baidu-translate` and `htbd_`/`HTBD_`. The custom translation table is `{$wpdb->prefix}hyx_bd_translations`. The current minimum supported PHP version is 8.1 and the current minimum WordPress version is 6.4.
 - The repository has no Composer-managed development dependencies or bundled automated test suite. Validate PHP syntax with `find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l`. Any future automated tests must mock WordPress API calls and must not require live credentials, external network access, or a WordPress database.
 - Document supported languages, routing modes, data retention, translation lifecycle, and known limitations in the README whenever the implementation changes.
+
+## Release Workflow
+
+When the user issues `release x.x.x` or `release vx.x.x`:
+
+1. Determine the previous version from the latest Git tag reachable from the current commit and output that tag/version before making release changes. Accept the optional leading `v` in the requested version and preserve the repository's existing version/tag convention.
+2. Search the entire repository, including hidden files such as `.github` and excluding only Git internals and ignored/generated artifacts, for every occurrence of the previous version. Replace all release-version occurrences with the new version, including but not limited to PHP headers/constants, readme files, documentation, workflows, and issue templates. Report the files changed and verify that no stale release-version occurrence remains where the current release version is expected.
+3. Generate release notes from the previous tag through the current release state, using the commits and resulting diff in that range. Output both an English release log and a Chinese release log in Markdown format, with each complete language version enclosed in its own fenced code block. Keep the two logs semantically aligned and organize notable changes, fixes, compatibility notes, and upgrade considerations when applicable.

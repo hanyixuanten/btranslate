@@ -4,7 +4,7 @@ Homepage: https://github.com/hanyixuanten/HTBD
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.2
+Stable tag: 0.2.3
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -62,6 +62,9 @@ HTBD 将百度返回的译文保存在 WordPress 数据库中，但不保存完�
 
 == Changelog ==
 
-= 0.2.2 =
+= 0.2.3 =
 
-* 声明 GPLv3 许可证并补充 WordPress.org 插件元数据。
+* 将插件及代码库重命名为 HTBD / hyx-translator-for-baidu-translate。
+* 自动迁移旧版自建数据表中的翻译数据。
+* 更新打包流程、本地化资源、文档和问题模板以适配新的插件标识。
+* 修复发布归档构建流程。

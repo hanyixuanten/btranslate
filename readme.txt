@@ -4,7 +4,7 @@ Homepage: https://github.com/hanyixuanten/HTBD
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.2
+Stable tag: 0.2.3
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -57,6 +57,9 @@ Uninstalling removes plugin settings, scheduled tasks, and the custom translatio
 
 == Changelog ==
 
-= 0.2.2 =
+= 0.2.3 =
 
-* Declare GPLv3 licensing and WordPress.org plugin metadata.
+* Rename the plugin and codebase to HTBD / hyx-translator-for-baidu-translate.
+* Migrate existing translation data from the previous custom database table.
+* Update packaging, localization, documentation, and issue templates for the new plugin identity.
+* Fix the release archive build workflow.
