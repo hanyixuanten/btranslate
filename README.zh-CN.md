@@ -154,6 +154,8 @@ https://example.com/en/about/
 https://example.com/ja/about/
 ```
 
+通过目标语言子目录或绑定域名请求 `wp-login.php`、`wp-admin` 时，插件会重定向到源站对应地址，并保留查询参数。
+
 插件会优先使用已保存的译文。只有在原文发生变化、译文失效或用户主动要求刷新时，才需要重新调用翻译 API。
 
 ## 使用建议

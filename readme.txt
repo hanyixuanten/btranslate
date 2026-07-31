@@ -18,7 +18,7 @@ The WordPress admin interface follows the current WordPress locale. English is t
 
 Supported values include published post and page titles, content, excerpts, image alternative text, categories, tags, and selected SEO fields. Automatic translation is only scheduled for posts and pages with the `publish` status. Completed translations are stored in the `{$wpdb->prefix}hyx_bd_translations` custom database table. Existing `{$wpdb->prefix}btranslate_translations` data is migrated when the renamed plugin is activated. Front-end rendering reuses stored values and never calls the translation provider dynamically.
 
-Subdirectory routing supports paths such as `/en/example-post/`. Domain routing maps configured hostnames to target languages. Translation failures are non-fatal and fall back to source-language content.
+Subdirectory routing supports paths such as `/en/example-post/`. Domain routing maps configured hostnames to target languages. Requests for `wp-login.php` or `wp-admin` through a target-language route are redirected to the corresponding source-site URL while preserving query parameters. Translation failures are non-fatal and fall back to source-language content.
 
 == Installation ==
 

@@ -154,6 +154,8 @@ When Japanese uses the `/ja/` subdirectory, its translated URL is:
 https://example.com/ja/about/
 ```
 
+Requests for `wp-login.php` or `wp-admin` through a target-language subdirectory or bound domain are redirected to the corresponding source-site URL. Query parameters are preserved.
+
 The plugin prioritizes saved translations. It calls the translation API again only when the source content changes, a translation becomes invalid, or a user explicitly requests a refresh.
 
 ## Recommendations

@@ -6,10 +6,56 @@ class HTBD_Language_Router {
 	private $request_language = '';
 
 	public function register() {
+		$this->redirect_admin_request_to_source();
 		add_filter( 'query_vars', array( $this, 'query_vars' ) );
 		add_filter( 'do_parse_request', array( $this, 'strip_language_prefix' ), 1, 3 );
 		add_action( 'parse_request', array( $this, 'resolve_domain_language' ) );
 		add_filter( 'home_url', array( $this, 'localize_home_url' ), 20, 4 );
+	}
+
+	private function redirect_admin_request_to_source() {
+		if ( empty( $_SERVER['REQUEST_URI'] ) ) {
+			return;
+		}
+
+		$request_uri = sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+		$path        = wp_parse_url( $request_uri, PHP_URL_PATH );
+		$query       = wp_parse_url( $request_uri, PHP_URL_QUERY );
+
+		if ( ! is_string( $path ) ) {
+			return;
+		}
+
+		$relative_path      = $this->relative_path( $path );
+		$segments           = explode( '/', $relative_path, 2 );
+		$language           = sanitize_key( $segments[0] );
+		$uses_language_path = HTBD_Settings::is_routing_mode_enabled( 'subdirectory' ) && in_array( $language, HTBD_Settings::subdirectory_languages(), true );
+		$uses_language_host = HTBD_Settings::is_routing_mode_enabled( 'domain' ) && $this->request_uses_bound_domain();
+
+		if ( ! $uses_language_path && ! $uses_language_host ) {
+			return;
+		}
+
+		if ( $uses_language_path ) {
+			$relative_path = isset( $segments[1] ) ? $segments[1] : '';
+		}
+
+		if ( ! preg_match( '#^(?:wp-login\.php|wp-admin)(?:/|$)#', $relative_path ) ) {
+			return;
+		}
+
+		$source_url = untrailingslashit( (string) get_option( 'home', '' ) );
+		if ( '' === $source_url ) {
+			return;
+		}
+
+		$redirect_url = $source_url . '/' . ltrim( $relative_path, '/' );
+		if ( is_string( $query ) && '' !== $query ) {
+			$redirect_url .= '?' . $query;
+		}
+
+		wp_redirect( esc_url_raw( $redirect_url ), 302, 'HTBD' );
+		exit;
 	}
 
 	public function register_rewrite_rules() {
@@ -134,6 +180,13 @@ class HTBD_Language_Router {
 		$bindings = (array) HTBD_Settings::get()['domain_bindings'];
 
 		return '' !== $host && isset( $bindings[ $host ] ) && sanitize_key( $bindings[ $host ] ) === $language;
+	}
+
+	private function request_uses_bound_domain() {
+		$host     = isset( $_SERVER['HTTP_HOST'] ) ? HTBD_Settings::normalize_domain( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
+		$bindings = (array) HTBD_Settings::get()['domain_bindings'];
+
+		return '' !== $host && isset( $bindings[ $host ] ) && HTBD_Settings::is_supported_language( $bindings[ $host ] );
 	}
 
 	private function source_origin_parts( $parts ) {
