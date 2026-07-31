@@ -1,12 +1,13 @@
 <?php
 /**
  * Plugin Name: HTBD - hyx Translator powered by Baidu Translate
- * Plugin URI: https://github.com/hanyixuanten/HTBD
+ * Plugin URI: https://www.vblg.top/index.php/archives/147
  * Description: Persistent multilingual WordPress translations powered by Baidu Translate.
  * Version: 0.2.3
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Author: hanyixuanten
+ * Author URI: https://www.vblg.top
  * License: GPL-3.0-only
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: hyx-translator-for-baidu-translate
@@ -41,5 +42,18 @@ function htbd_load_textdomain() {
 	load_plugin_textdomain( 'hyx-translator-for-baidu-translate', false, dirname( plugin_basename( HTBD_FILE ) ) . '/languages' );
 }
 
+function htbd_add_plugin_row_meta( $plugin_meta, $plugin_file ) {
+	if ( plugin_basename( HTBD_FILE ) === $plugin_file ) {
+		$plugin_meta[] = sprintf(
+			'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
+			esc_url( 'https://github.com/hanyixuanten/HTBD' ),
+			esc_html__( 'GitHub Repository', 'hyx-translator-for-baidu-translate' )
+		);
+	}
+
+	return $plugin_meta;
+}
+
 add_action( 'plugins_loaded', 'htbd_load_textdomain', 5 );
 add_action( 'plugins_loaded', array( 'HTBD_Plugin', 'instance' ) );
+add_filter( 'plugin_row_meta', 'htbd_add_plugin_row_meta', 10, 2 );

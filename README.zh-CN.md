@@ -1,11 +1,14 @@
 # HTBD：基于百度翻译 API 的免费开源 Wordpress 多语言插件
 
+[![GitHub 仓库](https://img.shields.io/badge/GitHub-HTBD-181717?logo=github)](https://github.com/hanyixuanten/HTBD)
+
 HTBD 是一款 WordPress 多语言翻译插件，通过百度翻译开放平台 API，将网站中的文章、页面及其他内容翻译为不同语言，并为译文生成独立的语言访问地址。
 
 插件会将翻译结果保存在服务器的 `{$wpdb->prefix}hyx_bd_translations` 表中。除非用户主动刷新翻译，否则同一内容在同一目标语言下只需翻译一次。启用改名后的插件时，已有 `{$wpdb->prefix}btranslate_translations` 数据会自动迁移，无需在每次访问页面时重复调用翻译 API，有助于减少 API 请求量并提高页面加载速度。
 
 ## 项目地址
 
+- 插件主页：[https://www.vblg.top/index.php/archives/147](https://www.vblg.top/index.php/archives/147)
 - GitHub 仓库：[https://github.com/hanyixuanten/HTBD](https://github.com/hanyixuanten/HTBD)
 - WordPress 插件主页：[https://wordpress.org/plugins/hyx-translator-for-baidu-translate/](https://wordpress.org/plugins/hyx-translator-for-baidu-translate/)
 

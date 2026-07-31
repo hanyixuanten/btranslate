@@ -1,11 +1,14 @@
 # HTBD: A Free and Open-Source WordPress Multilingual Plugin Powered by the Baidu Translate API
 
+[![GitHub repository](https://img.shields.io/badge/GitHub-HTBD-181717?logo=github)](https://github.com/hanyixuanten/HTBD)
+
 HTBD is a multilingual translation plugin for WordPress. It uses the Baidu Translate API to translate posts, pages, and other website content into different languages, with a dedicated URL for each translated version.
 
 Translations are stored on the server in `{$wpdb->prefix}hyx_bd_translations`. Unless a user explicitly refreshes a translation, the same content is translated only once for each target language. Existing `{$wpdb->prefix}btranslate_translations` data is migrated when the renamed plugin is activated. This avoids calling the translation API on every page visit, reducing API usage and improving page load performance.
 
 ## Project Links
 
+- Plugin homepage: [https://www.vblg.top/index.php/archives/147](https://www.vblg.top/index.php/archives/147)
 - GitHub repository: [https://github.com/hanyixuanten/HTBD](https://github.com/hanyixuanten/HTBD)
 - WordPress plugin page: [https://wordpress.org/plugins/hyx-translator-for-baidu-translate/](https://wordpress.org/plugins/hyx-translator-for-baidu-translate/)
 

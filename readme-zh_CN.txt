@@ -1,6 +1,6 @@
 === HTBD - hyx Translator powered by Baidu Translate ===
 Contributors: hanyixuanten
-Homepage: https://github.com/hanyixuanten/HTBD
+Homepage: https://www.vblg.top/index.php/archives/147
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
