@@ -46,7 +46,9 @@ class HTBD_Admin {
 				'progressUrl'   => admin_url( 'admin-ajax.php' ),
 				'progressNonce' => wp_create_nonce( 'htbd_translation_progress' ),
 				'i18n'          => array(
+					/* translators: 1: translated content item count, 2: total content item count. */
 					'contentItems'  => __( '(%1$s / %2$s content items)', 'hyx-translator-for-baidu-translate' ),
+					/* translators: 1: latest task status, 2: translated post/page count, 3: total post/page count, 4: translated category/tag count, 5: total category/tag count. */
 					'latestTask'    => __( 'Latest task: %1$s. Posts and pages: %2$s / %3$s; categories and tags: %4$s / %5$s. Updates automatically every 5 seconds.', 'hyx-translator-for-baidu-translate' ),
 					'failedItems'   => __( 'Failed translations', 'hyx-translator-for-baidu-translate' ),
 					'retranslate'   => __( 'Retranslate', 'hyx-translator-for-baidu-translate' ),
@@ -384,6 +386,7 @@ class HTBD_Admin {
 			}
 
 			if ( '' === $name ) {
+				/* translators: %d: content item ID. */
 				$name = sprintf( __( 'Content #%d', 'hyx-translator-for-baidu-translate' ), $item_id );
 			}
 
