@@ -59,10 +59,11 @@ class HTBD_Admin {
 	}
 
 	public function sanitize_settings( $settings ) {
-		$settings = (array) $settings;
-		$bindings = array();
-		$routing_modes = HTBD_Settings::routing_modes( $settings['routing_mode'] ?? array() );
-		$target_languages = array_values( array_filter( array_map( 'sanitize_key', explode( ',', (string) ( $settings['target_languages'] ?? 'en' ) ) ) ) );
+		$settings                    = (array) $settings;
+		$bindings                    = array();
+		$auto_detect_source_language = ! empty( $settings['auto_detect_source_language'] );
+		$routing_modes               = HTBD_Settings::routing_modes( $settings['routing_mode'] ?? array() );
+		$target_languages            = array_values( array_filter( array_map( 'sanitize_key', explode( ',', (string) ( $settings['target_languages'] ?? 'en' ) ) ) ) );
 
 		foreach ( preg_split( '/\r\n|\r|\n/', (string) ( $settings['domain_bindings'] ?? '' ) ) as $line ) {
 			$parts = array_map( 'trim', explode( '=', $line, 2 ) );
@@ -74,14 +75,15 @@ class HTBD_Admin {
 		}
 
 		return array(
-			'source_language'   => sanitize_key( $settings['source_language'] ?? 'zh' ),
-			'target_languages'  => $target_languages,
-			'routing_mode'      => $routing_modes,
-			'domain_bindings'   => $bindings,
-			'fallback_language' => sanitize_key( $settings['fallback_language'] ?? 'zh' ),
-			'baidu_app_id'      => sanitize_text_field( $settings['baidu_app_id'] ?? '' ),
-			'baidu_secret_key'  => sanitize_text_field( $settings['baidu_secret_key'] ?? '' ),
-			'log_requests'      => ! empty( $settings['log_requests'] ),
+			'auto_detect_source_language' => $auto_detect_source_language,
+			'source_language'            => $auto_detect_source_language ? 'auto' : sanitize_key( $settings['source_language'] ?? 'zh' ),
+			'target_languages'           => $target_languages,
+			'routing_mode'               => $routing_modes,
+			'domain_bindings'            => $bindings,
+			'fallback_language'          => sanitize_key( $settings['fallback_language'] ?? 'zh' ),
+			'baidu_app_id'               => sanitize_text_field( $settings['baidu_app_id'] ?? '' ),
+			'baidu_secret_key'           => sanitize_text_field( $settings['baidu_secret_key'] ?? '' ),
+			'log_requests'               => ! empty( $settings['log_requests'] ),
 		);
 	}
 
@@ -97,7 +99,8 @@ class HTBD_Admin {
 			<form action="options.php" method="post">
 				<?php settings_fields( 'htbd_settings' ); ?>
 				<table class="form-table" role="presentation">
-					<tr><th scope="row"><label for="htbd-source-language"><?php esc_html_e( 'Source language', 'hyx-translator-for-baidu-translate' ); ?></label></th><td><input id="htbd-source-language" name="htbd_settings[source_language]" type="text" value="<?php echo esc_attr( $settings['source_language'] ); ?>" /><p class="description"><?php esc_html_e( 'Use a Baidu Translate language code, for example zh.', 'hyx-translator-for-baidu-translate' ); ?></p></td></tr>
+					<tr><th scope="row"><?php esc_html_e( 'Source language detection', 'hyx-translator-for-baidu-translate' ); ?></th><td><label for="htbd-auto-detect-source-language"><input id="htbd-auto-detect-source-language" name="htbd_settings[auto_detect_source_language]" type="checkbox" value="1" <?php checked( $settings['auto_detect_source_language'] ); ?> /> <?php esc_html_e( 'Automatically detect the source language', 'hyx-translator-for-baidu-translate' ); ?></label></td></tr>
+					<tr id="htbd-source-language-row"<?php echo $settings['auto_detect_source_language'] ? ' style="display:none"' : ''; ?>><th scope="row"><label for="htbd-source-language"><?php esc_html_e( 'Source language', 'hyx-translator-for-baidu-translate' ); ?></label></th><td><input id="htbd-source-language" name="htbd_settings[source_language]" type="text" value="<?php echo esc_attr( $settings['source_language'] ); ?>" /><p class="description"><?php esc_html_e( 'Use a Baidu Translate language code, for example zh.', 'hyx-translator-for-baidu-translate' ); ?></p></td></tr>
 					<tr><th scope="row"><label for="htbd-target-languages"><?php esc_html_e( 'Target languages', 'hyx-translator-for-baidu-translate' ); ?></label></th><td><input id="htbd-target-languages" name="htbd_settings[target_languages]" type="text" value="<?php echo esc_attr( implode( ',', $settings['target_languages'] ) ); ?>" class="regular-text" /><p class="description"><?php esc_html_e( 'Separate multiple language codes with commas, for example en,ja.', 'hyx-translator-for-baidu-translate' ); ?></p></td></tr>
 					<tr><th scope="row"><?php esc_html_e( 'URL mode', 'hyx-translator-for-baidu-translate' ); ?></th><td><fieldset id="htbd-routing-mode"><label><input type="checkbox" name="htbd_settings[routing_mode][]" value="subdirectory" <?php checked( in_array( 'subdirectory', $settings['routing_mode'], true ) ); ?> /> <?php esc_html_e( 'Subdirectory', 'hyx-translator-for-baidu-translate' ); ?></label><br /><label><input type="checkbox" name="htbd_settings[routing_mode][]" value="domain" <?php checked( in_array( 'domain', $settings['routing_mode'], true ) ); ?> /> <?php esc_html_e( 'Domain', 'hyx-translator-for-baidu-translate' ); ?></label></fieldset></td></tr>
 					<tr id="htbd-domain-bindings-row"<?php echo in_array( 'domain', $settings['routing_mode'], true ) ? '' : ' style="display:none"'; ?>><th scope="row"><label for="htbd-domain-bindings"><?php esc_html_e( 'Domain bindings', 'hyx-translator-for-baidu-translate' ); ?></label></th><td><textarea id="htbd-domain-bindings" name="htbd_settings[domain_bindings]" rows="4" class="large-text" placeholder="en.example.com=en"><?php echo esc_textarea( implode( "\n", $bindings ) ); ?></textarea><p class="description"><?php esc_html_e( 'Enter one domain=language code pair per line, for example en.example.com=en. Do not include https://, a path, or a port.', 'hyx-translator-for-baidu-translate' ); ?></p></td></tr>

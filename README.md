@@ -121,12 +121,14 @@ Because the plugin has not yet been approved for the WordPress.org Plugin Direct
 1. Sign in to WordPress Admin.
 2. Open the HTBD settings page.
 3. Enter the **APP ID** and **secret key** provided by the Baidu Translate Open Platform.
-4. Set the website's source language.
+4. Set the website's source language, or enable **Automatically detect the source language** to use Baidu's `auto` source language mode.
 5. Add the target languages you want to enable.
 6. Select a language URL mode, such as language subdirectories or domain binding.
 7. Save the settings.
 
 After changing language routing settings, open **Settings > Permalinks** in WordPress Admin and confirm that the permalink configuration is working correctly.
+
+Automatic detection is stored as a separate setting. Entering `auto` in the source language field without enabling automatic detection remains a distinct configuration state.
 
 ### 4. Start Translating
 

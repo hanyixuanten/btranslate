@@ -3,10 +3,18 @@
 
 	var domainMode = document.querySelector('#htbd-routing-mode input[value="domain"]');
 	var bindingsRow = document.getElementById('htbd-domain-bindings-row');
+	var autoDetectSourceLanguage = document.getElementById('htbd-auto-detect-source-language');
+	var sourceLanguageRow = document.getElementById('htbd-source-language-row');
 
 	if (domainMode && bindingsRow) {
 		domainMode.addEventListener('change', function () {
 			bindingsRow.style.display = domainMode.checked ? '' : 'none';
+		});
+	}
+
+	if (autoDetectSourceLanguage && sourceLanguageRow) {
+		autoDetectSourceLanguage.addEventListener('change', function () {
+			sourceLanguageRow.style.display = autoDetectSourceLanguage.checked ? 'none' : '';
 		});
 	}
 

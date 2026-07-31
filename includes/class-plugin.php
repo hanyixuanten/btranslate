@@ -40,11 +40,12 @@ class HTBD_Plugin {
 		add_option(
 			'htbd_settings',
 			array(
-				'source_language'   => 'zh',
-				'target_languages'  => array( 'en' ),
-				'routing_mode'      => array( 'subdirectory' ),
-				'domain_bindings'   => array(),
-				'fallback_language' => 'zh',
+				'auto_detect_source_language' => false,
+				'source_language'            => 'zh',
+				'target_languages'           => array( 'en' ),
+				'routing_mode'               => array( 'subdirectory' ),
+				'domain_bindings'            => array(),
+				'fallback_language'          => 'zh',
 			),
 			'',
 			false

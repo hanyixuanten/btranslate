@@ -24,8 +24,10 @@ Subdirectory routing supports paths such as `/en/example-post/`. Domain routing 
 
 1. Upload the `hyx-translator-for-baidu-translate` directory to `/wp-content/plugins/`.
 2. Activate HTBD through the Plugins screen in WordPress.
-3. Open Settings > HTBD and configure the Baidu credentials, languages, and routing mode.
+3. Open Settings > HTBD and configure the Baidu credentials, languages, and routing mode. Enable automatic source-language detection to use Baidu's `auto` source language mode.
 4. After saving settings for the first time, manually run Retranslate all content to queue existing content.
+
+Automatic detection is stored independently from the source language value. Manually entering `auto` without enabling automatic detection remains a distinct configuration state.
 
 == External Services ==
 

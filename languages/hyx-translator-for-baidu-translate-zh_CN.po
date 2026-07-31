@@ -32,6 +32,12 @@ msgstr "暂时无法读取翻译进度。"
 msgid "Failed translations"
 msgstr "翻译失败的内容"
 
+msgid "Source language detection"
+msgstr "源语言识别"
+
+msgid "Automatically detect the source language"
+msgstr "自动识别源语言"
+
 msgid "Source language"
 msgstr "源语言"
 

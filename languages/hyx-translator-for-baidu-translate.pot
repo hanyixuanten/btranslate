@@ -40,6 +40,12 @@ msgstr ""
 msgid "Failed translations"
 msgstr ""
 
+msgid "Source language detection"
+msgstr ""
+
+msgid "Automatically detect the source language"
+msgstr ""
+
 #: includes/class-admin.php:95
 msgid "Source language"
 msgstr ""

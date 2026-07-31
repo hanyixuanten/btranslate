@@ -5,14 +5,15 @@ defined( 'ABSPATH' ) || exit;
 class HTBD_Settings {
 	public static function get() {
 		$defaults = array(
-			'source_language'   => 'zh',
-			'target_languages'  => array( 'en' ),
-			'routing_mode'      => array( 'subdirectory' ),
-			'domain_bindings'   => array(),
-			'fallback_language' => 'zh',
-			'baidu_app_id'      => '',
-			'baidu_secret_key'  => '',
-			'log_requests'      => false,
+			'auto_detect_source_language' => false,
+			'source_language'            => 'zh',
+			'target_languages'           => array( 'en' ),
+			'routing_mode'               => array( 'subdirectory' ),
+			'domain_bindings'            => array(),
+			'fallback_language'          => 'zh',
+			'baidu_app_id'               => '',
+			'baidu_secret_key'           => '',
+			'log_requests'               => false,
 		);
 
 		$stored_settings = get_option( 'htbd_settings', false );
