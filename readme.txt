@@ -4,7 +4,7 @@ Homepage: https://www.vblg.top/index.php/archives/147
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.3
+Stable tag: 0.2.4
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -60,6 +60,13 @@ Failed posts, pages, categories, or tags appear below the progress bar on the Se
 Uninstalling removes plugin settings, scheduled tasks, and the custom translation table, including all persisted translations.
 
 == Changelog ==
+
+= 0.2.4 =
+
+* Fix translated titles so singular views use the current post context.
+* Preserve content inside HTML `<pre>` and `<code>` elements instead of sending it for translation.
+* Improve plugin security metadata and translator attribution.
+* Update the plugin homepage URL.
 
 = 0.2.3 =
 

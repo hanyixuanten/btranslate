@@ -33,7 +33,7 @@ body:
     id: plugin-version
     attributes:
       label: HTBD version
-      placeholder: "For example: 0.2.3"
+      placeholder: "For example: 0.2.4"
     validations:
       required: true
 

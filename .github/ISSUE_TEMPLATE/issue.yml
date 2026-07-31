@@ -33,7 +33,7 @@ body:
     id: plugin-version
     attributes:
       label: HTBD 版本
-      placeholder: 例如：0.2.3
+      placeholder: 例如：0.2.4
     validations:
       required: true
 

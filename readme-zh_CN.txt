@@ -4,7 +4,7 @@ Homepage: https://www.vblg.top/index.php/archives/147
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.3
+Stable tag: 0.2.4
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -65,6 +65,13 @@ HTBD 将百度返回的译文保存在 WordPress 数据库中，但不保存完�
 卸载会删除插件设置、计划任务和自建翻译表，包括所有已持久化的翻译。停用插件不会删除这些数据。
 
 == Changelog ==
+
+= 0.2.4 =
+
+* 修复单篇内容页面未按当前文章上下文显示翻译标题的问题。
+* 保留 HTML `<pre>` 和 `<code>` 元素内的内容，不再将其发送翻译。
+* 完善插件安全元数据和译者署名。
+* 更新插件主页 URL。
 
 = 0.2.3 =
 
