@@ -134,6 +134,32 @@ class HTBD_Admin {
 				<?php wp_nonce_field( 'htbd_queue_existing_translations' ); ?>
 				<?php submit_button( __( 'Translate all categories and tags', 'hyx-translator-for-baidu-translate' ), 'secondary', 'submit', false ); ?>
 			</form>
+			<?php if ( count( $settings['target_languages'] ) > 1 ) : ?>
+				<?php foreach ( $settings['target_languages'] as $target_language ) : ?>
+					<hr />
+					<h3><?php echo esc_html( strtoupper( $target_language ) ); ?></h3>
+					<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" data-htbd-confirm="<?php echo esc_attr__( 'This will retranslate all content and use your API quota. Continue?', 'hyx-translator-for-baidu-translate' ); ?>">
+						<input type="hidden" name="action" value="htbd_queue_existing_translations" />
+						<input type="hidden" name="language" value="<?php echo esc_attr( $target_language ); ?>" />
+						<?php wp_nonce_field( 'htbd_queue_existing_translations' ); ?>
+						<?php submit_button( sprintf( '%s %s', $target_language, __( 'Retranslate all content', 'hyx-translator-for-baidu-translate' ) ), 'secondary', 'submit', false ); ?>
+					</form>
+					<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block;margin-right:8px" data-htbd-confirm="<?php echo esc_attr__( 'This will retranslate all posts and pages and use your API quota. Continue?', 'hyx-translator-for-baidu-translate' ); ?>">
+						<input type="hidden" name="action" value="htbd_queue_existing_translations" />
+						<input type="hidden" name="scope" value="posts" />
+						<input type="hidden" name="language" value="<?php echo esc_attr( $target_language ); ?>" />
+						<?php wp_nonce_field( 'htbd_queue_existing_translations' ); ?>
+						<?php submit_button( sprintf( '%s %s', $target_language, __( 'Translate all posts', 'hyx-translator-for-baidu-translate' ) ), 'secondary', 'submit', false ); ?>
+					</form>
+					<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" style="display:inline-block" data-htbd-confirm="<?php echo esc_attr__( 'This will retranslate all categories and tags and use your API quota. Continue?', 'hyx-translator-for-baidu-translate' ); ?>">
+						<input type="hidden" name="action" value="htbd_queue_existing_translations" />
+						<input type="hidden" name="scope" value="terms" />
+						<input type="hidden" name="language" value="<?php echo esc_attr( $target_language ); ?>" />
+						<?php wp_nonce_field( 'htbd_queue_existing_translations' ); ?>
+						<?php submit_button( sprintf( '%s %s', $target_language, __( 'Translate all categories and tags', 'hyx-translator-for-baidu-translate' ) ), 'secondary', 'submit', false ); ?>
+					</form>
+				<?php endforeach; ?>
+			<?php endif; ?>
 			<hr />
 			<h2><?php esc_html_e( 'Translation cache', 'hyx-translator-for-baidu-translate' ); ?></h2>
 			<p><?php esc_html_e( 'After clearing the cache, the front end temporarily displays source content. Baidu Translate API calls resume when content is translated again.', 'hyx-translator-for-baidu-translate' ); ?></p>
@@ -161,12 +187,19 @@ class HTBD_Admin {
 		if ( ! in_array( $scope, array( 'all', 'posts', 'terms' ), true ) ) {
 			wp_die( esc_html__( 'Invalid translation scope.', 'hyx-translator-for-baidu-translate' ) );
 		}
+		$target_language = isset( $_POST['language'] ) ? sanitize_key( wp_unslash( $_POST['language'] ) ) : '';
+		$languages       = HTBD_Settings::target_languages();
+		if ( '' !== $target_language ) {
+			if ( ! in_array( $target_language, $languages, true ) ) {
+				wp_die( esc_html__( 'Invalid translation request.', 'hyx-translator-for-baidu-translate' ) );
+			}
+			$languages = array( $target_language );
+		}
 
 		$scheduled = 0;
 		$next_run  = time();
 		$post_ids  = array();
 		$term_ids  = array();
-		$languages = HTBD_Settings::target_languages();
 
 		if ( 'all' === $scope || 'posts' === $scope ) {
 			$post_ids = get_posts(
