@@ -59,7 +59,7 @@ msgid "Target languages"
 msgstr ""
 
 #: includes/class-admin.php:96
-msgid "Separate multiple language codes with commas, for example en,ja."
+msgid "Separate multiple language codes with commas, for example en,jp."
 msgstr ""
 
 #: includes/class-admin.php:97

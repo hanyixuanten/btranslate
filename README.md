@@ -37,7 +37,7 @@ The plugin supports translating the main content of WordPress posts and pages, i
 
 HTBD can generate dedicated URLs for different languages, with support for:
 
-- Language subdirectories such as `/en/` and `/ja/`
+- Language subdirectories such as `/en/` and `/jp/`
 - A separate domain for each language
 - Language-specific permalinks based on the configured routing mode
 
@@ -150,10 +150,10 @@ When English uses the `/en/` subdirectory, its translated URL is:
 https://example.com/en/about/
 ```
 
-When Japanese uses the `/ja/` subdirectory, its translated URL is:
+When Japanese uses the `/jp/` subdirectory, its translated URL is:
 
 ```txt
-https://example.com/ja/about/
+https://example.com/jp/about/
 ```
 
 Requests for `wp-login.php` or `wp-admin` through a target-language subdirectory or bound domain are redirected to the corresponding source-site URL. Query parameters are preserved.

@@ -37,7 +37,7 @@ HTBD 使用百度翻译开放平台提供的翻译 API。用户可以在 WordPre
 
 HTBD 可以为不同语言生成独立的访问地址，支持：
 
-- 语言子目录，例如 `/en/`、`/ja/`
+- 语言子目录，例如 `/en/`、`/jp/`
 - 不同语言绑定不同域名
 - 根据配置生成对应语言的固定链接
 
@@ -150,10 +150,10 @@ https://example.com/about/
 https://example.com/en/about/
 ```
 
-日语使用 `/ja/` 子目录时，译文地址为：
+日语使用 `/jp/` 子目录时，译文地址为：
 
 ```txt
-https://example.com/ja/about/
+https://example.com/jp/about/
 ```
 
 通过目标语言子目录或绑定域名请求 `wp-login.php`、`wp-admin` 时，插件会重定向到源站对应地址，并保留查询参数。

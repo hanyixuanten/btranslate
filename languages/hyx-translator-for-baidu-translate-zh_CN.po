@@ -47,8 +47,8 @@ msgstr "使用百度翻译语言代码，例如 zh。"
 msgid "Target languages"
 msgstr "目标语言"
 
-msgid "Separate multiple language codes with commas, for example en,ja."
-msgstr "多个语言代码用英文逗号分隔，例如 en,ja。"
+msgid "Separate multiple language codes with commas, for example en,jp."
+msgstr "多个语言代码用英文逗号分隔，例如 en,jp。"
 
 msgid "URL mode"
 msgstr "网址模式"
