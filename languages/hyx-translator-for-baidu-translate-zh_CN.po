@@ -185,3 +185,21 @@ msgstr "尚未配置百度翻译凭据。"
 
 msgid "Baidu Translate returned an invalid response."
 msgstr "百度翻译返回了无效响应。"
+
+msgid "GitHub Repository"
+msgstr "GitHub 代码仓库"
+
+msgid "https://www.vblg.top"
+msgstr "https://www.vblg.top"
+
+msgid "hanyixuanten"
+msgstr "hanyixuanten"
+
+msgid "Persistent multilingual WordPress translations powered by Baidu Translate."
+msgstr "由百度翻译提供支持，为 WordPress 生成并持久化保存多语言翻译。"
+
+msgid "https://www.vblg.top/index.php/archives/147"
+msgstr "https://www.vblg.top/index.php/archives/147"
+
+msgid "HTBD - hyx Translator powered by Baidu Translate"
+msgstr "HTBD - hyx 百度翻译多语言插件"

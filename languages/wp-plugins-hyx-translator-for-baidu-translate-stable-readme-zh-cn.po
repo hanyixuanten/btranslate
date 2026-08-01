@@ -1,0 +1,179 @@
+# Translation of Plugins - HTBD &#8211; hyx Translator powered by Baidu Translate - Stable Readme (latest release) in Chinese (China)
+# This file is distributed under the same license as the Plugins - HTBD &#8211; hyx Translator powered by Baidu Translate - Stable Readme (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2026-08-01 00:00+0000\n"
+"Last-Translator: HTBD contributors\n"
+"Language-Team: Chinese (China)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: GlotPress/4.0.3\n"
+"Language: zh_CN\n"
+"Project-Id-Version: Plugins - HTBD &#8211; hyx Translator powered by Baidu Translate - Stable Readme (latest release)\n"
+
+#. Short description.
+#, gp-priority: high
+msgid "Persistent multilingual WordPress translations powered by the Baidu Translate API."
+msgstr "由百度翻译 API 提供支持，为 WordPress 生成并持久化保存多语言翻译。"
+
+#. Plugin name.
+#, gp-priority: high
+msgid "HTBD - hyx Translator powered by Baidu Translate"
+msgstr "HTBD - hyx 百度翻译多语言插件"
+
+#. Found in faq paragraph.
+msgid "Uninstalling removes plugin settings, scheduled tasks, and the custom translation table, including all persisted translations."
+msgstr "卸载会删除插件设置、计划任务和自建翻译表，包括所有已持久化的翻译。"
+
+#. Found in faq paragraph.
+msgid "Failed posts, pages, categories, or tags appear below the progress bar on the Settings page. Use the Retranslate button beside an item to retry it."
+msgstr "翻译失败的文章、页面、分类或标签会显示在设置页面的进度条下方。点击对应项目旁的“重新翻译”按钮即可重试。"
+
+#. Found in faq paragraph.
+msgid "No. Content inside HTML <code>&lt;pre&gt;</code> and <code>&lt;code&gt;</code> elements is preserved in the source language and is not sent for translation."
+msgstr "不会。HTML <code>&lt;pre&gt;</code> 和 <code>&lt;code&gt;</code> 元素内的内容会保留源语言，不会发送进行翻译。"
+
+#. Found in faq paragraph.
+msgid "No. Each value is translated by a scheduled task and persisted for reuse. Front-end requests read stored translations only."
+msgstr "不会。每个值都由计划任务翻译并持久化保存以供重复使用。前端请求只读取已保存的翻译。"
+
+#. Found in faq header.
+msgid "What data is removed during uninstall?"
+msgstr "卸载时会删除哪些数据？"
+
+#. Found in faq header.
+msgid "How do I retry a failed translation?"
+msgstr "如何重试失败的翻译？"
+
+#. Found in faq header.
+msgid "Does the plugin translate code in posts or pages?"
+msgstr "插件会翻译文章或页面中的代码吗？"
+
+#. Found in faq header.
+msgid "Does the plugin translate content on every page request?"
+msgstr "插件会在每次页面请求时翻译内容吗？"
+
+#. Found in installation paragraph.
+msgid "Automatic detection is stored independently from the source language value. Manually entering <code>auto</code> without enabling automatic detection remains a distinct configuration state."
+msgstr "自动识别状态与源语言值分开保存。在未启用自动识别时手动输入 <code>auto</code>，仍属于不同的配置状态。"
+
+#. Found in installation list item.
+msgid "After saving settings for the first time, manually run Retranslate all content to queue existing content."
+msgstr "第一次保存设置后，手动执行“重新翻译所有内容”，将现有内容加入队列。"
+
+#. Found in installation list item.
+msgid "Open Settings &gt; HTBD and configure the Baidu credentials, languages, and routing mode. Enable automatic source-language detection to use Baidu's <code>auto</code> source language mode."
+msgstr "打开“设置 &gt; HTBD”，配置百度翻译凭据、语言和路由模式。启用自动识别源语言可使用百度翻译的 <code>auto</code> 源语言模式。"
+
+#. Found in installation list item.
+msgid "Activate HTBD through the Plugins screen in WordPress."
+msgstr "在 WordPress 的“插件”页面启用 HTBD。"
+
+#. Found in installation list item.
+msgid "Upload the <code>hyx-translator-for-baidu-translate</code> directory to <code>/wp-content/plugins/</code>."
+msgstr "将 <code>hyx-translator-for-baidu-translate</code> 目录上传到 <code>/wp-content/plugins/</code>。"
+
+#. Found in description paragraph.
+msgid "HTBD stores the returned translated text in the WordPress database but does not store complete Baidu response payloads. Data sent to Baidu is subject to Baidu's own terms and privacy practices:"
+msgstr "HTBD 将百度返回的译文保存在 WordPress 数据库中，但不保存完整的百度响应内容。发送给百度的数据受百度自身条款和隐私规则约束："
+
+#. Found in description paragraph.
+msgid "For each translation request, the plugin sends the text being translated, the configured source and target language codes, the Baidu application ID, a random salt, and a request signature. Depending on the content being translated, the text may contain published post or page titles, body text, excerpts, selected SEO title and description values, attached image alternative text, and category or tag names and descriptions. Standard network information, including the originating server IP address, is also visible to Baidu as part of the HTTPS request. The secret key is used locally to create the signature and is not sent as a separate request field."
+msgstr "每次翻译请求会发送待翻译文本、配置的源语言和目标语言代码、百度应用 ID、随机盐值和请求签名。根据待翻译内容，文本可能包含已发布文章或页面的标题、正文、摘要、指定的 SEO 标题和描述、附件图片替代文本，以及分类或标签的名称和描述。作为 HTTPS 请求的一部分，百度也能看到来源服务器 IP 地址等标准网络信息。密钥只在本地用于生成签名，不会作为独立的请求字段发送。"
+
+#. Found in description paragraph.
+msgid "The API is contacted by scheduled tasks after a published post or page is saved, after a supported category or tag is created or edited, or after an administrator explicitly queues or refreshes translations. Front-end page views reuse stored translations and do not contact Baidu. The plugin also makes no Baidu request when valid persisted translations are already available, unless an administrator explicitly requests a refresh."
+msgstr "已发布的文章或页面保存后、支持的分类或标签创建或编辑后，或者管理员明确将翻译加入队列或刷新翻译时，计划任务会请求该 API。前端页面访问只读取已保存的翻译，不会请求百度。已有有效的持久化翻译时，插件也不会请求百度，除非管理员明确要求刷新。"
+
+#. Found in description paragraph.
+msgid "HTBD connects to the Baidu Translate Open Platform API, a service provided by Baidu, to translate WordPress content. The plugin cannot generate new translations without this service. A Baidu Translate account, application ID, and secret key are required. Baidu may apply request quotas or usage charges according to the service plan selected by the site administrator."
+msgstr "HTBD 连接由百度提供的百度翻译开放平台 API，以翻译 WordPress 内容。没有该外部服务，插件无法生成新的翻译。站点管理员需要百度翻译账户、应用 ID 和密钥。百度可能根据站点管理员选择的服务方案实施请求配额或收取使用费用。"
+
+#. Found in description paragraph.
+msgid "Subdirectory routing supports paths such as <code>/en/example-post/</code>. Domain routing maps configured hostnames to target languages. Requests for <code>wp-login.php</code> or <code>wp-admin</code> through a target-language route are redirected to the corresponding source-site URL while preserving query parameters. Translation failures are non-fatal and fall back to source-language content."
+msgstr "子目录路由支持 <code>/en/example-post/</code> 等路径。域名路由可将配置的主机名映射到目标语言。通过目标语言路由请求 <code>wp-login.php</code> 或 <code>wp-admin</code> 时，插件会重定向到源站对应地址并保留查询参数。翻译失败不会中断页面请求，而会回退显示源语言内容。"
+
+#. Found in description paragraph.
+msgid "Supported values include published post and page titles, content, excerpts, image alternative text, categories, tags, and selected SEO fields. Automatic translation is only scheduled for posts and pages with the <code>publish</code> status. Completed translations are stored in the <code>{$wpdb-&gt;prefix}hyx_bd_translations</code> custom database table. Existing <code>{$wpdb-&gt;prefix}btranslate_translations</code> data is migrated when the renamed plugin is activated. Front-end rendering reuses stored values and never calls the translation provider dynamically."
+msgstr "支持的值包括已发布文章和页面的标题、正文、摘要、图片替代文本、分类、标签及部分 SEO 字段。插件只为 <code>publish</code> 状态的文章和页面自动安排翻译。完成的翻译保存在 <code>{$wpdb-&gt;prefix}hyx_bd_translations</code> 自建数据表中；启用改名后的插件时，已有 <code>{$wpdb-&gt;prefix}btranslate_translations</code> 数据会自动迁移。前端渲染只读取已保存的值，不会动态请求翻译服务。"
+
+#. Found in description paragraph.
+msgid "The WordPress admin interface follows the current WordPress locale. English is the default, and a bundled Simplified Chinese translation is used when WordPress is set to <code>zh_CN</code>."
+msgstr "WordPress 后台界面会跟随当前 WordPress 语言：默认显示英文，WordPress 设为 <code>zh_CN</code> 时使用插件内置的简体中文翻译。"
+
+#. Found in description paragraph.
+msgid "HTBD translates supported WordPress content with the Baidu Translate API and persists each translation for reuse. It supports language-specific subdirectory URLs and domain bindings."
+msgstr "HTBD 使用百度翻译 API 翻译支持的 WordPress 内容，并将每个翻译结果持久化保存以供重复使用。插件支持语言子目录 URL 和语言域名绑定。"
+
+#. Found in description list item.
+msgid "Baidu privacy policy: https://privacy.baidu.com/policy"
+msgstr "百度隐私政策：https://privacy.baidu.com/policy"
+
+#. Found in description list item.
+msgid "Baidu Translate Open Platform service agreement: https://fanyi-api.baidu.com/doc/6"
+msgstr "百度翻译开放平台服务协议：https://fanyi-api.baidu.com/doc/6"
+
+#. Found in description list item.
+msgid "Baidu Translate API documentation: https://fanyi-api.baidu.com/doc/23"
+msgstr "百度翻译 API 文档：https://fanyi-api.baidu.com/doc/23"
+
+#. Found in description header.
+msgid "External Services"
+msgstr "外部服务"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Add automated GitHub Release packaging and WordPress.org SVN deployment workflows."
+msgstr "新增 GitHub Release 自动打包及 WordPress.org SVN 自动部署工作流。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Redirect target-language <code>wp-admin</code> and <code>wp-login.php</code> requests to the source site while preserving query parameters."
+msgstr "将目标语言路由中的 <code>wp-admin</code> 和 <code>wp-login.php</code> 请求重定向到源站，并保留查询参数。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Add automatic source-language detection using Baidu's <code>auto</code> mode."
+msgstr "新增使用百度翻译 <code>auto</code> 模式自动识别源语言的功能。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Fix the release archive build workflow."
+msgstr "修复发布归档构建流程。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Update packaging, localization, documentation, and issue templates for the new plugin identity."
+msgstr "更新打包流程、本地化资源、文档和问题模板以适配新的插件标识。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Migrate existing translation data from the previous custom database table."
+msgstr "迁移旧版自建数据表中已有的翻译数据。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Rename the plugin and codebase to HTBD / hyx-translator-for-baidu-translate."
+msgstr "将插件及代码库重命名为 HTBD / hyx-translator-for-baidu-translate。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Update the plugin homepage URL."
+msgstr "更新插件主页 URL。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Improve plugin security metadata and translator attribution."
+msgstr "完善插件安全元数据和译者署名。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Preserve content inside HTML <code>&lt;pre&gt;</code> and <code>&lt;code&gt;</code> elements instead of sending it for translation."
+msgstr "保留 HTML <code>&lt;pre&gt;</code> 和 <code>&lt;code&gt;</code> 元素内的内容，不再将其发送进行翻译。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Fix translated titles so singular views use the current post context."
+msgstr "修复翻译标题，使单篇内容视图使用当前文章上下文。"
