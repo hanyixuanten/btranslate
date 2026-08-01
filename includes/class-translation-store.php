@@ -78,8 +78,18 @@ class HTBD_Translation_Store {
 		);
 	}
 
-	public function clear() {
+	public function clear( $target_language = '' ) {
 		global $wpdb;
+
+		if ( '' !== $target_language ) {
+			return $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- This explicitly clears one language from the plugin's persistent translation cache.
+				$wpdb->prepare(
+					'DELETE FROM %i WHERE target_language = %s',
+					self::table_name(),
+					sanitize_key( $target_language )
+				)
+			);
+		}
 
 		return $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- This explicitly clears the plugin's persistent translation cache.
 			$wpdb->prepare( 'DELETE FROM %i', self::table_name() )

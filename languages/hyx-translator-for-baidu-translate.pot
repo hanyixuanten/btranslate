@@ -167,6 +167,11 @@ msgid ""
 "and reset progress. Continue?"
 msgstr ""
 
+#. translators: %s: target language code.
+#, php-format
+msgid "This will delete all saved %s translations. Continue?"
+msgstr ""
+
 #: includes/class-admin.php:132
 msgid "Clear translation cache"
 msgstr ""

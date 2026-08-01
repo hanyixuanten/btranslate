@@ -158,6 +158,12 @@ class HTBD_Admin {
 						<?php wp_nonce_field( 'htbd_queue_existing_translations' ); ?>
 						<?php submit_button( sprintf( '%s %s', $target_language, __( 'Translate all categories and tags', 'hyx-translator-for-baidu-translate' ) ), 'secondary', 'submit', false ); ?>
 					</form>
+					<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" data-htbd-confirm="<?php echo esc_attr( sprintf( /* translators: %s: target language code. */ __( 'This will delete all saved %s translations. Continue?', 'hyx-translator-for-baidu-translate' ), $target_language ) ); ?>">
+						<input type="hidden" name="action" value="htbd_clear_translation_cache" />
+						<input type="hidden" name="language" value="<?php echo esc_attr( $target_language ); ?>" />
+						<?php wp_nonce_field( 'htbd_clear_translation_cache_' . $target_language ); ?>
+						<?php submit_button( sprintf( '%s %s', $target_language, __( 'Clear translation cache', 'hyx-translator-for-baidu-translate' ) ), 'delete', 'submit', false ); ?>
+					</form>
 				<?php endforeach; ?>
 			<?php endif; ?>
 			<hr />
@@ -255,20 +261,27 @@ class HTBD_Admin {
 			wp_die( esc_html__( 'You do not have permission to perform this action.', 'hyx-translator-for-baidu-translate' ) );
 		}
 
-		check_admin_referer( 'htbd_clear_translation_cache' );
-		$deleted = ( new HTBD_Translation_Store() )->clear();
+		$target_language = isset( $_POST['language'] ) ? sanitize_key( wp_unslash( $_POST['language'] ) ) : '';
+		if ( '' !== $target_language && ! in_array( $target_language, HTBD_Settings::target_languages(), true ) ) {
+			wp_die( esc_html__( 'Invalid translation request.', 'hyx-translator-for-baidu-translate' ) );
+		}
+
+		check_admin_referer( 'htbd_clear_translation_cache' . ( $target_language ? '_' . $target_language : '' ) );
+		$deleted = ( new HTBD_Translation_Store() )->clear( $target_language );
 
 		if ( false === $deleted ) {
 			wp_die( esc_html__( 'Failed to clear the translation cache.', 'hyx-translator-for-baidu-translate' ) );
 		}
 
-		wp_clear_scheduled_hook( 'htbd_process_translation' );
-		wp_clear_scheduled_hook( 'htbd_process_term_translation' );
-		wp_clear_scheduled_hook( 'htbd_process_seo_output_translation' );
-		delete_option( 'htbd_translation_task' );
-		delete_option( 'htbd_retranslation_batch' );
+		if ( '' === $target_language ) {
+			wp_clear_scheduled_hook( 'htbd_process_translation' );
+			wp_clear_scheduled_hook( 'htbd_process_term_translation' );
+			wp_clear_scheduled_hook( 'htbd_process_seo_output_translation' );
+			delete_option( 'htbd_translation_task' );
+			delete_option( 'htbd_retranslation_batch' );
+		}
 
-		wp_safe_redirect( add_query_arg( 'htbd_cache_cleared', 1, admin_url( 'options-general.php?page=htbd' ) ) );
+		wp_safe_redirect( add_query_arg( 'htbd_cache_cleared', $target_language ? $target_language : 1, admin_url( 'options-general.php?page=htbd' ) ) );
 		exit;
 	}
 

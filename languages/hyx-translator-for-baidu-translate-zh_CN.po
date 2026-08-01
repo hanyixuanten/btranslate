@@ -119,6 +119,10 @@ msgstr "清除后，前台会暂时显示源文；重新翻译时将再次调用
 msgid "This will delete all saved translations, cancel pending translation tasks, and reset progress. Continue?"
 msgstr "这将删除所有已保存的翻译、取消待执行翻译任务并重置进度。确认继续吗？"
 
+#, php-format
+msgid "This will delete all saved %s translations. Continue?"
+msgstr "这将删除所有已保存的 %s 翻译。确认继续吗？"
+
 msgid "Clear translation cache"
 msgstr "清除已翻译的缓存"
 
