@@ -35,7 +35,10 @@ build() {
 		"${plugin_dir}/"
 	cp -R "${script_dir}/includes" "${plugin_dir}/"
 	cp -R "${script_dir}/assets" "${plugin_dir}/"
-	cp -R "${script_dir}/languages" "${plugin_dir}/"
+	mkdir -p "${plugin_dir}/languages"
+	cp "${script_dir}/languages/${plugin_slug}.pot" \
+		"${script_dir}/languages/${plugin_slug}-zh_CN.po" \
+		"${plugin_dir}/languages/"
 	msgfmt --check --check-format \
 		--output-file="${plugin_dir}/languages/${plugin_slug}-zh_CN.mo" \
 		"${script_dir}/languages/${plugin_slug}-zh_CN.po"
@@ -48,6 +51,10 @@ build() {
 	unzip -p "${archive_path}" "${plugin_slug}/readme.txt" | grep -q "^Stable tag: ${version}$"
 	unzip -p "${archive_path}" "${plugin_slug}/readme-zh_CN.txt" | grep -q "^Stable tag: ${version}$"
 	unzip -Z1 "${archive_path}" | grep -q "^${plugin_slug}/languages/${plugin_slug}-zh_CN.mo$"
+	if unzip -Z1 "${archive_path}" | grep -q '/wp-plugins-.*\.po$'; then
+		printf 'Unexpected GlotPress submission file found in archive.\n' >&2
+		exit 1
+	fi
 	unzip -Z1 "${archive_path}" | grep -q "^${plugin_slug}/includes/interface-translation-provider.php$"
 	unzip -Z1 "${archive_path}" | grep -q "^${plugin_slug}/assets/js/admin.js$"
 	if unzip -Z1 "${archive_path}" | grep -Eq '/class-btranslate-[^/]+\.php$'; then

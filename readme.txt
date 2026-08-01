@@ -14,7 +14,7 @@ Persistent multilingual WordPress translations powered by the Baidu Translate AP
 
 HTBD translates supported WordPress content with the Baidu Translate API and persists each translation for reuse. It supports language-specific subdirectory URLs and domain bindings.
 
-The WordPress admin interface follows the current WordPress locale. English is the default, and a bundled Simplified Chinese translation is used when WordPress is set to `zh_CN`.
+The WordPress admin interface follows the current WordPress locale. English is the default. Approved WordPress.org language packs take priority, with the bundled Simplified Chinese translation used as a fallback when WordPress is set to `zh_CN`.
 
 Supported values include published post and page titles, content, excerpts, image alternative text, categories, tags, and selected SEO fields. Automatic translation is only scheduled for posts and pages with the `publish` status. Completed translations are stored in the `{$wpdb->prefix}hyx_bd_translations` custom database table. Existing `{$wpdb->prefix}btranslate_translations` data is migrated when the renamed plugin is activated. Front-end rendering reuses stored values and never calls the translation provider dynamically.
 

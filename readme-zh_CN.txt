@@ -14,7 +14,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 HTBD 使用百度翻译 API 翻译 WordPress 内容，并将每个翻译结果持久化保存以供重复使用。插件支持语言子目录 URL 和语言域名绑定。
 
-WordPress 后台界面会跟随当前 WordPress 语言：默认显示英文，WordPress 设为 `zh_CN` 时使用插件内置的简体中文翻译。
+WordPress 后台界面会跟随当前 WordPress 语言，默认显示英文。WordPress.org 已批准的官方语言包优先；WordPress 设为 `zh_CN` 且官方语言包不可用时，插件会回退使用内置的简体中文翻译。
 
 支持的内容包括已发布文章和页面的标题、正文、摘要、图片替代文本、分类、标签及部分 SEO 字段。插件只为 `publish` 状态的文章和页面自动安排翻译。完成的翻译保存在 `{$wpdb->prefix}hyx_bd_translations` 自建数据表中；启用改名后的插件时，已有 `{$wpdb->prefix}btranslate_translations` 数据会自动迁移。前端渲染只读取已保存的翻译，不会动态请求翻译服务。
 

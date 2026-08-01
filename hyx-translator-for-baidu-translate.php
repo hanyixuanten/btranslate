@@ -54,6 +54,6 @@ function htbd_add_plugin_row_meta( $plugin_meta, $plugin_file ) {
 	return $plugin_meta;
 }
 
-add_action( 'plugins_loaded', 'htbd_load_textdomain', 5 );
+add_action( 'init', 'htbd_load_textdomain', 0 );
 add_action( 'plugins_loaded', array( 'HTBD_Plugin', 'instance' ) );
 add_filter( 'plugin_row_meta', 'htbd_add_plugin_row_meta', 10, 2 );
