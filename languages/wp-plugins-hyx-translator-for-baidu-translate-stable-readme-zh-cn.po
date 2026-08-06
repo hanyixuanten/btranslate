@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Plugins - HTBD &#8211; hyx Translator powered by Baidu Translate - Stable Readme (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-08-01 00:00+0000\n"
+"PO-Revision-Date: 2026-08-06 00:00+0000\n"
 "Last-Translator: HTBD contributors\n"
 "Language-Team: Chinese (China)\n"
 "MIME-Version: 1.0\n"
@@ -100,8 +100,8 @@ msgid "Supported values include published post and page titles, content, excerpt
 msgstr "支持的值包括已发布文章和页面的标题、正文、摘要、图片替代文本、分类、标签及部分 SEO 字段。插件只为 <code>publish</code> 状态的文章和页面自动安排翻译。完成的翻译保存在 <code>{$wpdb-&gt;prefix}hyx_bd_translations</code> 自建数据表中；启用改名后的插件时，已有 <code>{$wpdb-&gt;prefix}btranslate_translations</code> 数据会自动迁移。前端渲染只读取已保存的值，不会动态请求翻译服务。"
 
 #. Found in description paragraph.
-msgid "The WordPress admin interface follows the current WordPress locale. English is the default, and a bundled Simplified Chinese translation is used when WordPress is set to <code>zh_CN</code>."
-msgstr "WordPress 后台界面会跟随当前 WordPress 语言：默认显示英文，WordPress 设为 <code>zh_CN</code> 时使用插件内置的简体中文翻译。"
+msgid "The WordPress admin interface follows the current WordPress locale. English is the default. Approved WordPress.org language packs take priority, with the bundled Simplified Chinese translation used as a fallback when WordPress is set to <code>zh_CN</code>."
+msgstr "WordPress 后台界面会跟随当前 WordPress 语言。默认显示英文；WordPress.org 已批准的语言包优先，WordPress 设为 <code>zh_CN</code> 时，插件内置的简体中文翻译用作后备。"
 
 #. Found in description paragraph.
 msgid "HTBD translates supported WordPress content with the Baidu Translate API and persists each translation for reuse. It supports language-specific subdirectory URLs and domain bindings."
@@ -122,6 +122,26 @@ msgstr "百度翻译 API 文档：https://fanyi-api.baidu.com/doc/23"
 #. Found in description header.
 msgid "External Services"
 msgstr "外部服务"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Improve WordPress.org localization packaging and release deployment workflows."
+msgstr "改进 WordPress.org 本地化资源打包和发布部署工作流。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Preserve target-language routing when submitting comments and following comment redirects."
+msgstr "提交评论及处理评论重定向时保留目标语言路由。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Fix Baidu Japanese routing to use the supported <code>jp</code> language code."
+msgstr "修复百度日语路由，改用受支持的 <code>jp</code> 语言代码。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Add per-language controls for translating posts, terms, and clearing persisted translations."
+msgstr "新增按语言翻译文章和分类项以及清除持久化翻译的控制项。"
 
 #. Found in changelog list item.
 #, gp-priority: low

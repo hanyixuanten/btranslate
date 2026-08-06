@@ -4,7 +4,7 @@ Homepage: https://www.vblg.top/index.php/archives/147
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.3.0
+Stable tag: 0.3.1
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -62,6 +62,13 @@ Failed posts, pages, categories, or tags appear below the progress bar on the Se
 Uninstalling removes plugin settings, scheduled tasks, and the custom translation table, including all persisted translations.
 
 == Changelog ==
+
+= 0.3.1 =
+
+* Add per-language controls for translating posts, terms, and clearing persisted translations.
+* Fix Baidu Japanese routing to use the supported `jp` language code.
+* Preserve target-language routing when submitting comments and following comment redirects.
+* Improve WordPress.org localization packaging and release deployment workflows.
 
 = 0.3.0 =
 
