@@ -11,6 +11,9 @@ class HTBD_Language_Router {
 		add_filter( 'do_parse_request', array( $this, 'strip_language_prefix' ), 1, 3 );
 		add_action( 'parse_request', array( $this, 'resolve_domain_language' ) );
 		add_filter( 'home_url', array( $this, 'localize_home_url' ), 20, 4 );
+		add_filter( 'site_url', array( $this, 'localize_comment_post_url' ), 20, 4 );
+		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_language_redirect_hosts' ) );
+		add_filter( 'comment_post_redirect', array( $this, 'localize_comment_redirect' ) );
 	}
 
 	private function redirect_admin_request_to_source() {
@@ -138,17 +141,7 @@ class HTBD_Language_Router {
 		}
 
 		if ( HTBD_Settings::is_routing_mode_enabled( 'domain' ) && $this->request_uses_domain( $language ) ) {
-			$domain = array_search( $language, (array) $settings['domain_bindings'], true );
-			$parts  = wp_parse_url( $url );
-
-			if ( false !== $domain && is_array( $parts ) && ! empty( $parts['host'] ) ) {
-				$scheme   = isset( $parts['scheme'] ) ? $parts['scheme'] : 'https';
-				$path     = $this->source_path( isset( $parts['path'] ) ? $parts['path'] : '/' );
-				$query    = isset( $parts['query'] ) ? '?' . $parts['query'] : '';
-				$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
-
-				return $scheme . '://' . $domain . $path . $query . $fragment;
-			}
+			return $this->localized_domain_url( $url, $language );
 		}
 
 		if ( ! HTBD_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
@@ -173,6 +166,103 @@ class HTBD_Language_Router {
 
 	public function localize_home_url( $url, $path, $scheme, $blog_id ) {
 		return $this->localized_url( $url );
+	}
+
+	public function localize_comment_post_url( $url, $path, $scheme, $blog_id ) {
+		if ( 'wp-comments-post.php' !== basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) ) {
+			return $url;
+		}
+
+		$language = $this->current_language();
+
+		if ( ! HTBD_Settings::is_routing_mode_enabled( 'domain' ) || ! $this->request_uses_domain( $language ) ) {
+			return $url;
+		}
+
+		return $this->localized_domain_url( $url, $language );
+	}
+
+	public function allow_language_redirect_hosts( $hosts ) {
+		if ( ! HTBD_Settings::is_routing_mode_enabled( 'domain' ) ) {
+			return $hosts;
+		}
+
+		foreach ( (array) HTBD_Settings::get()['domain_bindings'] as $domain => $language ) {
+			$domain = HTBD_Settings::normalize_domain( $domain );
+
+			if ( '' !== $domain && HTBD_Settings::is_supported_language( $language ) ) {
+				$hosts[] = $domain;
+			}
+		}
+
+		return array_values( array_unique( $hosts ) );
+	}
+
+	public function localize_comment_redirect( $location ) {
+		$referer = wp_get_raw_referer();
+
+		if ( ! is_string( $referer ) || '' === $referer ) {
+			return $location;
+		}
+
+		$language = $this->language_from_url( $referer );
+
+		if ( '' === $language ) {
+			return $location;
+		}
+
+		$referer_host = HTBD_Settings::normalize_domain( (string) wp_parse_url( $referer, PHP_URL_HOST ) );
+		$bindings     = (array) HTBD_Settings::get()['domain_bindings'];
+
+		if ( HTBD_Settings::is_routing_mode_enabled( 'domain' ) && isset( $bindings[ $referer_host ] ) ) {
+			return $this->localized_domain_url( $location, $language );
+		}
+
+		return $this->localized_url( $location, $language );
+	}
+
+	private function localized_domain_url( $url, $language ) {
+		$domain = array_search( $language, (array) HTBD_Settings::get()['domain_bindings'], true );
+		$parts  = wp_parse_url( $url );
+
+		if ( false === $domain || ! is_array( $parts ) || empty( $parts['host'] ) ) {
+			return $url;
+		}
+
+		$scheme   = isset( $parts['scheme'] ) ? $parts['scheme'] : 'https';
+		$path     = $this->source_path( isset( $parts['path'] ) ? $parts['path'] : '/' );
+		$query    = isset( $parts['query'] ) ? '?' . $parts['query'] : '';
+		$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
+
+		return $scheme . '://' . $domain . $path . $query . $fragment;
+	}
+
+	private function language_from_url( $url ) {
+		$parts = wp_parse_url( $url );
+
+		if ( ! is_array( $parts ) || empty( $parts['host'] ) ) {
+			return '';
+		}
+
+		$settings = HTBD_Settings::get();
+		$host     = HTBD_Settings::normalize_domain( $parts['host'] . ( isset( $parts['port'] ) ? ':' . $parts['port'] : '' ) );
+		$bindings = (array) $settings['domain_bindings'];
+
+		if ( HTBD_Settings::is_routing_mode_enabled( 'domain' ) && isset( $bindings[ $host ] ) && HTBD_Settings::is_supported_language( $bindings[ $host ] ) ) {
+			return sanitize_key( $bindings[ $host ] );
+		}
+
+		$home_host = HTBD_Settings::normalize_domain( (string) wp_parse_url( (string) get_option( 'home', '' ), PHP_URL_HOST ) );
+		if ( $host !== $home_host || ! HTBD_Settings::is_routing_mode_enabled( 'subdirectory' ) ) {
+			return '';
+		}
+
+		$path       = isset( $parts['path'] ) ? $parts['path'] : '/';
+		$segments   = explode( '/', $this->relative_path( $path ), 2 );
+		$language   = sanitize_key( $segments[0] );
+		$languages  = HTBD_Settings::subdirectory_languages();
+
+		return in_array( $language, $languages, true ) ? $language : '';
 	}
 
 	private function request_uses_domain( $language ) {
