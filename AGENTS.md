@@ -48,6 +48,7 @@ Unless a user explicitly requests a refresh, each translatable value must be tra
 - Plugin slug and PHP prefix: `hyx-translator-for-baidu-translate` and `htbd_`/`HTBD_`. The custom translation table is `{$wpdb->prefix}hyx_bd_translations`. The current minimum supported PHP version is 8.1 and the current minimum WordPress version is 6.4.
 - The repository has no Composer-managed development dependencies or bundled automated test suite. Validate PHP syntax with `find . -path './.git' -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 php -l`. Any future automated tests must mock WordPress API calls and must not require live credentials, external network access, or a WordPress database.
 - Document supported languages, routing modes, data retention, translation lifecycle, and known limitations in the README whenever the implementation changes.
+- Whenever any README or readme file is updated, update the corresponding PO translation file under `languages/` in the same change so the translated documentation remains synchronized.
 
 ## Release Workflow
 

@@ -30,7 +30,6 @@ build() {
 	cp "${script_dir}/${plugin_file}" \
 		"${script_dir}/uninstall.php" \
 		"${script_dir}/readme.txt" \
-		"${script_dir}/readme-zh_CN.txt" \
 		"${script_dir}/LICENSE" \
 		"${plugin_dir}/"
 	cp -R "${script_dir}/includes" "${plugin_dir}/"
@@ -49,7 +48,6 @@ build() {
 
 	unzip -p "${archive_path}" "${plugin_slug}/${plugin_file}" | grep -q '^ \* Plugin Name: HTBD - hyx Translator powered by Baidu Translate$'
 	unzip -p "${archive_path}" "${plugin_slug}/readme.txt" | grep -q "^Stable tag: ${version}$"
-	unzip -p "${archive_path}" "${plugin_slug}/readme-zh_CN.txt" | grep -q "^Stable tag: ${version}$"
 	unzip -Z1 "${archive_path}" | grep -q "^${plugin_slug}/languages/${plugin_slug}-zh_CN.mo$"
 	if unzip -Z1 "${archive_path}" | grep -q '/wp-plugins-.*\.po$'; then
 		printf 'Unexpected GlotPress submission file found in archive.\n' >&2
